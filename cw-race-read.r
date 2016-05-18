@@ -1,16 +1,19 @@
-require(TTR)
-require(data.table)
-require(dplyr)
-require(tidyr)
-require(Amelia)
+rm(list=ls())
+
+library(TTR)
+library(dplyr)
+library(tidyr)
+library(Amelia)
 
 ##############################################################
 ### Read Foster Care Entry Data - State-year panel produced from AFCARS
 ### produced with FC_AFCARS_indTOstate.r in this repository
 
-setwd("H:/")
+source("~/Dropbox/cw-race/cw-race-functions.r")
+setwd("~/Dropbox/data/fc-race")
 
-fcpanel<-read.csv("/afcars/fcstate.csv")[,-1]
+
+fcpanel<-read.csv("fcstate.csv")[,-1]
 names(fcpanel)[ncol(fcpanel)]<-"prtjail"
 fcpanel<-fcpanel[fcpanel$state!=72, ]
 fcpanel<-fcpanel[fcpanel$state!=11, ]
@@ -122,11 +125,10 @@ names(edu)<-c("year", "state", "drop", "edu.ft.emp", "edu.tot.pay")
 
 
 
-spend<-join_all(list(police, welfare, corrections, edu, total), by=c("state", "year"))
-spend<-spend[,-c(3, 6, 9, 12)]
+spend<-full_join(police, welfare, corrections, edu, total, by=c("state", "year"))
 spend<-spend[-(which(spend$state=="DC")),]
 names(spend)[2]<-"stname"
-spend<-spend[,-(which(names(spend)%in%"drop"))]
+spend<-spend[,-(grep("drop", names(spend)))]
 
 
 ### Death sentences from DPIC
@@ -136,7 +138,7 @@ d.g<-gather(death, "stname","year", 2:39)
 names(d.g)<-c("stname", "year", "death.sent")
 d.g$year<-as.numeric(substring(d.g$year,2))
 
-sp.pol<-join_all(list(spend, pol, d.g), 
+sp.pol<-full_join(spend, pol, d.g, 
 	by=c("stname", "year"))
 
 sp.pol$death.pen<-!(is.na(sp.pol$death.sent))
@@ -153,15 +155,16 @@ rpp$rpp<-rpp$rpp/100
 names(rpp)[1]<-"state"
 rp.out<-rpp[,c(1,9)]
 
-fc<-join_all(list(fcpanel, popmerge, incar, 
-	sp.pol, crime, pov), by=c("state", "year"))
+fc<-full_join(fcpanel, popmerge, incar, 
+	sp.pol, crime, pov, by=c("state", "year"))
 
-fc<-join_all(list(fc, rp.out), by="state")
+fc<-full_join(fc, rp.out, by="state")
 
 fc<-inflation(fc,money=c("SNAPBen3",
 	"AFDCBen3", "avgrent", 
 	"police.tot.pay", "cor.tot.pay", "welfare.tot.pay", "tot.tot.pay"))
 
+fc$stname<-NA
 fc<-stnames(fc)
 
 fc<-fc[fc$year!=2001,]
