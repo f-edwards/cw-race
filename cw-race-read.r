@@ -1,5 +1,6 @@
 rm(list=ls())
 
+library(plyr)
 library(TTR)
 library(dplyr)
 library(tidyr)
@@ -11,7 +12,6 @@ library(Amelia)
 
 source("~/Dropbox/cw-race/cw-race-functions.r")
 setwd("~/Dropbox/data/fc-race")
-
 
 fcpanel<-read.csv("fcstate.csv")[,-1]
 names(fcpanel)[ncol(fcpanel)]<-"prtjail"
@@ -125,7 +125,7 @@ names(edu)<-c("year", "state", "drop", "edu.ft.emp", "edu.tot.pay")
 
 
 
-spend<-full_join(police, welfare, corrections, edu, total, by=c("state", "year"))
+spend<-join_all(list(police, welfare, corrections, edu, total), by=c("state", "year"))
 spend<-spend[-(which(spend$state=="DC")),]
 names(spend)[2]<-"stname"
 spend<-spend[,-(grep("drop", names(spend)))]
@@ -138,7 +138,7 @@ d.g<-gather(death, "stname","year", 2:39)
 names(d.g)<-c("stname", "year", "death.sent")
 d.g$year<-as.numeric(substring(d.g$year,2))
 
-sp.pol<-full_join(spend, pol, d.g, 
+sp.pol<-join_all(list(d.g,spend, pol),  
 	by=c("stname", "year"))
 
 sp.pol$death.pen<-!(is.na(sp.pol$death.sent))
@@ -155,14 +155,10 @@ rpp$rpp<-rpp$rpp/100
 names(rpp)[1]<-"state"
 rp.out<-rpp[,c(1,9)]
 
-fc<-full_join(fcpanel, popmerge, incar, 
-	sp.pol, crime, pov, by=c("state", "year"))
+fc<-join_all(list(fcpanel, popmerge, incar, 
+	sp.pol, crime, pov), by=c("state", "year"))
 
-fc<-full_join(fc, rp.out, by="state")
-
-fc<-inflation(fc,money=c("SNAPBen3",
-	"AFDCBen3", "avgrent", 
-	"police.tot.pay", "cor.tot.pay", "welfare.tot.pay", "tot.tot.pay"))
+fc<-join_all(list(fc, rp.out), by="state")
 
 fc$stname<-NA
 fc<-stnames(fc)
