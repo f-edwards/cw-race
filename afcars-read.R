@@ -46,9 +46,9 @@ makeState<-function(x){
                                                                               lifelos=mean(lifelos, na.rm=TRUE),
                                                                               grp.inst=sum(curplset==4|curplset==5))
       names(out)[3:ncol(out)]<-paste(names(out)[3:ncol(out)], r[i], sep=".")
-      out[is.na(out)]<-0S
+      out[is.na(out)]<-0
       if(i==1){r.out<-out}  
-      if(i>1){r.out<-full_join(r.out, out, by="st")}
+      if(i>1){r.out<-full_join(r.out, out, by=c("st", "datayear"))}
     }
   return(r.out)
 }
@@ -70,7 +70,7 @@ makeCounty<-function(x){
     names(out)[4:ncol(out)]<-paste(names(out)[4:ncol(out)], r[i], sep=".")
     out[is.na(out)]<-0
     if(i==1){r.out<-out}  
-    if(i>1){r.out<-full_join(r.out, out, by=c("fipscode", "st"))}
+    if(i>1){r.out<-full_join(r.out, out, by=c("fipscode", "st", "datayear"))}
   }
   return(r.out)
 }
