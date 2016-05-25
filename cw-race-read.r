@@ -13,11 +13,6 @@ library(Amelia)
 source("~/Dropbox/cw-race/cw-race-functions.r")
 setwd("~/Dropbox/data/fc-race")
 
-fcpanel<-read.csv("fcstate.csv")[,-1]
-names(fcpanel)[ncol(fcpanel)]<-"prtjail"
-fcpanel<-fcpanel[fcpanel$state!=72, ]
-fcpanel<-fcpanel[fcpanel$state!=11, ]
-
 #IPUMS ACS 2000-2011 - File created using CensusTransform.r in this repository
 pop<-read.csv("popdat.csv", head=TRUE)[,-1]
 
@@ -155,13 +150,17 @@ rpp$rpp<-rpp$rpp/100
 names(rpp)[1]<-"state"
 rp.out<-rpp[,c(1,9)]
 
-fc<-join_all(list(fcpanel, popmerge, incar, 
+fc<-join_all(list(popmerge, incar, 
 	sp.pol, crime, pov), by=c("state", "year"))
 
 fc<-join_all(list(fc, rp.out), by="state")
 
 fc$stname<-NA
 fc<-stnames(fc)
+
+fc.new<-read.csv("fc-race-state.csv")
+names(fc.new)[1:2]<-c("stname", "year")
+fc<-left_join(fc.new, fc, by=c("stname", "year"))
 
 fc<-fc[fc$year!=2001,]
 fc<-fc[fc$year!=2000,]

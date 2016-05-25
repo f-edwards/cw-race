@@ -38,3 +38,35 @@ ggplot(dat2, aes(x=YEAR, y=log(foreign/tot)))+
 
 write.csv(dat2, "census-race-1880-2014.csv", col.names=TRUE, row.names=FALSE)
 
+rm(dat)
+
+dat3<-read.csv("~\usa_00036.csv")
+
+
+dat4<-dat3%>%
+  #mutate(FIPS=paste(STATEFIP, COUNTYFIPS, sep=""))%>%
+  group_by(STATEFIP, YEAR)%>%
+  summarise(tot=sum(PERWT),
+            wht=sum((RACE==1)*(HISPAN==0)*PERWT),
+            wht.child=sum((RACE==1)*(HISPAN==0)*(AGE<18)*PERWT),
+            wht.child=sum((RACE==1)*(HISPAN==0)*(AGE<18)*(POVERTY<101)*PERWT),
+            wht.lessHS=sum((RACE==1)*(HISPAN==0)*(AGE>25)*(EDUCD<62)*PERWT), ###LESS THAN GED, NO GED OR DIPLOMA
+            blk=sum((RACE==2)*PERWT),
+            blk.child=sum((RACE==2)*(AGE<18)*PERWT),
+            blk.child.pov=sum((RACE==2)*(AGE<18)*(POVERTY<101)*PERWT),
+            blk.lessHS=sum((RACE==2)*(AGE>25)*(EDUCD<62)*PERWT),
+            amind=sum((RACE==3)*PERWT),
+            amind.child=sum((RACE==3)*(AGE<18)*PERWT),
+            amind.child.pov=sum((RACE==3)*(AGE<18)*(POVERTY<101)*PERWT),
+            amind.lessHS=sum((RACE==3)*(AGE>25)*(EDUCD<62)*PERWT),
+            latino=sum(HISPAN!=c(0,9)*PERWT),
+            latino.child=sum(HISPAN!=c(0,9)*(AGE<18)*PERWT),
+            latino.child.pov=sum(HISPAN!=c(0,9)*(AGE<18)*(POVERTY<101)*PERWT),
+            latino.lessHS=sum(HISPAN!=c(0,9)*(AGE>25)*(EDUCD<62)*PERWT),
+            foreign=sum((BPL>120)*PERWT),
+            foreign.child=sum((BPL>120)*(AGE<18)*PERWT),
+            foreign.child=sum((BPL>120)*(AGE<18)*(POVERTY<101)*PERWT),
+            foreign.lessHS=sum((BPL>120)*(AGE>25)*(EDUCD<62)*PERWT)
+  )
+
+write.csv("~\Dropbox\data\fc-race\pop-race-2000-2014.csv", row.names=FALSE)
