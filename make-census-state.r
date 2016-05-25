@@ -40,7 +40,7 @@ write.csv(dat2, "census-race-1880-2014.csv", col.names=TRUE, row.names=FALSE)
 
 rm(dat)
 
-dat3<-read.csv("~\usa_00036.csv")
+dat3<-as.data.frame(fread("~/Downloads/usa_00036.csv"))
 
 
 dat4<-dat3%>%
@@ -49,7 +49,7 @@ dat4<-dat3%>%
   summarise(tot=sum(PERWT),
             wht=sum((RACE==1)*(HISPAN==0)*PERWT),
             wht.child=sum((RACE==1)*(HISPAN==0)*(AGE<18)*PERWT),
-            wht.child=sum((RACE==1)*(HISPAN==0)*(AGE<18)*(POVERTY<101)*PERWT),
+            wht.child.pov=sum((RACE==1)*(HISPAN==0)*(AGE<18)*(POVERTY<101)*PERWT),
             wht.lessHS=sum((RACE==1)*(HISPAN==0)*(AGE>25)*(EDUCD<62)*PERWT), ###LESS THAN GED, NO GED OR DIPLOMA
             blk=sum((RACE==2)*PERWT),
             blk.child=sum((RACE==2)*(AGE<18)*PERWT),
@@ -65,7 +65,7 @@ dat4<-dat3%>%
             latino.lessHS=sum(HISPAN!=c(0,9)*(AGE>25)*(EDUCD<62)*PERWT),
             foreign=sum((BPL>120)*PERWT),
             foreign.child=sum((BPL>120)*(AGE<18)*PERWT),
-            foreign.child=sum((BPL>120)*(AGE<18)*(POVERTY<101)*PERWT),
+            foreign.child.pov=sum((BPL>120)*(AGE<18)*(POVERTY<101)*PERWT),
             foreign.lessHS=sum((BPL>120)*(AGE>25)*(EDUCD<62)*PERWT)
   )
 

@@ -14,7 +14,7 @@ source("~/Dropbox/cw-race/cw-race-functions.r")
 setwd("~/Dropbox/data/fc-race")
 
 #IPUMS ACS 2000-2011 - File created using CensusTransform.r in this repository
-pop<-read.csv("popdat.csv", head=TRUE)[,-1]
+pop<-read.csv("pop-race-2000-2014.csv", head=TRUE)[,-1]
 
 ### Create three-year moving averages for 2000-2002, 2001-2003, 2002-2004, 2003-2005, 2004-2006 
 ### for comparability with 3 yr ACS for 2007 onward
@@ -164,3 +164,12 @@ fc<-left_join(fc.new, fc, by=c("stname", "year"))
 
 fc<-fc[fc$year!=2001,]
 fc<-fc[fc$year!=2000,]
+
+### CREATE VARS
+fc<-fc%>%mutate(cl.wht.pc=cl.white/wht.child, cl.blk.pc=cl.blk/blk.child, 
+                cl.amind.pc=cl.nat.am/amind.child, cl.lat.pc=cl.latino/latino.child,
+                ent.wht.pc=ent.white/wht.child, ent.blk.pc=ent.blk/blk.child,
+                ent.amind.pc=ent.nat.am/amind.child, ent.lat.pc=ent.latino/latino.child,
+                chpov.wht.pc=wht.child.pov/wht.child, chpov.blk.pc=blk.child.pov/blk.child,
+                chpov.amind.pc=amind.child.pov/amind.child, chpov.latino.pc=latino.child.pov/latino.child
+                )
