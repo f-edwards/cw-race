@@ -40,7 +40,10 @@ write.csv(dat2, "census-race-1880-2014.csv", col.names=TRUE, row.names=FALSE)
 
 rm(dat)
 
-dat3<-as.data.frame(fread("~/Downloads/usa_00036.csv"))
+colClasses=sapply(fread("H:/usa_00037.csv", nrows=100), class)
+
+
+dat3<-as.data.frame(fread("H:/usa_00037.csv", colClasses=colClasses))
 
 
 dat4<-dat3%>%
@@ -69,4 +72,4 @@ dat4<-dat3%>%
             foreign.lessHS=sum((BPL>120)*(AGE>25)*(EDUCD<62)*PERWT)
   )
 
-write.csv("~\Dropbox\data\fc-race\pop-race-2000-2014.csv", row.names=FALSE)
+write.csv(dat4, "H:/pop-race-2000-2014.csv", row.names=FALSE)
