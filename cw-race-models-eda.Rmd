@@ -1,3 +1,11 @@
+---
+title: "cw-race-models-eda"
+author: "Frank Edwards"
+date: "June 1, 2016"
+output: pdf_document
+---
+
+```{r echo=FALSE, message=FALSE}
 #########
 # These models replicate models from "Saving Children" for racial inequalities. Expanding to Nat. Am., Latino and working through separate outcomes (i.e LOS, Nplacement, placement setting, casegoal) at the individual level is the next step
 
@@ -19,8 +27,26 @@ ggplot(data=fc, aes(x=year, y=lifelos.blk))+geom_line(aes(color="black"))+
   ggtitle("Lifetime mean days in FC by race")
 
 
-fc$cl.disp<-(fc$cl.blk.pc/fc$blkchild)/(fc$cl.white/fc$whtchild)
+fc$bw.disp<-fc$cl.blk.pc/fc$cl.wht.pc
+fc$lw.disp<-fc$cl.lat.pc/fc$cl.wht.pc
+fc$ami.disp<-fc$cl.amind.pc/fc$cl.wht.pc
 
+ggplot(data=fc, aes(x=year, y=cl.blk.pc))+geom_line(aes(color="black"))+
+  geom_line(aes(y=cl.wht.pc, color="white"))+
+  geom_line(aes(y=cl.amind.pc, color="nat.am"))+
+  geom_line(aes(y=cl.lat.pc, color="latino"))+
+  xlab("Year")+ylab("Caseload per cap")+
+  ylim(0, 0.20)+
+  facet_wrap(~stname)+
+  ggtitle("")
+
+ggplot(data=fc, aes(x=year, y=bw.disp))+geom_line(aes(color="b/w"))+
+  geom_line(aes(y=lw.disp, color="l/w"))+
+  geom_line(aes(y=ami.disp, color="a/w"))+
+  xlab("Year")+ylab("Caseload per cap")+
+  ylim(0,15)+
+  facet_wrap(~stname)+
+  ggtitle("")
 
 ###listwise deletion for now, will do imputation later
 #fc.int<-amelia(fc, m=10, ts="year", cs="state", idvars=?)
@@ -115,4 +141,4 @@ whtcl.glmer<-glmer(bcl~scale(unemprt)+scale(childnot2par)+
                    data=fc.ineq,
                    family=poisson)
 
-### WRITE THIS UP SO FAR
+```

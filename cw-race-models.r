@@ -10,18 +10,35 @@ source("~/Dropbox/cw-race/cw-race-read.r")
 hist<-read.csv("~/Dropbox/data/fc-race/hist-pop.csv")
 
 ###TS PLOTS
-ggplot(data=fc, aes(x=datayear, y=lifelos.blk))+geom_line(aes(color="black"))+
+ggplot(data=fc, aes(x=year, y=lifelos.blk))+geom_line(aes(color="black"))+
   geom_line(aes(y=lifelos.white, color="white"))+
   geom_line(aes(y=lifelos.nat.am, color="nat.am"))+
   geom_line(aes(y=lifelos.latino, color="latino"))+
   xlab("Year")+ylab("Mean Lifetime Days in FC")+
-  facet_wrap(~st)+
+  facet_wrap(~stname)+
   ggtitle("Lifetime mean days in FC by race")
 
-names(new.fc)[which(names(new.fc)%in%c("datayear", "st"))]<-c("stname", "year")
 
+fc$bw.disp<-fc$cl.blk.pc/fc$cl.wht.pc
+fc$lw.disp<-fc$cl.lat.pc/fc$cl.wht.pc
+fc$ami.disp<-fc$cl.amind.pc/fc$cl.wht.pc
 
-fc$cl.disp<-(fc$bcl/fc$blkchild)/(fc$wcl/fc$whtchild)
+ggplot(data=fc, aes(x=year, y=cl.blk.pc))+geom_line(aes(color="black"))+
+  geom_line(aes(y=cl.wht.pc, color="white"))+
+  geom_line(aes(y=cl.amind.pc, color="nat.am"))+
+  geom_line(aes(y=cl.lat.pc, color="latino"))+
+  xlab("Year")+ylab("Caseload per cap")+
+  ylim(0, 0.20)+
+  facet_wrap(~stname)+
+  ggtitle("")
+
+ggplot(data=fc, aes(x=year, y=bw.disp))+geom_line(aes(color="b/w"))+
+  geom_line(aes(y=lw.disp, color="l/w"))+
+  geom_line(aes(y=ami.disp, color="a/w"))+
+  xlab("Year")+ylab("Caseload per cap")+
+  ylim(0,15)+
+  facet_wrap(~stname)+
+  ggtitle("")
 
 ###listwise deletion for now, will do imputation later
 #fc.int<-amelia(fc, m=10, ts="year", cs="state", idvars=?)

@@ -14,32 +14,11 @@ source("~/Dropbox/cw-race/cw-race-functions.r")
 setwd("~/Dropbox/data/fc-race")
 
 #IPUMS ACS 2000-2011 - File created using CensusTransform.r in this repository
-pop<-read.csv("pop-race-2000-2014.csv", head=TRUE)[,-1]
+pop<-read.csv("pop-race-2000-2014.csv", head=TRUE)
 
 ### Create three-year moving averages for 2000-2002, 2001-2003, 2002-2004, 2003-2005, 2004-2006 
 ### for comparability with 3 yr ACS for 2007 onward
 states<-unique(pop$state)
-
-temp<-pop[pop$year<2007,]
-mov.ave<-matrix(ncol=ncol(pop))
-for(s in 1:length(states)){
-	s.temp<-temp[temp$state==states[s],]
-	s.temp<-s.temp[with(s.temp, order(year)),]
-	s.ma<-matrix(nrow=7, ncol=ncol(s.temp))
-	s.ma[,1]<-s.temp$state
-	s.ma[,2]<-s.temp$year
-
-	for(c in 3:ncol(s.temp)){
-		s.ma[,c]<-SMA(s.temp[,c], 3)
-	}
-	mov.ave<-rbind(mov.ave, s.ma)
-}
-
-mov.ave<-as.data.frame(mov.ave)
-names(mov.ave)<-names(pop)
-mov.ave<-na.omit(mov.ave)
-popmerge<-rbind(pop[pop$year>2006, ], mov.ave, pop[pop$year==2000, ])
-
 
 ### Berry et al. Citizen and Govt Ideology data: https://rcfording.wordpress.com/state-ideology-data/
 ### Converted by author from .xlsx into .csv
@@ -49,7 +28,7 @@ pol<-cleanpol(ideo)
 pol$year<-pol$year+1
 
 ### NATIONAL PRISONER STATISTICS http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/34540
-incartemp<-read.delim("34540-0001-Data.tsv", head=TRUE)
+incartemp<-read.delim("36281-0001-Data.tsv", head=TRUE)
 s.inc<-incartemp$STATE
 incartemp<-incartemp[,-3]
 incartemp[incartemp<0]<-NA
@@ -59,8 +38,11 @@ incar<-(data.frame(state=incartemp$STATEID, year=incartemp$YEAR,
   incartot=incartemp$CWPRIVM+incartemp$CWPRIVF,
   new.incar=incartemp$ADTOTM+incartemp$ADTOTF))  
 
+incar<-cbind(incar, incartemp[,53:80])
+
 ### FBI UCR Data - http://www.icpsr.umich.edu/icpsrweb/ICPSR/series/57/studies?sortBy=7&archive=ICPSR&q=allocated+state&searchSource=revise
 ### Crimes reported to police
+cr12<-read.ucr("35019-0004-Data.txt", 2012)
 cr11<-read.ucr("34582-0004-Data.txt", 2011)
 cr10<-read.ucr("33523-0004-Data.txt", 2010)
 cr09<-read.ucr("30763-0004-Data.txt", 2009)
@@ -73,7 +55,7 @@ cr03<-read.ucr("04360-0004-Data.txt", 2003)
 cr02<-read.ucr("04009-0004-Data.txt", 2002)
 cr01<-read.ucr("03721-0004-Data.txt", 2001)
 cr00<-read.ucr("03451-0004-Data.txt", 2000)
-crime<-rbind(cr11,cr10,cr09,cr08, cr07, cr06, cr05, cr04, cr03, cr02, cr01, cr00)
+crime<-rbind(cr12,cr11,cr10,cr09,cr08, cr07, cr06, cr05, cr04, cr03, cr02, cr01, cr00)
 
 
 ### University of Kentucky Center for Poverty research data - http://www.ukcpr.org/data
@@ -150,7 +132,7 @@ rpp$rpp<-rpp$rpp/100
 names(rpp)[1]<-"state"
 rp.out<-rpp[,c(1,9)]
 
-fc<-join_all(list(popmerge, incar, 
+fc<-join_all(list(pop, incar, 
 	sp.pol, crime, pov), by=c("state", "year"))
 
 fc<-join_all(list(fc, rp.out), by="state")
@@ -172,4 +154,6 @@ fc<-fc%>%mutate(cl.wht.pc=cl.white/wht.child, cl.blk.pc=cl.blk/blk.child,
                 ent.amind.pc=ent.nat.am/amind.child, ent.lat.pc=ent.latino/latino.child,
                 chpov.wht.pc=wht.child.pov/wht.child, chpov.blk.pc=blk.child.pov/blk.child,
                 chpov.amind.pc=amind.child.pov/amind.child, chpov.latino.pc=latino.child.pov/latino.child
-                )
+                )%>%
+  filter(year>2006)%>%filter(stname!=("PR"))%>%filter(stname!="DC")
+

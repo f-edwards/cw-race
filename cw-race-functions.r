@@ -468,14 +468,14 @@ crimestate<-function(x){
 }
 
 read.ucr<-function(x, year){
-	if(year%in%c(2000,2001,2002,2003,2004,2005,2006,2007,2008)){
+	if(year<2009){
 	out<-read.fwf(x, widths=c(4,1,1,4,2,3,8,8,3,3,8,6,6,4,4,5,5,6,6,6,4),
 	col.names=c("STUDYNO", "EDITION", "PART", "IDNO", "FIPS_ST", "FIPS_CTY", "CPOPARST", 
 		"CPOCRIM","AG_ARRST", "AG_OFF", "COVIND", "INDEX",
 		 "MODINDX", "MURDER", "RAPE", "ROBBERY",
 		"AGASLT","BURGLRY", "LARCENY","MVTHEFT", "ARSON"))
 	}
-	if(year%in%c(2009,2010,2011)){
+	if(year>2008){
 	out<-read.fwf(x, widths=c(4,1,1,4,2,3,8,8,3,3,8,6,6,4,4,5,5,6,6,6,4),
 	col.names=c("STUDYNO", "EDITION", "PART", "IDNO", "FIPS_ST", "FIPS_CTY", "CPOPARST", 
 		"CPOCRIM","AG_ARRST", "AG_OFF", "COVIND", "VIOL","PROP",

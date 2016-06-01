@@ -66,7 +66,9 @@ dat4<-dat3%>%
             foreign=sum((BPL>120)*PERWT),
             foreign.child=sum((BPL>120)*(AGE<18)*PERWT),
             foreign.child.pov=sum((BPL>120)*(AGE<18)*(POVERTY<101)*PERWT),
-            foreign.lessHS=sum((BPL>120)*(AGE>25)*(EDUCD<62)*PERWT)
+            foreign.lessHS=sum((BPL>120)*(AGE>25)*(EDUCD<62)*PERWT),
+            child=sum((AGE<18)*PERWT),
+            child.pov=sum((AGE<18)*(POVERTY<101)*PERWT)
   )
 
 write.csv("~\Dropbox\data\fc-race\pop-race-2000-2014.csv", row.names=FALSE)
