@@ -1,5 +1,3 @@
-rm(list=ls())
-
 library(plyr)
 library(TTR)
 library(dplyr)
@@ -10,8 +8,6 @@ library(Amelia)
 ### Read Foster Care Entry Data - State-year panel produced from AFCARS
 ### produced with FC_AFCARS_indTOstate.r in this repository
 
-source("~/Dropbox/cw-race/cw-race-functions.r")
-setwd("~/Dropbox/data/fc-race")
 
 #IPUMS ACS 2000-2011 - File created using CensusTransform.r in this repository
 pop<-read.csv("pop-race-2000-2014.csv", head=TRUE)
