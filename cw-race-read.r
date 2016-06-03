@@ -15,9 +15,10 @@ pop<-read.csv("pop-race-2000-2014.csv", head=TRUE)
 ### Berry et al. Citizen and Govt Ideology data: https://rcfording.wordpress.com/state-ideology-data/
 ### Converted by author from .xlsx into .csv
 
-# ideo<-read.csv("ideo6010.csv")
-# pol<-cleanpol(ideo)
-# pol$year<-pol$year+1
+ideo<-read.csv("ideo6014.csv")
+ideo$state<-NULL
+pol<-cleanpol2(ideo)
+pol$year<-pol$year
 
 ### NATIONAL PRISONER STATISTICS http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/34540
 incartemp<-read.delim("36281-0001-Data.tsv", head=TRUE)
@@ -34,40 +35,38 @@ incar<-cbind(incar, incartemp[,53:80])
 
 ### FBI UCR Data - http://www.icpsr.umich.edu/icpsrweb/ICPSR/series/57/studies?sortBy=7&archive=ICPSR&q=allocated+state&searchSource=revise
 ### Crimes reported to police
-cr12<-read.ucr("35019-0004-Data.txt", 2012)
-cr11<-read.ucr("34582-0004-Data.txt", 2011)
-cr10<-read.ucr("33523-0004-Data.txt", 2010)
-cr09<-read.ucr("30763-0004-Data.txt", 2009)
-cr08<-read.ucr("27644-0004-Data.txt", 2008)
-cr07<-read.ucr("25114-0004-Data.txt", 2007)
-cr06<-read.ucr("23780-0004-Data.txt", 2006)
-cr05<-read.ucr("04717-0004-Data.txt", 2005)
-cr04<-read.ucr("04466-0004-Data.txt", 2004)
-cr03<-read.ucr("04360-0004-Data.txt", 2003)
-cr02<-read.ucr("04009-0004-Data.txt", 2002)
-cr01<-read.ucr("03721-0004-Data.txt", 2001)
-cr00<-read.ucr("03451-0004-Data.txt", 2000)
-crime<-rbind(cr12,cr11,cr10,cr09,cr08, cr07, cr06, cr05, cr04, cr03, cr02, cr01, cr00)
+# cr12<-read.ucr("35019-0004-Data.txt", 2012)
+# cr11<-read.ucr("34582-0004-Data.txt", 2011)
+# cr10<-read.ucr("33523-0004-Data.txt", 2010)
+# cr09<-read.ucr("30763-0004-Data.txt", 2009)
+# cr08<-read.ucr("27644-0004-Data.txt", 2008)
+# cr07<-read.ucr("25114-0004-Data.txt", 2007)
+# cr06<-read.ucr("23780-0004-Data.txt", 2006)
+# cr05<-read.ucr("04717-0004-Data.txt", 2005)
+# cr04<-read.ucr("04466-0004-Data.txt", 2004)
+# cr03<-read.ucr("04360-0004-Data.txt", 2003)
+# cr02<-read.ucr("04009-0004-Data.txt", 2002)
+# cr01<-read.ucr("03721-0004-Data.txt", 2001)
+# cr00<-read.ucr("03451-0004-Data.txt", 2000)
+# crime<-rbind(cr12,cr11,cr10,cr09,cr08, cr07, cr06, cr05, cr04, cr03, cr02, cr01, cr00)
 
 
-# ### University of Kentucky Center for Poverty research data - http://www.ukcpr.org/data
-# pov<-read.csv("UKCPR_National_Welfare_Data_Set_090814.csv", na.strings=c("-", ""))
-# pov<-pov[pov$year>1999,]
-# names(pov)[1]<-"stname"
-# keeps<-c("state","year","AFDC.TANF.Recipients", "Food.Stamp.SNAP.Recipients", "AFDC.TANF.Benefit.for.3.person.family",
-# 	"FS.SNAP.Benefit.for.3.person.family", "AFDC.TANF_FS.3.Person.Benefit", "Total.SSI",
-# 	"NSLP.Total.Participation", "SBP.Total.Participation", "WIC.participation",
-# 	"Number.of.Poor..thousands.", "Food.Insecure", 
-# 	"Gross.State.Product",
-# 	"Medicaid.beneficiaries", "State.EITC.Rate")
-# pov<-cleanpol(pov)
-# 
-# pov<-pov[,names(pov)%in%keeps]
-# 
-# names(pov)<-c("state" ,"year","food.insec", "GSP", "AFDCRec", "SNAPRec", "AFDCBen3",
-# 	"SNAPBen3", "AFDCFS3Ben", "Total.SSI", "npoor", "eitc.st","medicaidrec",
-# 	 "WIC.par", "NSLP.Total", "SBP.Total")
-# pov$food.insec<-pov$food.insec/100 ## rescale to [0,1]
+### University of Kentucky Center for Poverty research data - http://www.ukcpr.org/data
+pov<-read.csv("UKCPR_National_Welfare_Data_01202016_0.csv", na.strings=c("-", ""))
+names(pov)[1]<-"stname"
+keeps<-c("stname","year","AFDC.TANF.Recipients", "Food.Stamp.SNAP.Recipients", "AFDC.TANF.Benefit.for.3.person.family",
+	"FS.SNAP.Benefit.for.3.person.family", "AFDC.TANF_FS.3.Person.Benefit", "Total.SSI",
+	"NSLP.Total.Participation", "SBP.Total.Participation", "WIC.participation",
+	"Number.of.Poor..thousands.", "Food.Insecure",
+	"Gross.State.Product",
+	"Medicaid.beneficiaries", "State.EITC.Rate")
+
+pov<-pov[,names(pov)%in%keeps]
+
+names(pov)<-c("stname" ,"year","food.insec", "GSP", "AFDCRec", "SNAPRec", "AFDCBen3",
+	"SNAPBen3", "AFDCFS3Ben", "Total.SSI", "npoor", "eitc.st","medicaidrec",
+	 "WIC.par", "NSLP.Total", "SBP.Total")
+pov$food.insec<-pov$food.insec/100 ## rescale to [0,1]
 
 #### State and local govt employment data from Annual Survey of Public Employment and Payroll 
 ### https://www.census.gov//govs/apes/
@@ -126,8 +125,7 @@ crime<-rbind(cr12,cr11,cr10,cr09,cr08, cr07, cr06, cr05, cr04, cr03, cr02, cr01,
 
 names(pop)[1:2]<-c("state", "year")
 
-fc<-join_all(list(pop, incar, 
-	 crime), by=c("state", "year"))
+fc<-join_all(list(pop, incar), by=c("state", "year"))
 
 fc$stname<-NA
 fc<-stnames(fc)
@@ -135,7 +133,8 @@ fc<-stnames(fc)
 fc.new<-read.csv("fc-race-state.csv")
 names(fc.new)[1:2]<-c("stname", "year")
 fc<-left_join(fc.new, fc, by=c("stname", "year"))
-
+fc<-left_join(fc, pov, by=c("stname", "year"))
+fc<-left_join(fc, pol, by=c("state", "year"))
 
 ### CREATE VARS
 fc<-fc%>%mutate(cl.wht.pc=cl.white/wht.child, cl.blk.pc=cl.blk/blk.child, 

@@ -5,9 +5,7 @@ date: "June 1, 2016"
 output: pdf_document
 ---
 
-INSERT WRITE UP HERE
-
-```{r echo=FALSE, message=FALSE, fig.width=7, fig.height=9, results="asis"}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis"}
 #########
 # These models replicate models from "Saving Children" for racial inequalities. Expanding to Nat. Am., Latino and working through separate outcomes (i.e LOS, Nplacement, placement setting, casegoal) at the individual level is the next step
 
@@ -17,12 +15,13 @@ library(Amelia)
 library(ggplot2)
 library(texreg)
 
-setwd("C:/Users/Kilgore/Dropbox/cw-race/data/")
-source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-functions.r")
-source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-read.r")
- 
-# source("~/Dropbox/cw-race/cw-race-functions.r")
-# source("~/Dropbox/cw-race/cw-race-read.r")
+# setwd("C:/Users/Kilgore/Dropbox/cw-race/data/")
+# source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-functions.r")
+# source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-read.r")
+
+setwd("~/Dropbox/cw-race/data/")
+source("~/Dropbox/cw-race/cw-race-functions.r")
+source("~/Dropbox/cw-race/cw-race-read.r")
 
 hist<-read.csv("hist-pop.csv")
 
@@ -37,9 +36,13 @@ bs<-read.csv("boardingschool.csv")
 ### SAVING CHILDREN VARS
 fc<-fc%>%mutate(obs=1:nrow(fc), 
  chpovrt=child.pov/child, 
- crime.pc=crime/tot,
  pctblk=blk/tot,
+ pctlat=latino/tot,
+ pctami=amind/tot,
  incarrt=(TOTRACEM+TOTRACEF)/adult,
+ b.incarrt=(BLACKM+BLACKF)/blk,
+ l.incarrt=(HISPM+HISPF)/latino,
+ a.incarrt=(AIANM+AIANF)/amind,
  bdisp.chpov=(blk.child.pov/blk.child)/(wht.child.pov/wht.child),
  year.c=year-2007
  )
@@ -75,6 +78,8 @@ ggplot(data=fc, aes(x=year, y=bw.disp))+geom_line(aes(color="b/w"))+
   facet_wrap(~stname)+
   ggtitle("Blk, Lat., Am. Ind./White caseload disproportion")
 
+ggplot(data=fc, aes(x=b.incarrt, y=bw.disp))+geom_point()+facet_wrap(~stname)
+
 disp.lmer<-lmer(log(bw.disp)~scale(chpovrt)+scale(incarrt)+
         scale(bdisp.chpov)+
         scale(pop.imm.1910)+
@@ -84,15 +89,60 @@ disp.lmer<-lmer(log(bw.disp)~scale(chpovrt)+scale(incarrt)+
         (1+year.c|stname), 
         data=fc.ineq)
 
-texreg(disp.lmer, caption="Outcome: log(B/W FC caseload per cap), state intercepts, state|year slopes")
+disp.reg.lmer<-lmer(log(bw.disp)~scale(chpovrt)+scale(incarrt)+
+        scale(bdisp.chpov)+scale(b.incarrt)+
+        scale(pop.imm.1910)+
+        scale(pop.blk.1910)+scale(pctblk)+
+        bs.true+
+        year.c+
+        (1+year.c|stname), 
+        data=fc.ineq)
 
-b.glmer<-glmer(cl.blk~scale(chpovrt)+scale(incarrt)+
+texreg(list(disp.lmer,disp.reg.lmer), caption="Outcome: log(B/W FC caseload per cap), state intercepts, state|year slopes")
+
+b.glmer<-glmer(cl.blk~scale(chpovrt)+scale(incarrt)+scale(b.incarrt)+
         scale(bdisp.chpov)+
         scale(pop.imm.1910)+
         scale(pop.blk.1910)+scale(pctblk)+
         bs.true+
         year.c+
-        (1+year.c|stname) + (1|obs), family=poisson, offset=log(blk.child),
+        (1|stname) + (1|obs), family=poisson, offset=log(blk.child),
+        data=fc.ineq)
+
+b.ineq.glmer<-glmer(cl.blk~scale(b.incarrt)+
+        scale(chpov.blk.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        bs.true+
+        scale(pctblk)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(blk.child),
+        data=fc.ineq)
+
+l.ineq.glmer<-glmer(cl.latino~scale(l.incarrt)+
+        scale(chpov.latino.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        bs.true+
+        scale(pctlat)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(latino.child),
+        data=fc.ineq)
+
+a.ineq.glmer<-glmer(cl.nat.am~scale(a.incarrt)+
+        scale(chpov.amind.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        bs.true+
+        scale(pctami)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(amind.child),
         data=fc.ineq)
 
 texreg(b.glmer, caption="Outcome: Black FC caseload (count), state intercepts, state|year slopes")
