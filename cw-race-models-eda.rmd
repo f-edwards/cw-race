@@ -1,0 +1,150 @@
+---
+title: "cw-race-models-eda"
+author: "Frank Edwards"
+date: "June 1, 2016"
+output: html_document
+---
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis", cache=TRUE}
+#########
+# These models replicate models from "Saving Children" for racial inequalities. Expanding to Nat. Am., Latino and working through separate outcomes (i.e LOS, Nplacement, placement setting, casegoal) at the individual level is the next step
+
+
+library(lme4)
+library(Amelia)
+library(ggplot2)
+library(texreg)
+
+# setwd("C:/Users/Kilgore/Dropbox/cw-race/data/")
+# source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-functions.r")
+# source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-read.r")
+
+setwd("C:/Users/frank/Dropbox/cw-race/data/")
+source("C:/Users/frank/Dropbox/cw-race/cw-race-functions.r")
+source("C:/Users/frank/Dropbox/cw-race/cw-race-read.r")
+
+hist<-read.csv("hist-pop.csv")
+
+fc$bw.disp<-fc$cl.blk.pc/fc$cl.wht.pc
+fc$lw.disp<-fc$cl.lat.pc/fc$cl.wht.pc
+fc$ami.disp<-fc$cl.amind.pc/fc$cl.wht.pc
+
+### BOARDING SCHOOL DATA
+### FROM http://www.archives.gov/research/native-americans/bia-guide/schools.html
+bs<-read.csv("boardingschool.csv")
+
+### SAVING CHILDREN VARS
+fc<-fc%>%mutate(obs=1:nrow(fc), 
+ chpovrt=child.pov/child, 
+ pctblk=blk/tot,
+ pctlat=latino/tot,
+ pctami=amind/tot,
+ incarrt=(TOTRACEM+TOTRACEF)/adult,
+ b.incarrt=(BLACKM+BLACKF)/blk,
+ l.incarrt=(HISPM+HISPF)/latino,
+ a.incarrt=(AIANM+AIANF)/amind,
+ bdisp.chpov=(blk.child.pov/blk.child)/(wht.child.pov/wht.child),
+ year.c=year-2007
+ )
+
+fc.ineq<-left_join(fc, hist, by="state")
+fc.ineq<-left_join(fc.ineq, bs, by="stname")
+fc.ineq$bs.true<-fc.ineq$boarding.n>0
+
+###TS PLOTS
+# ggplot(data=fc, aes(x=year, y=lifelos.blk))+geom_line(aes(color="black"))+
+#   geom_line(aes(y=lifelos.white, color="white"))+
+#   geom_line(aes(y=lifelos.nat.am, color="nat.am"))+
+#   geom_line(aes(y=lifelos.latino, color="latino"))+
+#   xlab("Year")+ylab("Mean Lifetime Days in FC")+
+#   facet_wrap(~stname)+
+#   ggtitle("Lifetime mean days in FC by race and state")
+
+ggplot(data=fc, aes(x=year, y=cl.blk.pc))+geom_line(aes(color="black"))+
+  geom_line(aes(y=cl.wht.pc, color="white"))+
+  geom_line(aes(y=cl.amind.pc, color="nat.am"))+
+  geom_line(aes(y=cl.lat.pc, color="latino"))+
+  xlab("Year")+ylab("Caseload per cap")+
+  ylim(0, 0.20)+
+  scale_x_continuous(breaks=c(2007,2012))+
+  facet_wrap(~stname)+
+  ggtitle("Foster care caseloads per capita by race and state")
+
+ggplot(data=fc, aes(x=year, y=bw.disp))+geom_line(aes(color="b/w"))+
+  geom_line(aes(y=lw.disp, color="l/w"))+
+  geom_line(aes(y=ami.disp, color="a/w"))+
+  xlab("Year")+ylab("Caseload disproportion")+
+  ylim(0,15)+
+  facet_wrap(~stname)+
+  ggtitle("Blk, Lat., Am. Ind./White caseload disproportion")
+
+ggplot(data=fc, aes(x=b.incarrt, y=bw.disp))+geom_point()+facet_wrap(~stname)
+
+disp.lmer<-lmer(log(bw.disp)~scale(chpovrt)+scale(incarrt)+
+        scale(bdisp.chpov)+
+        scale(pop.imm.1910)+
+        scale(pop.blk.1910)+scale(pctblk)+
+        bs.true+
+        year.c+
+        (1+year.c|stname), 
+        data=fc.ineq)
+
+disp.reg.lmer<-lmer(log(bw.disp)~scale(chpovrt)+scale(incarrt)+
+        scale(bdisp.chpov)+scale(b.incarrt)+
+        scale(pop.imm.1910)+
+        scale(pop.blk.1910)+scale(pctblk)+
+        bs.true+
+        year.c+
+        (1+year.c|stname), 
+        data=fc.ineq)
+
+htmlreg(list(disp.lmer,disp.reg.lmer), caption="Outcome: log(B/W FC caseload per cap), state intercepts, state|year slopes")
+
+b.glmer<-glmer(cl.blk~scale(chpovrt)+scale(incarrt)+scale(b.incarrt)+
+        scale(bdisp.chpov)+
+        scale(pop.imm.1910)+
+        scale(pop.blk.1910)+scale(pctblk)+
+        bs.true+
+        year.c+
+        (1|stname) + (1|obs), family=poisson, offset=log(blk.child),
+        data=fc.ineq)
+
+b.ineq.glmer<-glmer(cl.blk~scale(b.incarrt)+
+        scale(chpov.blk.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        bs.true+
+        scale(pctblk)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(blk.child),
+        data=fc.ineq)
+
+l.ineq.glmer<-glmer(cl.latino~scale(l.incarrt)+
+        scale(chpov.latino.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        bs.true+
+        scale(pctlat)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(latino.child),
+        data=fc.ineq)
+
+a.ineq.glmer<-glmer(cl.nat.am~scale(a.incarrt)+
+        scale(chpov.amind.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        bs.true+
+        scale(pctami)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(amind.child),
+        data=fc.ineq)
+
+htmlreg(list(b.ineq.glmer, l.ineq.glmer, a.ineq.glmer), caption="Caseloads by race, state intercepts, state|year slopes")
+
+```
