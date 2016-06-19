@@ -1,0 +1,254 @@
+---
+title: "Race and child welfare: bias across policy domains"
+author: "Frank Edwards"
+date: "June 1, 2016"
+output: html_document
+---
+
+#Introduction
+
+Racial inequalities in foster care are not merely a function of child maltreatment. Many have argued that inequality in child welfare outcomes across racial groups is likely a function of statistical selection, rather than biased decision-making among child welfare officials. However, child welfare agencies are only one potential source of structural racism that might bias child welfare agencies toward higher levels of intervention with families of color. We are unlikely to explain racial inequality in child welfare outcomes if we restrict our anlaysis of official bias to child welfare agencies alone. 
+It is well known that racial inequalities in criminal justice contact and incarceration are partially explained by racially biased policing, racially biased criminal justice decision making, and deep structural inequalities between groups. 
+
+It is also well established that state-level welfare policy making and case-level welfare decision making are affected by racial politics and racial bias. 
+
+Even if disproportionate exposure to material risk factors for child maltreatment completely explained racial inequality in foster care outcomes, these inequalities are endogenous to social policy. 
+
+However, it is unlikely that exposure to material risk factors alone explains inequality in child welfare system outcomes. A maltreatment report or a child's entry into foster care are the products of an elaborate chain of state action. 
+
+This paper evaluates the extent to which racial inequalities in child welfare outcomes are explained by the racial character of a state's system of social policy. 
+
+**Hypothesis 1:** racial inequalities in child welfare outcomes will be positively associated with racial inequalities in criminal justice outcomes at the state-level.
+
+**Hypothesis 2:** racial inequalities in child welfare outcomes will be positively associated with racial inequalities in welfare state accessibility and generosity. 
+
+#Analytic strategy
+
+States vary tremendously in levels of inequality in their child welfare systems. I exploit this variation to evaluate whether racialization of social policy helps to explain variation in racial and ethnic inequality in child welfare case outcomes. 
+
+I suggest that racial inequality in state social policy in criminal justice and social welfare programs predicts racial inequality in child welfare case outcomes. Three potential mechanisms may explain an observed association:
+
+1. **Systematic discrimination:** Unequal outcomes in one policy domain indicate a political culture of racial bias. In this case, the association between racial inequality in child welfare outcomes and racial inequality in another policy domain is SPURIOUS with a latent (unobserved) difference in racial politics across states. This difference in the racial politics of social policy may lead families of color to heightened surveilance and biased decision making in street-level bureaucracies.
+
+2. **Structural inequality:** Social policy affects the risk of child maltreatment. Incarceration and criminal justice contact are causally related to foster care entry, and have a series of collateral consequences that are very likely to affect the incidence of child maltreatment. Similarly, welfare programs clearly affect the incidence of child maltreatment. The ease with which families of color can access benefits and the value of those benefits will affect the likelihood of child abuse and neglect within those families. The racial politics of social policy may have a direct relationship to racial inequality in child welfare outcomes through their affects on structural racial inequality. 
+
+3. **Selection:** Some unmeasured feature associated with group membership may simulataneously cause increased exposure to multiple forms of state intervention or support. These selection processes are likely correlated with social disadvantage. The inclusion of group-specific measures of social disadvantage are an attempt to minimize the influence of selection in observed relationships, but cannot eliminate the possibility of selection influencing the results. 
+
+##Data and Measures
+
+I join a series of administrative, demographic, and political datasets to construct a state-year panel for the years 2007 - 2014 (N=350). 
+
+AFCARS
+ACS
+NATL PRISONER STATS
+FORDING DATA
+AREA HEALTH FILE?
+
+##Statistical models
+
+Given the hierarchical structure of these data (repeated observations of individual state unites over time), I use (TWO OR THREE - INDIVIDUAL LEVEL NCANDS?) multilevel modeling strategies. First, I construct multilevel count models of foster care caseloads by state with state intercepts and year by state slopes. Second, I construct multilevel linear models for ratios of racial disproportionality in foster care caseloads by state with state intercepts and year by state slopes. 
+
+Racialized social policy is likely to be a relatively stable feature of a state, but may be subject to short-term shocks or long-term trends. This multilevel strategy adusts for both time-invariant and time-varying differences across states on model outcomes that are not explained by included predictors. These models preserve the ability to make inferences on the relationships between predictors and outcomes both between and within states. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis"}
+#########
+# These models replicate models from "Saving Children" for racial inequalities. Expanding to Nat. Am., Latino and working through separate outcomes (i.e LOS, Nplacement, placement setting, casegoal) at the individual level is the next step
+
+library(lme4)
+library(Amelia)
+library(ggplot2)
+library(texreg)
+
+# setwd("C:/Users/Kilgore/Dropbox/cw-race/data/")
+# source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-functions.r")
+# source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-read.r")
+
+setwd("C:/Users/frank/Dropbox/cw-race/data/")
+source("C:/Users/frank/Dropbox/cw-race/cw-race-functions.r")
+source("C:/Users/frank/Dropbox/cw-race/cw-race-read.r")
+
+fc$bw.disp<-fc$cl.blk.pc/fc$cl.wht.pc
+fc$lw.disp<-fc$cl.lat.pc/fc$cl.wht.pc
+fc$ami.disp<-fc$cl.amind.pc/fc$cl.wht.pc
+
+### BOARDING SCHOOL DATA
+### FROM http://www.archives.gov/research/native-americans/bia-guide/schools.html
+### SAVING CHILDREN VARS
+fc<-fc%>%mutate(obs=1:nrow(fc), 
+ chpovrt=child.pov/child, 
+ pctblk=blk/tot,
+ pctlat=latino/tot,
+ pctami=amind/tot,
+ incarrt=ifelse(TOTRACEM>0, (TOTRACEM+TOTRACEF)/adult, NA),
+ b.incarrt=ifelse(BLACKM>0, (BLACKM+BLACKF)/blk, NA),
+ l.incarrt=ifelse(HISPM>0, (HISPM+HISPF)/latino,NA),
+ a.incarrt=ifelse(AIANM>0, (AIANM+AIANF)/amind,NA),
+ w.incarrt=ifelse(WHITEM>0, (WHITEM+WHITEF)/wht,NA),
+ b.incardisp=ifelse(BLACKM>0, b.incarrt/w.incarrt,NA),
+ l.incardisp=ifelse(HISPM>0, l.incarrt/w.incarrt,NA),
+ a.incardisp=ifelse(AIANM>0, a.incarrt/w.incarrt,NA),
+ bdisp.chpov=(blk.child.pov/blk.child)/(wht.child.pov/wht.child),
+ ldisp.chpov=(chpov.latino.pc/chpov.wht.pc),
+ adisp.chpov=(chpov.amind.pc/chpov.wht.pc),
+ year.c=year-2007
+ )
+
+fc.ineq<-fc
+
+### SOME MISSING INCARCERATION DATA REPORTED AS 0 - AK in 2013
+
+###TS PLOTS
+# ggplot(data=fc, aes(x=year, y=lifelos.blk))+geom_line(aes(color="black"))+
+#   geom_line(aes(y=lifelos.white, color="white"))+
+#   geom_line(aes(y=lifelos.nat.am, color="nat.am"))+
+#   geom_line(aes(y=lifelos.latino, color="latino"))+
+#   xlab("Year")+ylab("Mean Lifetime Days in FC")+
+#   facet_wrap(~stname)+
+#   ggtitle("Lifetime mean days in FC by race and state")
+
+race.pc.ts<-ggplot(data=fc, aes(x=year, y=cl.blk.pc))+geom_line(aes(color="black"))+
+  geom_line(aes(y=cl.wht.pc, color="white"))+
+  geom_line(aes(y=cl.amind.pc, color="nat.am"))+
+  geom_line(aes(y=cl.lat.pc, color="latino"))+
+  xlab("Year")+ylab("Caseload per cap")+
+  ylim(0, 0.20)+
+  scale_x_continuous(breaks=c(2007,2012))+
+  facet_wrap(~stname)+
+  ggtitle("Foster care caseloads per capita by race and state")
+
+dist.ts<-ggplot(data=fc, aes(x=year, y=bw.disp))+geom_line(aes(color="b/w"))+
+  geom_line(aes(y=lw.disp, color="l/w"))+
+  geom_line(aes(y=ami.disp, color="a/w"))+
+  xlab("Year")+ylab("Caseload disproportion")+
+  ylim(0,15)+
+  facet_wrap(~stname)+
+  ggtitle("Blk, Lat., Am. Ind./White caseload disproportion")
+
+incar.disp<-ggplot(data=fc, aes(x=b.incarrt, y=bw.disp))+geom_point()+facet_wrap(~stname)
+```
+
+These are count models for each group. Performing relatively well. Goal is to show that social policy affects FC by race.
+
+To do 
+
+- Add ICE measures, detentions / deportations by state
+- Set up disproportion as outcome for models
+- write the thing. Look at Eckenrode, Fluke, Drake as examples
+- Check pediatrics style guide
+
+##Findings 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis"}
+
+### HAWAII COUNTS AMIND DIFFERENTLY IN AFCARS / CENSUS. MAYBE NATIVE HAWAIIAN ARE INCLUDED IN AFCARS, NOT CENSUS COUNTS? DROPPING FOR NOW
+###MI
+###select vars to include
+fc.ineq<-fc.ineq%>%
+  select(cl.blk, b.incarrt, chpov.blk.pc, chpovrt,
+         incarrt, eitc.st, medicaidrec, child.pov, 
+         SNAPRec, inst6014_nom, year.c, pctblk, stname, obs, 
+         blk.child, cl.latino, l.incarrt, 
+         chpov.latino.pc, pctlat, latino.child, cl.nat.am, 
+         a.incarrt, chpov.amind.pc, amind.child, pctami,
+         w.incarrt, b.incardisp, l.incardisp, a.incardisp, 
+         bdisp.chpov, ldisp.chpov, adisp.chpov, bw.disp, 
+         lw.disp, ami.disp)%>%
+  filter(stname!="HI")
+
+bounds<-cbind(1:ncol(fc.ineq),
+              c(rep(0, ncol(fc.ineq)-3), rep(0.01,3)),
+              rep(Inf, ncol(fc.ineq)))
+              
+              
+
+fc.imp<-amelia(fc.ineq,
+         m=max(apply(fc.ineq, 2, function(x){sum(is.na(x))})),
+         ts="year.c", cs="stname", polytime=1, bounds=bounds)
+
+
+```
+### CONSTRUCT WELFARE INEQUALITY MEASURES TO INCLUDE (ON SERVER)
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis"}
+b.ineq.glmer<-glmer(cl.blk~-1+scale(b.incarrt)+
+        scale(chpov.blk.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        scale(pctblk)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(blk.child),
+      data=fc.imp$imputations[[1]])
+
+###WANT ICE DETENTION / DEPORTATION DATA BY STATE
+l.ineq.glmer<-glmer(cl.latino~-1+scale(l.incarrt)+
+        scale(chpov.latino.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        scale(pctlat)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(latino.child),
+        data=fc.imp$imputations[[1]])
+
+a.ineq.glmer<-glmer(cl.nat.am~-1+scale(a.incarrt)+
+        scale(chpov.amind.pc)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        scale(pctami)+
+        (year.c|stname) + (1|obs), family=poisson, offset=log(amind.child),
+        data=fc.imp$imputations[[1]])
+
+htmlreg(list(b.ineq.glmer, l.ineq.glmer, a.ineq.glmer), caption="Caseloads by race, state intercepts, state|year slopes")
+
+## Disproportion models
+b.disp<-lmer(log(bw.disp)~-1+scale(b.incardisp)+
+        scale(bdisp.chpov)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        scale(pctblk)+scale(pctami)+scale(pctlat)+
+        (year.c|stname),
+        data=fc.imp$imputations[[1]])
+
+a.disp<-lmer(log(ami.disp)~-1+scale(a.incardisp)+
+        scale(adisp.chpov)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        scale(pctami)+
+        (year.c|stname),
+        data=fc.imp$imputations[[1]])
+
+l.disp<-lmer(log(lw.disp)~-1+scale(l.incardisp)+
+        scale(ldisp.chpov)+
+        scale(chpovrt)+scale(incarrt)+
+        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
+        +scale(I(SNAPRec/child.pov))+
+        scale(inst6014_nom)+
+        year.c+
+        scale(pctlat)+
+        (year.c|stname),
+        data=fc.imp$imputations[[1]])
+
+
+htmlreg(list(b.disp, l.disp, a.disp), caption="Caseloads by race, state intercepts, state|year slopes")
+
+```
+
+DO NCANDS MODELS
+
+DOES PROPENSITY MODEL HELP WITH SELECTION? COULD WE DO SOME KIND OF RANDOMIZATION?
+
+#Discussion
+
+Racism is the explanation - either systematic bias or structural racism is a likely cause of racial inequality in child welfare case outcomes. 
