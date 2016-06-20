@@ -42,10 +42,9 @@ rm(dat)
 
 colClasses=sapply(fread("H:/usa_00037.csv", nrows=100), class)
 dat3<-as.data.frame(fread("H:/usa_00037.csv", colClasses=colClasses))
-
+dat3[dat3$INCWELFR==99999,"INCWELFR"]<-0
 
 dat4<-dat3%>%
-  #mutate(FIPS=paste(STATEFIP, COUNTYFIPS, sep=""))%>%
   group_by(STATEFIP, YEAR)%>%
   summarise(tot=sum(PERWT),
             wht=sum((RACE==1)*(HISPAN==0)*PERWT),
@@ -70,7 +69,16 @@ dat4<-dat3%>%
             foreign.lessHS=sum((BPL>120)*(AGE>25)*(EDUCD<62)*PERWT),
             child=sum((AGE<18)*PERWT),
             child.pov=sum((AGE<18)*(POVERTY<101)*PERWT),
-            adult=sum((AGE>17)*PERWT)
+            adult=sum((AGE>17)*PERWT),
+            welf=sum((INCWELFR>0)*PERWT),
+            wht.welf=sum((RACE==1)*(HISPAN==0)*(INCWELFR>0)*PERWT),
+            blk.welf=sum((RACE==2)*(INCWELFR>0)*PERWT),
+            latino.welf=sum(HISPAN!=c(0,9)*PERWT*(INCWELFR>0)),
+            amind.welf=sum((RACE==3)*PERWT*(INCWELFR>0)),
+            wht.snap=sum((RACE==1)*(HISPAN==0)*(FOODSTMP==2)*PERWT),
+            blk.snap=sum((RACE==2)*(FOODSTMP==2)*PERWT),
+            latino.snap=sum(HISPAN!=c(0,9)*PERWT*(FOODSTMP==2)),
+            amind.snap=sum((RACE==3)*PERWT*(FOODSTMP==2))
   )
 
 write.csv(dat4, "H:/pop-race-2000-2014.csv", row.names=FALSE)

@@ -58,14 +58,15 @@ library(lme4)
 library(Amelia)
 library(ggplot2)
 library(texreg)
+library(dplyr)
 
 # setwd("C:/Users/Kilgore/Dropbox/cw-race/data/")
 # source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-functions.r")
 # source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-read.r")
 
-setwd("C:/Users/frank/Dropbox/cw-race/data/")
-source("C:/Users/frank/Dropbox/cw-race/cw-race-functions.r")
-source("C:/Users/frank/Dropbox/cw-race/cw-race-read.r")
+setwd("H:/cw-race/data/")
+source("H:/cw-race/cw-race-functions.r")
+source("H:/cw-race/cw-race-read.r")
 
 fc$bw.disp<-fc$cl.blk.pc/fc$cl.wht.pc
 fc$lw.disp<-fc$cl.lat.pc/fc$cl.wht.pc
@@ -90,6 +91,14 @@ fc<-fc%>%mutate(obs=1:nrow(fc),
  bdisp.chpov=(blk.child.pov/blk.child)/(wht.child.pov/wht.child),
  ldisp.chpov=(chpov.latino.pc/chpov.wht.pc),
  adisp.chpov=(chpov.amind.pc/chpov.wht.pc),
+ b.welf.incl=blk.welf/blk.child.pov,
+ l.welf.incl=latino.welf/latino.child.pov,
+ a.welf.incl=amind.welf/amind.child.pov,
+ w.welf.incl=wht.welf/wht.child.pov,
+ b.snap.incl=blk.snap/blk.child.pov,
+ l.snap.incl=latino.snap/latino.child.pov,
+ a.snap.incl=amind.snap/amind.child.pov,
+ w.snap.incl=wht.snap/wht.child.pov,
  year.c=year-2007
  )
 
@@ -143,6 +152,7 @@ To do
 ### HAWAII COUNTS AMIND DIFFERENTLY IN AFCARS / CENSUS. MAYBE NATIVE HAWAIIAN ARE INCLUDED IN AFCARS, NOT CENSUS COUNTS? DROPPING FOR NOW
 ###MI
 ###select vars to include
+
 fc.ineq<-fc.ineq%>%
   select(cl.blk, b.incarrt, chpov.blk.pc, chpovrt,
          incarrt, eitc.st, medicaidrec, child.pov, 
@@ -152,11 +162,12 @@ fc.ineq<-fc.ineq%>%
          a.incarrt, chpov.amind.pc, amind.child, pctami,
          w.incarrt, b.incardisp, l.incardisp, a.incardisp, 
          bdisp.chpov, ldisp.chpov, adisp.chpov, bw.disp, 
-         lw.disp, ami.disp)%>%
+         lw.disp, ami.disp, b.welf.incl, a.welf.incl, l.welf.incl, 
+         w.welf.incl, a.snap.incl, b.snap.incl, l.snap.incl, w.snap.incl)%>%
   filter(stname!="HI")
 
 bounds<-cbind(1:ncol(fc.ineq),
-              c(rep(0, ncol(fc.ineq)-3), rep(0.01,3)),
+              rep(0.01, ncol(fc.ineq)),
               rep(Inf, ncol(fc.ineq)))
               
               
@@ -165,80 +176,70 @@ fc.imp<-amelia(fc.ineq,
          m=max(apply(fc.ineq, 2, function(x){sum(is.na(x))})),
          ts="year.c", cs="stname", polytime=1, bounds=bounds)
 
-
 ```
 ### CONSTRUCT WELFARE INEQUALITY MEASURES TO INCLUDE (ON SERVER)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis"}
 b.ineq.glmer<-glmer(cl.blk~-1+scale(b.incarrt)+
-        scale(chpov.blk.pc)+
+        scale(b.welf.incl)+scale(b.snap.incl)+
+        scale(chpov.blk.pc)+scale(pctblk)+
         scale(chpovrt)+scale(incarrt)+
-        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
-        +scale(I(SNAPRec/child.pov))+
         scale(inst6014_nom)+
         year.c+
-        scale(pctblk)+
         (year.c|stname) + (1|obs), family=poisson, offset=log(blk.child),
-      data=fc.imp$imputations[[1]])
+      data=fc.ineq)
 
 ###WANT ICE DETENTION / DEPORTATION DATA BY STATE
 l.ineq.glmer<-glmer(cl.latino~-1+scale(l.incarrt)+
-        scale(chpov.latino.pc)+
+        scale(l.welf.incl)+scale(l.snap.incl)+        
+        scale(chpov.latino.pc)+scale(pctlat)+
         scale(chpovrt)+scale(incarrt)+
-        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
-        +scale(I(SNAPRec/child.pov))+
         scale(inst6014_nom)+
         year.c+
-        scale(pctlat)+
         (year.c|stname) + (1|obs), family=poisson, offset=log(latino.child),
-        data=fc.imp$imputations[[1]])
+        data=fc.ineq)
 
 a.ineq.glmer<-glmer(cl.nat.am~-1+scale(a.incarrt)+
-        scale(chpov.amind.pc)+
+        scale(chpov.amind.pc)+scale(pctami)+
+        scale(a.welf.incl)+scale(a.snap.incl)+
         scale(chpovrt)+scale(incarrt)+
-        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
-        +scale(I(SNAPRec/child.pov))+
         scale(inst6014_nom)+
         year.c+
-        scale(pctami)+
         (year.c|stname) + (1|obs), family=poisson, offset=log(amind.child),
-        data=fc.imp$imputations[[1]])
+        data=fc.ineq)
 
 htmlreg(list(b.ineq.glmer, l.ineq.glmer, a.ineq.glmer), caption="Caseloads by race, state intercepts, state|year slopes")
 
 ## Disproportion models
 b.disp<-lmer(log(bw.disp)~-1+scale(b.incardisp)+
         scale(bdisp.chpov)+
+        scale(I(b.welf.incl/w.welf.incl))+scale(I(b.snap.incl/w.snap.incl))+
         scale(chpovrt)+scale(incarrt)+
-        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
-        +scale(I(SNAPRec/child.pov))+
         scale(inst6014_nom)+
         year.c+
-        scale(pctblk)+scale(pctami)+scale(pctlat)+
+        scale(pctblk)+
         (year.c|stname),
-        data=fc.imp$imputations[[1]])
+        data=fc.ineq)
 
 a.disp<-lmer(log(ami.disp)~-1+scale(a.incardisp)+
         scale(adisp.chpov)+
+        scale(I(a.welf.incl/w.welf.incl))+scale(I(a.snap.incl/w.snap.incl))+
         scale(chpovrt)+scale(incarrt)+
-        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
-        +scale(I(SNAPRec/child.pov))+
         scale(inst6014_nom)+
         year.c+
         scale(pctami)+
         (year.c|stname),
-        data=fc.imp$imputations[[1]])
+        data=fc.ineq)
 
 l.disp<-lmer(log(lw.disp)~-1+scale(l.incardisp)+
         scale(ldisp.chpov)+
+        scale(I(l.welf.incl/w.welf.incl))+scale(I(l.snap.incl/w.snap.incl))+  
         scale(chpovrt)+scale(incarrt)+
-        scale(eitc.st)+scale(I(medicaidrec/child.pov)) ###FIX WITH TOT POV
-        +scale(I(SNAPRec/child.pov))+
         scale(inst6014_nom)+
         year.c+
         scale(pctlat)+
         (year.c|stname),
-        data=fc.imp$imputations[[1]])
+        data=fc.ineq)
 
 
 htmlreg(list(b.disp, l.disp, a.disp), caption="Caseloads by race, state intercepts, state|year slopes")
