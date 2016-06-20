@@ -1,6 +1,7 @@
 library(rvest)
 library(dplyr)
 
+setwd("H:/cw-race/data/")
 years<-2007:2014
 
 url<-"http://trac.syr.edu/phptools/immigration/charges/state.php?project=1.75&stat=total&fy="
@@ -20,6 +21,7 @@ data<-data[-1,]
 data[,3]<-gsub(",", "", data[,3])
 data[which(data[,3]=="*"),3]<-NA
 data[,3]<-as.numeric(data[,3])
+data[,2]<-as.numeric(data[,2])
 data<-data[-which(data$state=="Entire US"),]
 
-write.csv("deport-proceedings.csv", row.names=FALSE)
+write.csv(data, "deport-proceedings.csv", row.names=FALSE)
