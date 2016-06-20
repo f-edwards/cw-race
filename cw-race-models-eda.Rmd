@@ -2,10 +2,10 @@
 title: "cw-race-models-eda"
 author: "Frank Edwards"
 date: "June 1, 2016"
-output: pdf_document
+output: html_document
 ---
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis"}
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis", cache=TRUE}
 #########
 # These models replicate models from "Saving Children" for racial inequalities. Expanding to Nat. Am., Latino and working through separate outcomes (i.e LOS, Nplacement, placement setting, casegoal) at the individual level is the next step
 
@@ -19,9 +19,9 @@ library(texreg)
 # source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-functions.r")
 # source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-read.r")
 
-setwd("~/Dropbox/cw-race/data/")
-source("~/Dropbox/cw-race/cw-race-functions.r")
-source("~/Dropbox/cw-race/cw-race-read.r")
+setwd("C:/Users/frank/Dropbox/cw-race/data/")
+source("C:/Users/frank/Dropbox/cw-race/cw-race-functions.r")
+source("C:/Users/frank/Dropbox/cw-race/cw-race-read.r")
 
 hist<-read.csv("hist-pop.csv")
 
@@ -98,7 +98,7 @@ disp.reg.lmer<-lmer(log(bw.disp)~scale(chpovrt)+scale(incarrt)+
         (1+year.c|stname), 
         data=fc.ineq)
 
-texreg(list(disp.lmer,disp.reg.lmer), caption="Outcome: log(B/W FC caseload per cap), state intercepts, state|year slopes")
+htmlreg(list(disp.lmer,disp.reg.lmer), caption="Outcome: log(B/W FC caseload per cap), state intercepts, state|year slopes")
 
 b.glmer<-glmer(cl.blk~scale(chpovrt)+scale(incarrt)+scale(b.incarrt)+
         scale(bdisp.chpov)+
@@ -145,6 +145,6 @@ a.ineq.glmer<-glmer(cl.nat.am~scale(a.incarrt)+
         (year.c|stname) + (1|obs), family=poisson, offset=log(amind.child),
         data=fc.ineq)
 
-texreg(b.glmer, caption="Outcome: Black FC caseload (count), state intercepts, state|year slopes")
+htmlreg(list(b.ineq.glmer, l.ineq.glmer, a.ineq.glmer), caption="Caseloads by race, state intercepts, state|year slopes")
 
 ```
