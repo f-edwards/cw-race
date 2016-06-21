@@ -123,6 +123,41 @@ pov$food.insec<-pov$food.insec/100 ## rescale to [0,1]
 # names(rpp)[1]<-"state"
 # rp.out<-rpp[,c(1,9)]
 
+### Deportation proceedings data from TRAC (http://trac.syr.edu/phptools/immigration/charges/deport_filing_charge.php, accessed 6/20/16)
+## scraper in trac-scrape.r in this repo
+# 
+deport<-read.csv("deport-proceedings.csv", stringsAsFactors = FALSE)
+deport$St<-deport$state
+deport<-cleanpol2(deport)
+deport$state<-as.numeric(deport$state)
+deport<-deport[-c(which(deport$St%in%(c("US Virgin Islands", "Guam", "Puerto Rico")))),]
+deport$ct.region<-ifelse(deport$St=="Alabama", "Georgia", 
+             ifelse(deport$St=="Alaska", "Oregon",
+              ifelse(deport$St=="Arkansas", "Tennessee",
+               ifelse(deport$St=="Delaware", "Maryland",
+                ifelse(deport$St=="Idaho", "Oregon",
+                 ifelse(deport$St=="Indiana", "Illinois",
+                  ifelse(deport$St=="Iowa", "Nebraska",
+                   ifelse(deport$St=="Kansas", "Missouri",
+                    ifelse(deport$St=="Kentucky", "Tennessee",
+                     ifelse(deport$St=="Maine", "Massachusetts",
+                      ifelse(deport$St=="Mississippi", "Louisiana",
+                       ifelse(deport$St=="Montana", "Oregon",
+                        ifelse(deport$St=="New Hampshire", "Massachusetts",
+                         ifelse(deport$St=="New Mexico", "Texas",
+                          ifelse(deport$St=="North Dakota", "Minnesota",
+                           ifelse(deport$St=="Oklahoma", "Texas",
+                            ifelse(deport$St=="Rhode Island", "Massachusetts",
+                             ifelse(deport$St=="South Carolina", "North Carolina",
+                              ifelse(deport$St=="South Dakota", "Minnesota",
+                               ifelse(deport$St=="Vermont", "Massachusetts",
+                                ifelse(deport$St=="West Virginia", "Virginia",
+                                 ifelse(deport$St=="Wisconsin", "Illinois",
+                                  ifelse(deport$St=="Wyoming", "Colorado",
+                                         deport$St)))))))))))))))))))))))
+
+
+
 names(pop)[1:2]<-c("state", "year")
 
 fc<-join_all(list(pop, incar), by=c("state", "year"))
@@ -135,6 +170,30 @@ names(fc.new)[1:2]<-c("stname", "year")
 fc<-left_join(fc.new, fc, by=c("stname", "year"))
 fc<-left_join(fc, pov, by=c("stname", "year"))
 fc<-left_join(fc, pol, by=c("state", "year"))
+fc<-left_join(fc, deport%>%select(-St), by=c("state", "year"))
+
+fc<-fc%>%filter(year>2006)%>%filter(stname!="PR")%>%filter(stname!="DC")
+fc$deport.adj<-NA
+
+
+deport.match<-function(x){
+  for(y in unique(x$year)){
+    for(c in unique(x$ct.region)){
+      z.y<-which((x$year==y) & (x$ct.region==c))
+      all.cases<-x[z.y[which(x[z.y, "statename"]==c)], "cases"]
+      pct.foreign<-x[z.y, "foreign"]/sum(x[z.y, "foreign"])
+      for(z in 1:length(z.y)){
+        x$deport.adj[z.y[z]]<-all.cases*pct.foreign[z]
+      }
+    }  
+  }
+  return(x)
+}
+
+fc<-deport.match(fc)
+fc$deport.pc<-fc$deport.adj/fc$foreign
+
+deport.ts<-ggplot(fc, aes(x=year, y=deport.pc))+geom_line()+facet_wrap(~stname)
 
 ### CREATE VARS
 fc<-fc%>%mutate(cl.wht.pc=cl.white/wht.child, cl.blk.pc=cl.blk/blk.child, 
