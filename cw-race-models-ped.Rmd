@@ -102,7 +102,7 @@ WRITE THE MODELS
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis"}
 #########
 # These models replicate models from "Saving Children" for racial inequalities. Expanding to Nat. Am., Latino and working through separate outcomes (i.e LOS, Nplacement, placement setting, casegoal) at the individual level is the next step
-
+rm(list=ls())
 library(lme4)
 library(Amelia)
 library(ggplot2)
@@ -148,6 +148,14 @@ fc<-fc%>%mutate(obs=1:nrow(fc),
  l.snap.incl=latino.snap/latino.child.pov,
  a.snap.incl=amind.snap/amind.child.pov,
  w.snap.incl=wht.snap/wht.child.pov,
+ w.unemp.rt=wht.unemp/(wht.emp+wht.unemp),
+ b.unemp.rt=blk.unemp/(blk.emp+blk.unemp),
+ a.unemp.rt=amind.unemp/(amind.unemp+amind.emp),
+ l.unemp.rt=latino.unemp/(latino.emp+latino.unemp),
+ w.singpar.rt=wht.singpar/wht.child,
+ b.singpar.rt=blk.singpar/blk.child,
+ a.singpar.rt=amind.singpar/amind.child,
+ l.singpar.rt=latino.singpar/latino.child,
  year.c=year-2007
  )
 
@@ -209,7 +217,9 @@ fc.ineq<-fc.ineq%>%
          w.incarrt, b.incardisp, l.incardisp, a.incardisp, 
          bdisp.chpov, ldisp.chpov, adisp.chpov, bw.disp, 
          lw.disp, ami.disp, b.welf.incl, a.welf.incl, l.welf.incl, 
-         w.welf.incl, a.snap.incl, b.snap.incl, l.snap.incl, w.snap.incl, deport.pc)%>%
+         w.welf.incl, a.snap.incl, b.snap.incl, l.snap.incl, w.snap.incl, deport.pc,
+         w.unemp.rt, b.unemp.rt, a.unemp.rt, l.unemp.rt, w.singpar.rt, b.singpar.rt, a.singpar.rt, 
+         l.singpar.rt, wht.lessHS, blk.lessHS, amind.lessHS, latino.lessHS)%>%
   filter(stname!="HI")
 
 colClass<-sapply(fc.ineq, class)
@@ -220,8 +230,7 @@ bounds<-cbind(1:ncol(fc.ineq),
 
 m=max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))
 
-fc.imp<-amelia(fc.ineq,
-         m=m,
+fc.imp<-amelia(fc.ineq, m=3,
          ts="year.c", cs="stname", polytime=1, bounds=bounds, p2s=0)
 
 for(i in 1:m){
@@ -239,7 +248,8 @@ for(i in 1:m){
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.width=7, fig.height=9, results="asis"}
 b.ineq.glmer<-glmer(cl.blk~-1+scale(b.incarrt)+
-        scale(b.welf.incl)+scale(b.snap.incl)+
+        scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
+        ##PUT IN WELF MEASURES, CRIME MEASURES FROM SAVCHILD
         scale(chpov.blk.pc)+scale(pctblk)+
         year.c+
         (year.c|stname) + (1|obs), family=poisson, offset=log(blk.child),
@@ -247,6 +257,7 @@ b.ineq.glmer<-glmer(cl.blk~-1+scale(b.incarrt)+
 
 ###WANT ICE DETENTION / DEPORTATION DATA BY STATE
 l.ineq.glmer<-glmer(cl.latino~-1+scale(l.incarrt)+
+        scale(l.unemp.rt)+scale(l.singpar.rt)+scale(latino.lessHS)+
         scale(chpov.latino.pc)+scale(pctlat)+
         scale(deport.pc)+
         year.c+
@@ -254,8 +265,8 @@ l.ineq.glmer<-glmer(cl.latino~-1+scale(l.incarrt)+
         data=fc.imp$imputations[[1]])
 
 a.ineq.glmer<-glmer(cl.nat.am~-1+scale(a.incarrt)+
+        scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
         scale(chpov.amind.pc)+scale(pctami)+
-        scale(a.welf.incl)+scale(a.snap.incl)+
         year.c+
         (year.c|stname) + (1|obs), family=poisson, offset=log(amind.child),
         data=fc.imp$imputations[[1]])

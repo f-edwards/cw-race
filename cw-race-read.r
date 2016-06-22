@@ -1,4 +1,3 @@
-library(plyr)
 library(TTR)
 library(dplyr)
 library(tidyr)
@@ -160,7 +159,7 @@ deport$ct.region<-ifelse(deport$St=="Alabama", "Georgia",
 
 names(pop)[1:2]<-c("state", "year")
 
-fc<-join_all(list(pop, incar), by=c("state", "year"))
+fc<-left_join(pop, incar, by=c("state", "year"))
 
 fc$stname<-NA
 fc<-stnames(fc)
