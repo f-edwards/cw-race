@@ -32,23 +32,8 @@ incar<-(data.frame(state=incartemp$STATEID, year=incartemp$YEAR,
 
 incar<-cbind(incar, incartemp[,53:80])
 
-### FBI UCR Data - http://www.icpsr.umich.edu/icpsrweb/ICPSR/series/57/studies?sortBy=7&archive=ICPSR&q=allocated+state&searchSource=revise
-### Crimes reported to police
-# cr12<-read.ucr("35019-0004-Data.txt", 2012)
-# cr11<-read.ucr("34582-0004-Data.txt", 2011)
-# cr10<-read.ucr("33523-0004-Data.txt", 2010)
-# cr09<-read.ucr("30763-0004-Data.txt", 2009)
-# cr08<-read.ucr("27644-0004-Data.txt", 2008)
-# cr07<-read.ucr("25114-0004-Data.txt", 2007)
-# cr06<-read.ucr("23780-0004-Data.txt", 2006)
-# cr05<-read.ucr("04717-0004-Data.txt", 2005)
-# cr04<-read.ucr("04466-0004-Data.txt", 2004)
-# cr03<-read.ucr("04360-0004-Data.txt", 2003)
-# cr02<-read.ucr("04009-0004-Data.txt", 2002)
-# cr01<-read.ucr("03721-0004-Data.txt", 2001)
-# cr00<-read.ucr("03451-0004-Data.txt", 2000)
-# crime<-rbind(cr12,cr11,cr10,cr09,cr08, cr07, cr06, cr05, cr04, cr03, cr02, cr01, cr00)
-
+ucr<-read.csv("ucr2014.csv", head=TRUE, stringsAsFactors = FALSE)
+names(ucr)[1]<-"stname"
 
 ### University of Kentucky Center for Poverty research data - http://www.ukcpr.org/data
 pov<-read.csv("UKCPR_National_Welfare_Data_01202016_0.csv", na.strings=c("-", ""))
@@ -170,6 +155,7 @@ fc<-left_join(fc.new, fc, by=c("stname", "year"))
 fc<-left_join(fc, pov, by=c("stname", "year"))
 fc<-left_join(fc, pol, by=c("state", "year"))
 fc<-left_join(fc, deport%>%select(-St), by=c("state", "year"))
+fc<-left_join(fc, ucr, by=c("stname", "year"))
 
 fc<-fc%>%filter(year>2006)%>%filter(stname!="PR")%>%filter(stname!="DC")
 fc$deport.adj<-NA
@@ -193,6 +179,9 @@ fc<-deport.match(fc)
 fc$deport.pc<-fc$deport.adj/fc$foreign
 
 deport.ts<-ggplot(fc, aes(x=year, y=deport.pc))+geom_line()+facet_wrap(~stname)
+
+fc[which(fc$amind.child.pov==0), "amind.child.pov"]<-NA
+fc[which(fc$stname=="HI" & fc$year==2010), "amind.child"]<-NA
 
 ### CREATE VARS
 fc<-fc%>%mutate(cl.wht.pc=cl.white/wht.child, cl.blk.pc=cl.blk/blk.child, 
