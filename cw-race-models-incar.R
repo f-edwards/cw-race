@@ -16,10 +16,10 @@ library(arm)
 # source("~/Dropbox/cw-race/cw-race-read.r")
 # setwd("~/Dropbox/cw-race-paper/")
 
+### for libra
 setwd("~/cw-race/data/")
 source("~/cw-race/cw-race-functions.r")
 source("~/cw-race/cw-race-read.r")
-setwd("~/cw-race-paper/")
 
 
 # setwd("H:/cw-race/data/")
