@@ -10,6 +10,7 @@ library(ggplot2)
 library(texreg)
 library(dplyr)
 library(arm)
+library(rstanarm)
 
 # setwd("~/Dropbox/cw-race/data/")
 # source("~/Dropbox/cw-race/cw-race-functions.r")
