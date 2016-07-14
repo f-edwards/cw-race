@@ -11,10 +11,10 @@ library(texreg)
 library(dplyr)
 library(arm)
 
-setwd("C:/Users/Kilgore/Dropbox/cw-race/data/")
-source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-functions.r")
-source("C:/Users/Kilgore/Dropbox/cw-race/cw-race-read.r")
-setwd("C:/Users/Kilgore/Dropbox/cw-race-paper/")
+setwd("~//Dropbox/cw-race/data/")
+source("~//Dropbox/cw-race/cw-race-functions.r")
+source("~//Dropbox/cw-race/cw-race-read.r")
+setwd("~//Dropbox/cw-race-paper/")
 
 # setwd("H:/cw-race/data/")
 # source("H:/cw-race/cw-race-functions.r")
@@ -113,6 +113,21 @@ disp.ts<-ggplot(data=fc, aes(x=year, y=bw.disp))+geom_line(aes(color="b/w"))+
   facet_wrap(~stname)+
   ggtitle("Blk, Lat., Am. Ind./White caseload disproportion")
 
+disp.incar.ts<-ggplot(data=fc, aes(x=year, y=b.incardisp))+geom_line(aes(color="b/w"))+
+  geom_line(aes(y=l.incardisp, color="l/w"))+
+  geom_line(aes(y=a.incardisp, color="a/w"))+
+  xlab("Year")+ylab("Incarceration disproportion")+
+  ylim(0,15)+
+  facet_wrap(~stname)+
+  ggtitle("Blk, Lat., Am. Ind./White incarceration disproportion")
+
+incar.ts<-ggplot(data=fc, aes(x=year, y=b.incarrt))+geom_line(aes(color="Black"))+
+  geom_line(aes(y=l.incarrt, color="Latino"))+
+  geom_line(aes(y=a.incarrt, color="Am. Ind."))+
+  xlab("Year")+ylab("Incarceration rates")+
+  facet_wrap(~stname)+
+  ggtitle("Blk, Lat., Am. Ind./White incarceration disproportion")
+
 ggsave("race-disp-ts.pdf", disp.ts)
 
 ### HAWAII COUNTS AMIND DIFFERENTLY IN AFCARS / CENSUS. MAYBE NATIVE HAWAIIAN ARE INCLUDED IN AFCARS, NOT CENSUS COUNTS? DROPPING FOR NOW
@@ -145,6 +160,8 @@ m=max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))
 
 fc.imp<-amelia(fc.ineq, m=m,
          ts="year.c", cs="stname", polytime=1, bounds=bounds, p2s=0)
+
+OItest<-overimpute(fc.imp, "l.incarrt")
 
 
 for(i in 1:m){
