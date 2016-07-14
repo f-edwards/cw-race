@@ -11,10 +11,16 @@ library(texreg)
 library(dplyr)
 library(arm)
 
-setwd("~/Dropbox/cw-race/data/")
-source("~/Dropbox/cw-race/cw-race-functions.r")
-source("~/Dropbox/cw-race/cw-race-read.r")
-setwd("~/Dropbox/cw-race-paper/")
+# setwd("~/Dropbox/cw-race/data/")
+# source("~/Dropbox/cw-race/cw-race-functions.r")
+# source("~/Dropbox/cw-race/cw-race-read.r")
+# setwd("~/Dropbox/cw-race-paper/")
+
+setwd("~/cw-race/data/")
+source("~/cw-race/cw-race-functions.r")
+source("~/cw-race/cw-race-read.r")
+setwd("~/cw-race-paper/")
+
 
 # setwd("H:/cw-race/data/")
 # source("H:/cw-race/cw-race-functions.r")
