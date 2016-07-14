@@ -11,10 +11,10 @@ library(texreg)
 library(dplyr)
 library(arm)
 
-setwd("~//Dropbox/cw-race/data/")
-source("~//Dropbox/cw-race/cw-race-functions.r")
-source("~//Dropbox/cw-race/cw-race-read.r")
-setwd("~//Dropbox/cw-race-paper/")
+setwd("~/Dropbox/cw-race/data/")
+source("~/Dropbox/cw-race/cw-race-functions.r")
+source("~/Dropbox/cw-race/cw-race-read.r")
+setwd("~/Dropbox/cw-race-paper/")
 
 # setwd("H:/cw-race/data/")
 # source("H:/cw-race/cw-race-functions.r")
@@ -183,7 +183,7 @@ b.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~-1+scale(b.incarrt)+
 
 l.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.latino~-1+scale(l.incarrt)+
         scale(l.unemp.rt)+scale(l.singpar.rt)+scale(latino.lessHS)+
-        scale(chpov.latino.pc)+scale(pctlat)+scale(pctblk)+
+        scale(chpov.latino.pc)+scale(pctlat)+
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
         (1|stname) + (1|obs), family=poisson, offset=log(latino.child),
@@ -191,7 +191,7 @@ l.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.latino~-1+scale(l.incarr
 
 a.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~-1+scale(a.incarrt)+
         scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
-        scale(chpov.amind.pc)+scale(pctami)+scale(pctblk)+
+        scale(chpov.amind.pc)+scale(pctami)+
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
         (1|stname) + (1|obs), family=poisson, offset=log(amind.child),
@@ -212,7 +212,7 @@ a.disp<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~-1+scale(a.inc
         scale(adisp.chpov)+
         scale(I(a.unemp.rt/w.unemp.rt))+scale(I(a.singpar.rt/w.singpar.rt))+
         scale(I(amind.lessHS/wht.lessHS))+
-        scale(pctami)+scale(pctblk)+
+        scale(pctami)+
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
         (1|stname),
@@ -222,7 +222,7 @@ l.disp<-lapply(fc.imp$imputations, function(d) lmer(log(lw.disp)~-1+scale(l.inca
         scale(ldisp.chpov)+
         scale(I(l.unemp.rt/w.unemp.rt))+scale(I(l.singpar.rt/w.singpar.rt))+
         scale(I(latino.lessHS/wht.lessHS))+
-        scale(pctlat)+scale(pctblk)+
+        scale(pctlat)+
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
         (1|stname),
@@ -289,7 +289,7 @@ d.names<-c()
 
 
 ## Bayesian multilevel for robustness
-# library(rstanarm)
+# # library(rstanarm)
 # fit<-stan_lmer(cl.nat.am~-1+scale(a.incarrt)+
 #              scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
 #              scale(chpov.amind.pc)+scale(pctami)+
@@ -316,3 +316,90 @@ d.names<-c()
 #         caption="Caseload disproportion by race, state intercepts, state|year slopes", 
 #         custom.model.names = c("Black", "Latino", "Native American"), custom.coef.names = names.m2, caption.above=TRUE)
 # 
+
+### FE MODELS
+
+b.count.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~-scale(b.incarrt)+
+                                                       scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
+                                                       scale(chpov.blk.pc)+scale(pctblk)+
+                                                       scale(inst6014_nom)+scale(v.crime.rt)+
+                                                       year.c+
+                                                       factor(stname), family=quasipoisson, offset=log(blk.child),
+                                                     data=d))
+# 
+l.count.fe<-lapply(fc.imp$imputations, function(d) glm(cl.latino~scale(l.incarrt)+
+                                                       scale(l.unemp.rt)+scale(l.singpar.rt)+scale(latino.lessHS)+
+                                                       scale(chpov.latino.pc)+scale(pctlat)+
+                                                       scale(inst6014_nom)+scale(v.crime.rt)+
+                                                       year.c+
+                                                       factor(stname) , family=quasipoisson, offset=log(latino.child),
+                                                     data=d))
+# 
+a.count.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~scale(a.incarrt)+
+                                                       scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
+                                                       scale(chpov.amind.pc)+scale(pctami)+
+                                                       scale(inst6014_nom)+scale(v.crime.rt)+
+                                                       year.c+
+                                                       factor(stname), family=quasipoisson, offset=log(amind.child),
+                                                     data=d))
+# 
+# ## Disproportion models
+b.disp.fe<-lapply(fc.imp$imputations, function(d) lm(log(bw.disp)~scale(b.incardisp)+
+                                                      scale(bdisp.chpov)+
+                                                      scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
+                                                      scale(I(blk.lessHS/wht.lessHS))+
+                                                      scale(pctblk)+
+                                                      scale(inst6014_nom)+scale(v.crime.rt)+
+                                                      year.c+
+                                                      factor(stname),
+                                                    data=d))
+# 
+a.disp.fe<-lapply(fc.imp$imputations, function(d) lm(log(ami.disp)~scale(a.incardisp)+
+                                                      scale(adisp.chpov)+
+                                                      scale(I(a.unemp.rt/w.unemp.rt))+scale(I(a.singpar.rt/w.singpar.rt))+
+                                                      scale(I(amind.lessHS/wht.lessHS))+
+                                                      scale(pctami)+scale(pctblk)+
+                                                      scale(inst6014_nom)+scale(v.crime.rt)+
+                                                      year.c+
+                                                      factor(stname),
+                                                    data=d))
+# 
+l.disp.fe<-lapply(fc.imp$imputations, function(d) lm(log(lw.disp)~scale(l.incardisp)+
+                                                      scale(ldisp.chpov)+
+                                                      scale(I(l.unemp.rt/w.unemp.rt))+scale(I(l.singpar.rt/w.singpar.rt))+
+                                                      scale(I(latino.lessHS/wht.lessHS))+
+                                                      scale(pctlat)+scale(pctblk)+
+                                                      scale(inst6014_nom)+scale(v.crime.rt)+
+                                                      year.c+
+                                                      factor(stname),
+                                                    data=d))
+
+## FE RESUlTS MIMIC DIFF IN DIFF - IF LOW VARIATION IN INCAR, CAN'T GET TRACTION ON FC (LIKELY)
+
+## BAYESIAN
+blk.count.bayes<-stan_glmer(cl.blk~-1+scale(b.incarrt)+
+                             scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
+                             scale(chpov.blk.pc)+scale(pctblk)+
+                             scale(inst6014_nom)+scale(v.crime.rt)+
+                             year.c+
+                             (1|stname) + (1|obs), family=poisson, offset=log(blk.child),
+                          data=fc.imp$imputations[[1]])
+
+lat.count.bayes<-stan_lmer(cl.latino~-1+scale(l.incarrt)+
+                             scale(l.unemp.rt)+scale(l.singpar.rt)+scale(latino.lessHS)+
+                             scale(chpov.latino.pc)+scale(pctlat)+
+                             scale(inst6014_nom)+scale(v.crime.rt)+
+                             year.c+
+                             (1|stname) + (1|obs), family=poisson, offset=log(latino.child),
+                          data=fc.imp$imputations[[1]])
+
+am.count.bayes<-stan_lmer(cl.nat.am~-1+scale(a.incarrt)+
+                 scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
+                 scale(chpov.amind.pc)+scale(pctami)+
+                 scale(inst6014_nom)+scale(v.crime.rt)+
+                 year.c+
+                 (1+year.c|stname) +(1|obs), family=poisson, offset=log(amind.child),
+               data=fc.imp$imputations[[1]])
+
+warnings()
+
