@@ -99,42 +99,42 @@ fc.ineq<-fc
 #   facet_wrap(~stname)+
 #   ggtitle("Lifetime mean days in FC by race and state")
 
-race.pc.ts<-ggplot(data=fc, aes(x=year, y=cl.blk.pc))+geom_line(aes(color="black"))+
-  geom_line(aes(y=cl.wht.pc, color="white"))+
-  geom_line(aes(y=cl.amind.pc, color="nat.am"))+
-  geom_line(aes(y=cl.lat.pc, color="latino"))+
-  xlab("Year")+ylab("Caseload per cap")+
-  ylim(0, 0.20)+
-  scale_x_continuous(breaks=c(2007,2012))+
-  facet_wrap(~stname)+
-  ggtitle("Foster care caseloads per capita by race and state")
+# race.pc.ts<-ggplot(data=fc, aes(x=year, y=cl.blk.pc))+geom_line(aes(color="black"))+
+#   geom_line(aes(y=cl.wht.pc, color="white"))+
+#   geom_line(aes(y=cl.amind.pc, color="nat.am"))+
+#   geom_line(aes(y=cl.lat.pc, color="latino"))+
+#   xlab("Year")+ylab("Caseload per cap")+
+#   ylim(0, 0.20)+
+#   scale_x_continuous(breaks=c(2007,2012))+
+#   facet_wrap(~stname)+
+#   ggtitle("Foster care caseloads per capita by race and state")
 
-ggsave("race-pc-ts.pdf", race.pc.ts)
+# ggsave("race-pc-ts.pdf", race.pc.ts)
 
-disp.ts<-ggplot(data=fc, aes(x=year, y=bw.disp))+geom_line(aes(color="b/w"))+
-  geom_line(aes(y=lw.disp, color="l/w"))+
-  geom_line(aes(y=ami.disp, color="a/w"))+
-  xlab("Year")+ylab("Caseload disproportion")+
-  ylim(0,15)+
-  facet_wrap(~stname)+
-  ggtitle("Blk, Lat., Am. Ind./White caseload disproportion")
+# disp.ts<-ggplot(data=fc, aes(x=year, y=bw.disp))+geom_line(aes(color="b/w"))+
+#   geom_line(aes(y=lw.disp, color="l/w"))+
+#   geom_line(aes(y=ami.disp, color="a/w"))+
+#   xlab("Year")+ylab("Caseload disproportion")+
+#   ylim(0,15)+
+#   facet_wrap(~stname)+
+#   ggtitle("Blk, Lat., Am. Ind./White caseload disproportion")
 
-disp.incar.ts<-ggplot(data=fc, aes(x=year, y=b.incardisp))+geom_line(aes(color="b/w"))+
-  geom_line(aes(y=l.incardisp, color="l/w"))+
-  geom_line(aes(y=a.incardisp, color="a/w"))+
-  xlab("Year")+ylab("Incarceration disproportion")+
-  ylim(0,15)+
-  facet_wrap(~stname)+
-  ggtitle("Blk, Lat., Am. Ind./White incarceration disproportion")
+# disp.incar.ts<-ggplot(data=fc, aes(x=year, y=b.incardisp))+geom_line(aes(color="b/w"))+
+#   geom_line(aes(y=l.incardisp, color="l/w"))+
+#   geom_line(aes(y=a.incardisp, color="a/w"))+
+#   xlab("Year")+ylab("Incarceration disproportion")+
+#   ylim(0,15)+
+#   facet_wrap(~stname)+
+#   ggtitle("Blk, Lat., Am. Ind./White incarceration disproportion")
 
-incar.ts<-ggplot(data=fc, aes(x=year, y=b.incarrt))+geom_line(aes(color="Black"))+
-  geom_line(aes(y=l.incarrt, color="Latino"))+
-  geom_line(aes(y=a.incarrt, color="Am. Ind."))+
-  xlab("Year")+ylab("Incarceration rates")+
-  facet_wrap(~stname)+
-  ggtitle("Blk, Lat., Am. Ind./White incarceration disproportion")
+# incar.ts<-ggplot(data=fc, aes(x=year, y=b.incarrt))+geom_line(aes(color="Black"))+
+#   geom_line(aes(y=l.incarrt, color="Latino"))+
+#   geom_line(aes(y=a.incarrt, color="Am. Ind."))+
+#   xlab("Year")+ylab("Incarceration rates")+
+#   facet_wrap(~stname)+
+#   ggtitle("Blk, Lat., Am. Ind./White incarceration disproportion")
 
-ggsave("race-disp-ts.pdf", disp.ts)
+# ggsave("race-disp-ts.pdf", disp.ts)
 
 ### HAWAII COUNTS AMIND DIFFERENTLY IN AFCARS / CENSUS. MAYBE NATIVE HAWAIIAN ARE INCLUDED IN AFCARS, NOT CENSUS COUNTS? DROPPING FOR NOW
 ###MI
@@ -167,7 +167,7 @@ m=max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))
 fc.imp<-amelia(fc.ineq, m=m,
          ts="year.c", cs="stname", polytime=1, bounds=bounds, p2s=0)
 
-OItest<-overimpute(fc.imp, "l.incarrt")
+# OItest<-overimpute(fc.imp, "l.incarrt")
 
 
 for(i in 1:m){
@@ -179,7 +179,7 @@ for(i in 1:m){
 }
 
 
-b.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~-1+scale(b.incarrt)+
+b.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~scale(b.incarrt)+
         scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
         scale(chpov.blk.pc)+scale(pctblk)+
         scale(inst6014_nom)+scale(v.crime.rt)+
@@ -187,7 +187,7 @@ b.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~-1+scale(b.incarrt)+
         (1|stname) + (1|obs), family=poisson, offset=log(blk.child),
       data=d))
 
-l.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.latino~-1+scale(l.incarrt)+
+l.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.latino~scale(l.incarrt)+
         scale(l.unemp.rt)+scale(l.singpar.rt)+scale(latino.lessHS)+
         scale(chpov.latino.pc)+scale(pctlat)+
         scale(inst6014_nom)+scale(v.crime.rt)+
@@ -195,7 +195,7 @@ l.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.latino~-1+scale(l.incarr
         (1|stname) + (1|obs), family=poisson, offset=log(latino.child),
         data=d))
 
-a.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~-1+scale(a.incarrt)+
+a.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~scale(a.incarrt)+
         scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
         scale(chpov.amind.pc)+scale(pctami)+
         scale(inst6014_nom)+scale(v.crime.rt)+
@@ -204,7 +204,7 @@ a.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~-1+scale(a.incarr
         data=d))
 
 ## Disproportion models
-b.disp<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~-1+scale(b.incardisp)+
+b.disp<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~scale(b.incardisp)+
         scale(bdisp.chpov)+
         scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
         scale(I(blk.lessHS/wht.lessHS))+
@@ -214,7 +214,7 @@ b.disp<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~-1+scale(b.inca
         (1|stname),
         data=d))
 
-a.disp<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~-1+scale(a.incardisp)+
+a.disp<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~scale(a.incardisp)+
         scale(adisp.chpov)+
         scale(I(a.unemp.rt/w.unemp.rt))+scale(I(a.singpar.rt/w.singpar.rt))+
         scale(I(amind.lessHS/wht.lessHS))+
@@ -224,7 +224,7 @@ a.disp<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~-1+scale(a.inc
         (1|stname),
         data=d))
 
-l.disp<-lapply(fc.imp$imputations, function(d) lmer(log(lw.disp)~-1+scale(l.incardisp)+
+l.disp<-lapply(fc.imp$imputations, function(d) lmer(log(lw.disp)~scale(l.incardisp)+
         scale(ldisp.chpov)+
         scale(I(l.unemp.rt/w.unemp.rt))+scale(I(l.singpar.rt/w.singpar.rt))+
         scale(I(latino.lessHS/wht.lessHS))+
@@ -296,7 +296,7 @@ d.names<-c()
 
 ## Bayesian multilevel for robustness
 # # library(rstanarm)
-# fit<-stan_lmer(cl.nat.am~-1+scale(a.incarrt)+
+# fit<-stan_lmer(cl.nat.am~scale(a.incarrt)+
 #              scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
 #              scale(chpov.amind.pc)+scale(pctami)+
 #              scale(inst6014_nom)+scale(v.crime.rt)+
@@ -383,7 +383,7 @@ l.disp.fe<-lapply(fc.imp$imputations, function(d) lm(log(lw.disp)~scale(l.incard
 ## FE RESUlTS MIMIC DIFF IN DIFF - IF LOW VARIATION IN INCAR, CAN'T GET TRACTION ON FC (LIKELY)
 
 ## BAYESIAN
-blk.count.bayes<-stan_glmer(cl.blk~-1+scale(b.incarrt)+
+blk.count.bayes<-stan_glmer(cl.blk~scale(b.incarrt)+
                              scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
                              scale(chpov.blk.pc)+scale(pctblk)+
                              scale(inst6014_nom)+scale(v.crime.rt)+
@@ -391,7 +391,7 @@ blk.count.bayes<-stan_glmer(cl.blk~-1+scale(b.incarrt)+
                              (1|stname) + (1|obs), family=poisson, offset=log(blk.child),
                           data=fc.imp$imputations[[1]])
 
-lat.count.bayes<-stan_lmer(cl.latino~-1+scale(l.incarrt)+
+lat.count.bayes<-stan_glmer(cl.latino~scale(l.incarrt)+
                              scale(l.unemp.rt)+scale(l.singpar.rt)+scale(latino.lessHS)+
                              scale(chpov.latino.pc)+scale(pctlat)+
                              scale(inst6014_nom)+scale(v.crime.rt)+
@@ -399,7 +399,7 @@ lat.count.bayes<-stan_lmer(cl.latino~-1+scale(l.incarrt)+
                              (1|stname) + (1|obs), family=poisson, offset=log(latino.child),
                           data=fc.imp$imputations[[1]])
 
-am.count.bayes<-stan_lmer(cl.nat.am~-1+scale(a.incarrt)+
+am.count.bayes<-stan_glmer(cl.nat.am~scale(a.incarrt)+
                  scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
                  scale(chpov.amind.pc)+scale(pctami)+
                  scale(inst6014_nom)+scale(v.crime.rt)+
@@ -407,5 +407,36 @@ am.count.bayes<-stan_lmer(cl.nat.am~-1+scale(a.incarrt)+
                  (1+year.c|stname) +(1|obs), family=poisson, offset=log(amind.child),
                data=fc.imp$imputations[[1]])
 
-warnings()
+b.disp.bayes<-stan_lmer(log(bw.disp)~scale(b.incardisp)+
+        scale(bdisp.chpov)+
+        scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
+        scale(I(blk.lessHS/wht.lessHS))+
+        scale(pctblk)+
+        scale(inst6014_nom)+scale(v.crime.rt)+
+        year.c+
+        (1|stname),
+        data=fc.imp$imputations[[1]])
 
+l.disp.bayes<-stan_lmer(log(lw.disp)~scale(l.incardisp)+
+        scale(ldisp.chpov)+
+        scale(I(l.unemp.rt/w.unemp.rt))+scale(I(l.singpar.rt/w.singpar.rt))+
+        scale(I(latino.lessHS/wht.lessHS))+
+        scale(pctlat)+
+        scale(inst6014_nom)+scale(v.crime.rt)+
+        year.c+
+        (1|stname),
+        data=fc.imp$imputations[[1]])
+
+a.disp.bayes<-stan_lmer(log(bw.disp)~scale(a.incardisp)+
+        scale(adisp.chpov)+
+        scale(I(a.unemp.rt/w.unemp.rt))+scale(I(a.singpar.rt/w.singpar.rt))+
+        scale(I(amind.lessHS/wht.lessHS))+
+        scale(pctami)+
+        scale(inst6014_nom)+scale(v.crime.rt)+
+        year.c+
+        (1|stname),
+        data=fc.imp$imputations[[1]])
+
+warnings()
+save.image(file="cw-race-models-incar.R", safe=TRUE)
+quit("no")
