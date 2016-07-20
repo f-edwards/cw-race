@@ -154,7 +154,7 @@ names(fc.new)[1:2]<-c("stname", "year")
 fc<-left_join(fc.new, fc, by=c("stname", "year"))
 fc<-left_join(fc, pov, by=c("stname", "year"))
 fc<-left_join(fc, pol, by=c("state", "year"))
-fc<-left_join(fc, deport%>%select(-St), by=c("state", "year"))
+fc<-left_join(fc, deport%>%dplyr::select(-St), by=c("state", "year"))
 fc<-left_join(fc, ucr, by=c("stname", "year"))
 
 fc<-fc%>%filter(year>2006)%>%filter(stname!="PR")%>%filter(stname!="DC")
