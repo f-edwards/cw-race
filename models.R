@@ -79,10 +79,6 @@ fc<-fc%>%mutate(obs=1:nrow(fc),
  l.welf.incl=latino.welf/latino.child.pov,
  a.welf.incl=amind.welf/amind.child.pov,
  w.welf.incl=wht.welf/wht.child.pov,
- # b.snap.incl=blk.snap/blk.child.pov,
- # l.snap.incl=latino.snap/latino.child.pov,
- # a.snap.incl=amind.snap/amind.child.pov,
- # w.snap.incl=wht.snap/wht.child.pov,
  w.unemp.rt=wht.unemp/(wht.emp+wht.unemp),
  b.unemp.rt=blk.unemp/(blk.emp+blk.unemp),
  a.unemp.rt=amind.unemp/(amind.unemp+amind.emp),
@@ -176,16 +172,16 @@ fc.ineq<-fc.ineq%>%
          cl.white, wht.child, chpov.wht.pc, pctwht)
 
 ### Descriptive table
-fc.desc1<-fc.ineq%>%select(-stname, -obs, -chpovrt, -incarrt, -eitc.st, -child.pov, 
-                          -year.c)
+# fc.desc1<-fc.ineq%>%select(-stname, -obs, -chpovrt, -incarrt, -eitc.st, -child.pov, 
+#                           -year.c)
 
-fc.desc<-fc.desc1%>%mutate("Black foster care caseloads per 100,000")
-Mean<-round(sapply(na.omit(fc.desc), mean),3)
-SD<-round(sapply(na.omit(fc.desc), sd),3)
-Min<-round(sapply(na.omit(fc.desc), min),3)
-Max<-round(sapply(na.omit(fc.desc), max),3)
-descriptives<-xtable(cbind(Mean, SD, Minimum, Maximum), caption="Descriptive Statistics")
-print(descriptives, file="desctable.tex")
+# fc.desc<-fc.desc1%>%mutate("Black foster care caseloads per 100,000")
+# Mean<-round(sapply(na.omit(fc.desc), mean),3)
+# SD<-round(sapply(na.omit(fc.desc), sd),3)
+# Min<-round(sapply(na.omit(fc.desc), min),3)
+# Max<-round(sapply(na.omit(fc.desc), max),3)
+# descriptives<-xtable(cbind(Mean, SD, Minimum, Maximum), caption="Descriptive Statistics")
+# print(descriptives, file="desctable.tex")
 
 
 colClass<-sapply(fc.ineq, class)
