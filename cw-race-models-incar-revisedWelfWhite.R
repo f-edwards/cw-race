@@ -13,15 +13,15 @@ library(arm)
 library(rstanarm)
 library(xtable)
 
-setwd("C:/Users/kilgore/Dropbox/cw-race/data/")
-source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
-source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
-setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
+# setwd("C:/Users/kilgore/Dropbox/cw-race/data/")
+# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
+# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
+# setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
 # 
-# ### for libra
-# setwd("~/cw-race/data/")
-# source("~/cw-race/cw-race-functions.r")
-# source("~/cw-race/cw-race-read.r")
+### for libra
+setwd("~/cw-race/data/")
+source("~/cw-race/cw-race-functions.r")
+source("~/cw-race/cw-race-read.r")
 
 
 # setwd("H:/cw-race/data/")
@@ -47,6 +47,11 @@ fc[which(fc$stname=="HI"), index]
 # fc.ineq[fc.ineq$stname=="HI", c(grep("ami", colnames(fc.ineq)))]<-NA
 # fc.ineq[fc.ineq$stname=="HI", "cl.nat.am"]<-NA
 
+fc2014<-fc%>%filter(year==2014)%>%summarise(blkcl=sum(cl.blk), whtcl=sum(cl.white),
+                                            amicl=sum(cl.nat.am, na.rm=TRUE), latcl=sum(cl.latino),
+                                            blkch=sum(blk.child), whtch=sum(wht.child),
+                                            amich=sum(amind.child, na.rm=TRUE), latch=sum(latino.child))%>%
+  mutate(blkcl.pc=blkcl/blkch, whtcl.pc=whtcl/whtch, amicl.pc=amicl/amich, latcl.pc=latcl/latch)
 
 ### BOARDING SCHOOL DATA
 ### FROM http://www.archives.gov/research/native-americans/bia-guide/schools.html
@@ -92,6 +97,9 @@ fc.ineq<-fc
 ### SOME MISSING INCARCERATION DATA REPORTED AS 0 - AK in 2013
 fc$year.p<-fc$year-2000
 ##TS PLOTS
+
+
+
 race.pc.ts<-ggplot(data=fc, aes(x=year.p, y=cl.blk.pc))+geom_line(aes(color="Black"))+
   geom_line(aes(y=cl.amind.pc, color="Native Am"))+
   geom_line(aes(y=cl.lat.pc, color="Latino"))+
@@ -181,7 +189,7 @@ bounds<-cbind(1:ncol(fc.ineq),
               rep(0.001, ncol(fc.ineq)),
               rep(Inf, ncol(fc.ineq)))
 
-m=max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))
+m=ceiling(max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))/nrow(fc.ineq)*100)
 
 fc.imp<-amelia(fc.ineq, m=m,
          ts="year.c", cs="stname", polytime=1, bounds=bounds, p2s=0)
