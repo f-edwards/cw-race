@@ -18,11 +18,11 @@ library(xtable)
 # source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
 # setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
 # 
-### for libra
-setwd("~/cw-race/data/")
-source("~/cw-race/cw-race-functions.r")
-source("~/cw-race/cw-race-read.r")
-setwd("~/cw-race/")
+### for laptop
+setwd("~/Dropbox/cw-race/data/")
+source("~/Dropbox/cw-race/cw-race-functions.r")
+source("~/Dropbox/cw-race/cw-race-read.r")
+setwd("~/Dropbox/cw-race/")
 
 
 # setwd("H:/cw-race/data/")
@@ -175,11 +175,14 @@ fc.ineq<-fc.ineq%>%
          cl.white, wht.child, chpov.wht.pc, pctwht)
 
 ### Descriptive table
-fc.desc<-fc.ineq%>%select(-stname, -obs)
+fc.desc1<-fc.ineq%>%select(-stname, -obs, -chpovrt, -incarrt, -eitc.st, -child.pov, 
+                          -year.c)
+
+fc.desc<-fc.desc1%>%mutate("Black foster care caseloads per 100,000")
 Mean<-round(sapply(na.omit(fc.desc), mean),3)
 SD<-round(sapply(na.omit(fc.desc), sd),3)
-Minimum<-round(sapply(na.omit(fc.desc), min),3)
-Maximum<-round(sapply(na.omit(fc.desc), max),3)
+Min<-round(sapply(na.omit(fc.desc), min),3)
+Max<-round(sapply(na.omit(fc.desc), max),3)
 descriptives<-xtable(cbind(Mean, SD, Minimum, Maximum), caption="Descriptive Statistics")
 print(descriptives, file="desctable.tex")
 
@@ -287,7 +290,23 @@ makeMIRegTab<-function(x){
   r<-mi.meld(ldply(x, fixef)[,-1], ldply(x, se.fixef)[,-1])
   beta<-t(r[[1]])
   se<-t(r[[2]])
-  t<-beta/se
+  z<-beta/se
+  ### TO SUMMARIZE VARIANCE OF REs ACROSS IMPUTATIONS
+  ranefs.disp<-matrix(ncol=nrow(fc.ineq), nrow=m)
+  ranefs.disp.se<-matrix(ncol=nrow(fc.ineq), nrow=m)
+  ranefs.st<-ranefs.st.se<-matrix(ncol=length(unique(fc.ineq$stname)), nrow=m)
+  for(i in 1:m){
+    ranefs.disp[i,]<-ranef(x[[i]])[[1]][,1]
+    ranefs.disp.se[i,]<-se.ranef(x[[i]])[[1]][,1]
+    ranefs.st[i,]<-ranef(x[[i]])[[2]][,1]
+    ranefs.st.se[i,]<-as.numeric(se.ranef(x[[i]])[[2]][,1])
+  }
+  re.d<-mi.meld(ranefs.disp, ranefs.disp.se)
+  re.s<-mi.meld(ranefs.st, ranefs.st.se)
+  Sig2.ep<-var(t(re.d[[1]]))
+  names(Sig2.ep)<-"Sig2.ep"
+  Sig2.gam<-var(t(re.s[[1]]))
+  names(Sig2.gam)<-"Sig2.gam"
   # fixef.list<-NULL
   # for(i in 1:length(x)){
   #   newsim<-sim(x[[i]], n.sims=1000)
@@ -296,8 +315,9 @@ makeMIRegTab<-function(x){
   # beta.sim<-round(colMeans(fixef.list),3)
   # se.sim<-round(apply(fixef.list, 2, sd),3)
   # ci.sim<-round(as.data.frame(t(apply(fixef.list, 2, function(x)quantile(x, c(0.025, 0.975))))),3)
-  results<-as.data.frame(cbind(beta, se, t))
-  names(results)<-c("Beta", "SE", "t")
+  results<-as.data.frame(cbind(beta, se, z))
+  names(results)<-c("Beta", "SE", "z")
+  results<-list(results, Sig2.ep, Sig2.gam)
   return(results)
 }
 
@@ -318,21 +338,13 @@ print(xtable(a.c.tab, caption="Native American foster care caseloads. Poisson mu
       type="latex", file="a_c_tab.tex")
 
 l.c.tab<-makeMIRegTab(l.ineq)
-print(xtable(l.c.tab, caption="Latino foster care caseloads. Poisson multilevel regression", label="l.c.tab", digits=3),
-      type="latex", file="l_c_tab.tex")
 row.names(l.c.tab)<- c("Intercept", "Latino Incarceration rate", "Latino Unemployment rate", "Latino Single parent rate",
                        "Latino Adults w/o HS rate", "Latino Child poverty rate", "Percent Latino population",
                        "Latino welfare enrollment per child poverty",
                        "Leg. Ideology", "Violent crime rate", "Year")
+print(xtable(l.c.tab, caption="Latino foster care caseloads. Poisson multilevel regression", label="l.c.tab", digits=3),
+      type="latex", file="l_c_tab.tex")
 
-
-c.names<-c("Incarceration rate", "Unemployment rate", "Single parent rate",
-           "Adults w/o HS rate", "Child poverty rate", "Percent of population",
-           "Leg. Ideology", "Violent crime rate", "Year")
-
-row.names(b.c.tab)<-row.names(a.c.tab)<-row.names(l.c.tab)<-c.names
-
-count.tab<-rbind(b.c.tab,a.c.tab, l.c.tab)
 
 b.d.tab<-makeMIRegTab(b.disp)
 row.names(b.d.tab)<- c("Intercept", "Black/White Incarceration rate", "Black/White Unemployment rate", "Black/White Single parent rate",

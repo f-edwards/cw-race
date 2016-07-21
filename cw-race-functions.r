@@ -1,6 +1,37 @@
 ### Assorted functions for data cleaning and analysis
 ### Some unused in the current repository
 
+
+### Merges imputation results according to Rubin for beta, se
+
+makeMIRegTab<-function(x){
+  r<-mi.meld(ldply(x, fixef)[,-1], ldply(x, se.fixef)[,-1])
+  beta<-t(r[[1]])
+  se<-t(r[[2]])
+  z<-beta/se
+  ### TO SUMMARIZE VARIANCE OF REs ACROSS IMPUTATIONS
+  ranefs.disp<-matrix(ncol=nrow(fc.ineq), nrow=m)
+  ranefs.disp.se<-matrix(ncol=nrow(fc.ineq), nrow=m)
+  ranefs.st<-ranefs.st.se<-matrix(ncol=length(unique(fc.ineq$stname)), nrow=m)
+  for(i in 1:m){
+    ranefs.disp[i,]<-ranef(x[[i]])[[1]][,1]
+    ranefs.disp.se[i,]<-se.ranef(x[[i]])[[1]][,1]
+    ranefs.st[i,]<-ranef(x[[i]])[[2]][,1]
+    ranefs.st.se[i,]<-as.numeric(se.ranef(x[[i]])[[2]][,1])
+  }
+  re.d<-mi.meld(ranefs.disp, ranefs.disp.se)
+  re.s<-mi.meld(ranefs.st, ranefs.st.se)
+  Sig2.ep<-var(t(re.d[[1]]))
+  names(Sig2.ep)<-"Sig2.ep"
+  Sig2.gam<-var(t(re.s[[1]]))
+  names(Sig2.gam)<-"Sig2.gam"
+  results<-as.data.frame(cbind(beta, se, z))
+  names(results)<-c("Beta", "SE", "z")
+  results<-list(results, Sig2.ep, Sig2.gam)
+  return(results)
+}
+
+
 ##Recode state abbreviations to fips
 cleanpol<-function(x){
 	x$state<-ifelse(x$stname=="AL",1, x$state)
@@ -119,6 +150,64 @@ cleanpol2<-function(x){
 	x$state<-ifelse((x$St=="WY"|x$St=="Wyoming"),56, x$state)
 	x$state<-ifelse((x$St=="PR"|x$St=="Puerto Rico"), 72, x$state)
 return(x)
+}
+
+
+StateNames<-function(x){
+  x$St<-x$state
+  x$state<-ifelse(x$St=="AL", "Alabama", x$state)
+  x$state<-ifelse(x$St=="AK", "Alaska", x$state)
+  x$state<-ifelse(x$St=="AZ", "Arizona", x$state)
+  x$state<-ifelse(x$St=="AR", "Arkansas", x$state)
+  x$state<-ifelse(x$St=="CA", "California", x$state)
+  x$state<-ifelse(x$St=="CO", "Colorado", x$state)
+  x$state<-ifelse(x$St=="CT", "Connecticut", x$state)
+  x$state<-ifelse(x$St=="DE", "Delaware", x$state)
+  x$state<-ifelse(x$St=="DC", "District of Columbia", x$state)
+  x$state<-ifelse(x$St=="FL", "Florida", x$state)
+  x$state<-ifelse(x$St=="GA", "Georgia", x$state)
+  x$state<-ifelse(x$St=="HI", "Hawaii", x$state)
+  x$state<-ifelse(x$St=="ID", "Idaho", x$state)
+  x$state<-ifelse(x$St=="IL", "Illinois", x$state)
+  x$state<-ifelse(x$St=="IN", "Indiana", x$state)
+  x$state<-ifelse(x$St=="IA", "Iowa", x$state)
+  x$state<-ifelse(x$St=="KS", "Kansas", x$state)
+  x$state<-ifelse(x$St=="KY", "Kentucky", x$state)
+  x$state<-ifelse(x$St=="LA", "Louisiana", x$state)
+  x$state<-ifelse(x$St=="ME", "Maine", x$state)
+  x$state<-ifelse(x$St=="MD", "Maryland", x$state)
+  x$state<-ifelse(x$St=="MA", "Massachusetts", x$state)
+  x$state<-ifelse(x$St=="MI", "Michigan", x$state)
+  x$state<-ifelse(x$St=="MN", "Minnesota", x$state)
+  x$state<-ifelse(x$St=="MS", "Mississippi", x$state)
+  x$state<-ifelse(x$St=="MO", "Missouri", x$state)
+  x$state<-ifelse(x$St=="MT", "Montana", x$state)
+  x$state<-ifelse(x$St=="NE", "Nebraska", x$state)
+  x$state<-ifelse(x$St=="NV", "Nevada", x$state)
+  x$state<-ifelse(x$St=="NH", "New Hampshire", x$state)
+  x$state<-ifelse(x$St=="NJ", "New Jersey", x$state)
+  x$state<-ifelse(x$St=="NM", "New Mexico", x$state)
+  x$state<-ifelse(x$St=="NY", "New York", x$state)
+  x$state<-ifelse(x$St=="NC", "North Carolina", x$state)
+  x$state<-ifelse(x$St=="ND", "North Dakota", x$state)
+  x$state<-ifelse(x$St=="OH", "Ohio", x$state)
+  x$state<-ifelse(x$St=="OK", "Oklahoma", x$state)
+  x$state<-ifelse(x$St=="OR", "Oregon", x$state)
+  x$state<-ifelse(x$St=="PA", "Pennsylvania", x$state)
+  x$state<-ifelse(x$St=="RI", "Rhode Island", x$state)
+  x$state<-ifelse(x$St=="SC", "South Carolina", x$state)
+  x$state<-ifelse(x$St=="SD", "South Dakota", x$state)
+  x$state<-ifelse(x$St=="TN", "Tennessee", x$state)
+  x$state<-ifelse(x$St=="TX", "Texas", x$state)
+  x$state<-ifelse(x$St=="UT", "Utah", x$state)
+  x$state<-ifelse(x$St=="VT", "Vermont", x$state)
+  x$state<-ifelse(x$St=="VA", "Virginia", x$state)
+  x$state<-ifelse(x$St=="WA", "Washington", x$state)
+  x$state<-ifelse(x$St=="WV", "West Virginia", x$state)
+  x$state<-ifelse(x$St=="WI", "Wisconsin", x$state)
+  x$state<-ifelse(x$St=="WY", "Wyoming", x$state)
+  x$state<-ifelse(x$St=="PR", "Puerto Rico", x$state)
+  return(x)
 }
 
 stnames<-function(x){
