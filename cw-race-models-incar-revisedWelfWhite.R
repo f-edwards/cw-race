@@ -22,6 +22,7 @@ library(xtable)
 setwd("~/cw-race/data/")
 source("~/cw-race/cw-race-functions.r")
 source("~/cw-race/cw-race-read.r")
+setwd("~/cw-race/")
 
 
 # setwd("H:/cw-race/data/")
