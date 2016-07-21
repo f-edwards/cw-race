@@ -287,16 +287,17 @@ makeMIRegTab<-function(x){
   r<-mi.meld(ldply(x, fixef)[,-1], ldply(x, se.fixef)[,-1])
   beta<-t(r[[1]])
   se<-t(r[[2]])
-  fixef.list<-NULL
-  for(i in 1:length(x)){
-    newsim<-sim(x[[i]], n.sims=1000)
-    fixef.list<-rbind(fixef.list, fixef(newsim))
-  }
-  beta.sim<-round(colMeans(fixef.list),3)
-  se.sim<-round(apply(fixef.list, 2, sd),3)
-  ci.sim<-round(as.data.frame(t(apply(fixef.list, 2, function(x)quantile(x, c(0.025, 0.975))))),3)
-  results<-as.data.frame(cbind(beta.sim, se.sim, ci.sim))
-  names(results)<-c("Beta", "SE", "95 percent CI, lower", "95 percent CI, upper")
+  t<-beta/se
+  # fixef.list<-NULL
+  # for(i in 1:length(x)){
+  #   newsim<-sim(x[[i]], n.sims=1000)
+  #   fixef.list<-rbind(fixef.list, fixef(newsim))
+  # }
+  # beta.sim<-round(colMeans(fixef.list),3)
+  # se.sim<-round(apply(fixef.list, 2, sd),3)
+  # ci.sim<-round(as.data.frame(t(apply(fixef.list, 2, function(x)quantile(x, c(0.025, 0.975))))),3)
+  results<-as.data.frame(cbind(beta, se, t))
+  names(results)<-c("Beta", "SE", "t")
   return(results)
 }
 
@@ -515,5 +516,5 @@ print(xtable(l.d.tab, caption="Latino/White foster care caseload disproportion. 
 #         data=fc.imp$imputations[[1]])
 
 # warnings()
-# save.image(file="cw-race-models-incar.R", safe=TRUE)
+# save.image(file="cw-race-models-incar.Rdata", safe=TRUE)
 # #quit("no")
