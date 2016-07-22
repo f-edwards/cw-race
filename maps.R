@@ -76,11 +76,11 @@ MapPlot <- MapPlot + xlab(NULL) + ylab(NULL)
 MapPlot <- MapPlot + facet_wrap(~c, ncol=3)
 
 print(MapPlot)
-ggsave(plot = MapPlot, "CLMap.pdf", h = 8, w = 16)
+ggsave(plot = MapPlot, "CLMap.pdf", h = 6, w = 8)
 
 fclong<-with(fcmap, 
              data.frame(region=rep(region, 6),
-              q=c(returnquant(bw.disp), returnquant(aw.disp), returnquant(lw.disp), returnquant(b.incardisp), returnquant(a.incardisp), returnquant(l.incardisp))))
+              q=c(returnquant(bw.disp), returnquant(ami.disp), returnquant(lw.disp), returnquant(b.incardisp), returnquant(a.incardisp), returnquant(l.incardisp))))
               
 fclong$c<-c(rep("Black/White foster care caseload disproportion", n), 
             rep("Native American/White foster care caseload disproportion", n), 
@@ -129,4 +129,4 @@ MapPlot <- MapPlot + xlab(NULL) + ylab(NULL)
 MapPlot <- MapPlot + facet_wrap(~c, ncol=3)
 
 print(MapPlot)
-ggsave(plot = MapPlot, "DispMap.pdf", h = 8, w = 16)
+ggsave(plot = MapPlot, "DispMap.pdf", h = 6, w = 8)
