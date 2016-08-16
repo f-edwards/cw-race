@@ -14,20 +14,28 @@ makeMIRegTab<-function(x){
   ranefs.disp.se<-matrix(ncol=nrow(fc.ineq), nrow=m)
   ranefs.st<-ranefs.st.se<-matrix(ncol=length(unique(fc.ineq$stname)), nrow=m)
   for(i in 1:m){
+  	if(length(ranef(x[[i]]))>1){ 	
     ranefs.disp[i,]<-ranef(x[[i]])[[1]][,1]
     ranefs.disp.se[i,]<-se.ranef(x[[i]])[[1]][,1]
     ranefs.st[i,]<-ranef(x[[i]])[[2]][,1]
     ranefs.st.se[i,]<-as.numeric(se.ranef(x[[i]])[[2]][,1])
+	}
+	if(length(ranef(x[[i]]))==1) {
+		ranefs.st[i,]<-ranef(x[[i]])[[1]][,1]
+    	ranefs.st.se[i,]<-as.numeric(se.ranef(x[[i]])[[1]][,1])
+	}
+
   }
-  re.d<-mi.meld(ranefs.disp, ranefs.disp.se)
+  # re.d<-mi.meld(ranefs.disp, ranefs.disp.se)
   re.s<-mi.meld(ranefs.st, ranefs.st.se)
-  Sig2.ep<-var(t(re.d[[1]]))
-  names(Sig2.ep)<-"Sig2.ep"
+  # Sig2.ep<-var(t(re.d[[1]]))
+  # names(Sig2.ep)<-"Sig2.ep"
   Sig2.gam<-var(t(re.s[[1]]))
   names(Sig2.gam)<-"Sig2.gam"
   results<-as.data.frame(cbind(beta, se, z))
   names(results)<-c("Beta", "SE", "z")
-  results<-list(results, Sig2.ep, Sig2.gam)
+  # results[11,1]<-Sig2.ep
+  results[12,1]<-Sig2.gam
   return(results)
 }
 
