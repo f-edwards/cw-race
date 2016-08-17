@@ -13,16 +13,16 @@ library(arm)
 library(rstanarm)
 library(xtable)
 
-setwd("C:/Users/kilgore/Dropbox/cw-race/data/")
-source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
-source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
-setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
+# setwd("C:/Users/kilgore/Dropbox/cw-race/data/")
+# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
+# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
+# setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
 
 # ## for laptop
-# setwd("~/Dropbox/cw-race/data/")
-# source("~/Dropbox/cw-race/cw-race-functions.r")
-# source("~/Dropbox/cw-race/cw-race-read.r")
-# setwd("~/Dropbox/cw-race/")
+setwd("~/Dropbox/cw-race/data/")
+source("~/Dropbox/cw-race/cw-race-functions.r")
+source("~/Dropbox/cw-race/cw-race-read.r")
+setwd("~/Dropbox/cw-race/")
 
 # ### for libra
 # setwd("~/cw-race/data/")

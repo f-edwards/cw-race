@@ -17,9 +17,9 @@ returnquant<-function(x){
 }
 
 fc14<-fc.ineq%>%filter(year.c==7)
-fcmap<-fc14%>%select(stname, bw.disp, lw.disp, ami.disp, b.incardisp, a.incardisp, 
-                     l.incardisp, l.incarrt, b.incarrt, a.incarrt, cl.blk, cl.nat.am, cl.latino, blk.child, latino.child, amind.child)%>%
-                     mutate("bcl.rt"=cl.blk/blk.child, "acl.rt"=cl.nat.am/amind.child, "lcl.rt"=cl.latino/latino.child)
+fcmap<-fc14%>%dplyr::select(stname, bw.disp, ami.disp, b.incardisp, a.incardisp, 
+                     b.incarrt, a.incarrt, cl.blk, cl.nat.am, blk.child, amind.child)%>%
+                     mutate("bcl.rt"=cl.blk/blk.child, "acl.rt"=cl.nat.am/amind.child)
 
 fcmap$state<-fcmap$St<-fcmap$stname
 fcmap<-StateNames(fcmap)
@@ -29,23 +29,21 @@ states<-map_data("state")
 n<-nrow(fcmap)
 
 fclong<-with(fcmap, 
-             data.frame(region=rep(region, 6),
-              q=c(returnquant(bcl.rt), returnquant(acl.rt), returnquant(lcl.rt), returnquant(b.incarrt), returnquant(a.incarrt), returnquant(l.incarrt))))
+             data.frame(region=rep(region, 4),
+              q=as.factor(c(returnquant(bcl.rt), returnquant(acl.rt), returnquant(b.incarrt), returnquant(a.incarrt)))))
               
 fclong$c<-c(rep("Black children in foster care per capita", n), 
             rep("Native American children in foster care per capita", n), 
-            rep("Latino children in foster care per capita", n), 
             rep("Black Incarceration per capita", n),
-            rep("Native American incarceration per capita", n),
-            rep("Latino incarceration per capita", n))
+            rep("Native American incarceration per capita", n))
 fclong$c<-factor(fclong$c, levels=c("Black children in foster care per capita", 
-                                    "Native American children in foster care per capita", "Latino children in foster care per capita",
-                                    "Black Incarceration per capita", "Native American incarceration per capita", "Latino incarceration per capita"))
+                                    "Native American children in foster care per capita", 
+                                    "Black Incarceration per capita", "Native American incarceration per capita"))
 
 choro<-merge(states, fclong, by="region")
 choro <- choro[order(choro$order), ]
 
-gray.pal<-c("gray99", "gray65", "gray40", "gray15", "gray1")
+gray.pal<-c("gray90", "gray65", "gray40", "gray15", "gray1")
 
 MapPlot <- ggplot(choro,
                   aes(x = long, y = lat, group = group, fill = q))
