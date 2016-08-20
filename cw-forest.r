@@ -24,7 +24,7 @@ forest.est<-forest.est%>%filter(var!="Intercept")
 
 # 
 forest.est$var<-factor(forest.est$var)
-forest.est$var<-factor(forest.est$var, levels(forest.est$var)[c(10, 8, 4, 9, 5, 2, 1, 6, 7, 3)])
+forest.est$var<-factor(forest.est$var, levels(forest.est$var)[c(10, 8, 4,5, 9, 2, 1, 6, 7, 3)])
 
 # forest.est$varname<-factor(forest.est$varname, levels(forest.est$varname)[c(1:9, 18,10:14, 15:17)])
 
@@ -41,9 +41,11 @@ ggplot(data=forest.est, aes(x=beta,y=var))+
 
 ### Disp models
 
-forest.est<-data.frame("var"=rep(c("Intercept", "Incarceration disproportion", "Unemployment disproportion", "Single parent disproportion",
-                                   "Adults w/o HS disproportion", "Child poverty disproportion", "Percent population",
+forest.est<-data.frame("var"=rep(c("Intercept", "Incarceration disproportion", "Child poverty disproportion",
+                                   "Unemployment disproportion", "Single parent disproportion",
+                                   "Adults w/o HS disproportion",  
                                    "Welfare per child poverty disproportion",
+                                   "Percent population",
                                    "Leg. ideology", "Violent crime rate", "Year"),2),
                        "Race"=c(rep("African American/White", 11), rep("Native American/White",11)), 
                        "beta"=c(colMeans(b.disp.sim), colMeans(a.disp.sim)), 
@@ -56,7 +58,7 @@ forest.est<-forest.est%>%filter(var!="Intercept")
 
 # 
 forest.est$var<-factor(forest.est$var)
-forest.est$var<-factor(forest.est$var, levels(forest.est$var)[c(10, 8, 4, 9, 5, 2, 1, 6, 7, 3)])
+forest.est$var<-factor(forest.est$var, levels(forest.est$var)[c(10, 8, 4, 5, 9, 2, 1, 6, 7, 3)])
 
 # forest.est$varname<-factor(forest.est$varname, levels(forest.est$varname)[c(1:9, 18,10:14, 15:17)])
 
