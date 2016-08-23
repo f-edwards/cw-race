@@ -66,8 +66,12 @@ fc<-fc%>%mutate(obs=1:nrow(fc),
  pctwht=wht/tot,
  incarrt=ifelse(TOTRACEM>0, (TOTRACEM+TOTRACEF)/adult, NA),
  b.incarrt=ifelse(BLACKM>0, (BLACKM+BLACKF)/b.adult, NA),
+ b.m.incarrt=ifelse(BLACKM>0, (BLACKM)/b.adult, NA),
+ b.f.incarrt=ifelse(BLACKM>0, (BLACKF)/b.adult, NA),
  l.incarrt=ifelse(HISPM>0, (HISPM+HISPF)/l.adult,NA),
  a.incarrt=ifelse(AIANM>0, (AIANM+AIANF)/a.adult,NA),
+ a.m.incarrt=ifelse(AIANM>0, (AIANM)/a.adult,NA),
+ a.f.incarrt=ifelse(AIANM>0, (AIANF)/a.adult,NA),
  w.incarrt=ifelse(WHITEM>0, (WHITEM+WHITEF)/w.adult,NA),
  b.incardisp=ifelse(BLACKM>0, b.incarrt/w.incarrt,NA),
  l.incardisp=ifelse(HISPM>0, l.incarrt/w.incarrt,NA),
@@ -166,7 +170,8 @@ fc.ineq<-fc.ineq%>%
          w.unemp.rt, b.unemp.rt, a.unemp.rt,  w.singpar.rt, b.singpar.rt, a.singpar.rt, 
          wht.lessHS, blk.lessHS, amind.lessHS, latino.lessHS,
          v.crime.rt,
-         cl.white, wht.child, chpov.wht.pc, pctwht)
+         cl.white, wht.child, chpov.wht.pc, pctwht,
+         b.m.incarrt, b.f.incarrt, a.m.incarrt, a.f.incarrt)
 
 ### Descriptive table
 # fc.desc1<-fc.ineq%>%select(-stname, -obs, -chpovrt, -incarrt, -eitc.st, -child.pov, 
@@ -190,7 +195,8 @@ bounds<-cbind(1:ncol(fc.ineq),
 m=ceiling(max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))/nrow(fc.ineq)*100)
 
 fc.imp<-amelia(fc.ineq, m=m,
-         ts="year.c", cs="stname", polytime=1, bounds=bounds, p2s=0)
+         ts="year.c", cs="stname", polytime=1, bounds=bounds, p2s=0,
+         idvars=c("b.f.incarrt", "a.f.incarrt"))
 
 # OItest<-overimpute(fc.imp, "l.incarrt")
 
@@ -213,13 +219,30 @@ b.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~1+scale(b.incarrt)+
         (1|stname) + (1|obs), family=poisson, offset=log(blk.child),
       data=d, control=glmerControl(optCtrl=list(maxfun=2e5))))
 
-b.cl.fe<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~1+scale(b.incarrt)+
+##REWRITE AS NEGBIN OR PSEUDO POIS
+b.cl.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.incarrt)+
         scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
         scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
-        factor(stname) + (1|obs), family=poisson, offset=log(blk.child),
-      data=d, control=glmerControl(optCtrl=list(maxfun=2e5))))
+        factor(stname) , family=quasipoisson, offset=log(blk.child),
+      data=d))
+
+b.cl.m.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.m.incarrt)+
+        scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
+        scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
+        scale(inst6014_nom)+scale(v.crime.rt)+
+        year.c+
+        factor(stname) , family=quasipoisson, offset=log(blk.child),
+      data=d))
+
+b.cl.f.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.f.incarrt)+
+        scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
+        scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
+        scale(inst6014_nom)+scale(v.crime.rt)+
+        year.c+
+        factor(stname) , family=quasipoisson, offset=log(blk.child),
+      data=d))
 
 # w.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.white~1+scale(w.incarrt)+scale(incarrt)+
 #           scale(w.unemp.rt)+scale(w.singpar.rt)+scale(wht.lessHS)+
@@ -237,13 +260,29 @@ a.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~1+scale(a.incarrt
         (1|stname) + (1|obs), family=poisson, offset=log(amind.child),
         data=d, control=glmerControl(optCtrl=list(maxfun=2e5))))
 
-a.cl.fe<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~1+scale(a.incarrt)+
+a.cl.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~1+scale(a.incarrt)+
         scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
         scale(chpov.amind.pc)+scale(pctami)+scale(a.welf.incl)+
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
-        factor(stname) + (1|obs), family=poisson, offset=log(amind.child),
-        data=d, control=glmerControl(optCtrl=list(maxfun=2e5))))
+        factor(stname), family=quasipoisson, offset=log(amind.child),
+        data=d))
+
+a.cl.m.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~1+scale(a.m.incarrt)+
+        scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
+        scale(chpov.amind.pc)+scale(pctami)+scale(a.welf.incl)+
+        scale(inst6014_nom)+scale(v.crime.rt)+
+        year.c+
+        factor(stname), family=quasipoisson, offset=log(amind.child),
+        data=d))
+
+a.cl.f.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~1+scale(a.f.incarrt)+
+        scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
+        scale(chpov.amind.pc)+scale(pctami)+scale(a.welf.incl)+
+        scale(inst6014_nom)+scale(v.crime.rt)+
+        year.c+
+        factor(stname), family=quasipoisson, offset=log(amind.child),
+        data=d))
 
 ## Disproportion models
 b.disp<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~1+scale(b.incardisp)+
