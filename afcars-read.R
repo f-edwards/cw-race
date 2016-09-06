@@ -5,7 +5,6 @@ setwd("H:/AFCARS-new")
 library(data.table)
 library(dplyr)
 
-
 names.funct<-function(x){
   names(x)<-tolower(names(x))
   return(x)

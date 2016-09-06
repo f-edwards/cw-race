@@ -32,6 +32,10 @@ incar<-(data.frame(state=incartemp$STATEID, year=incartemp$YEAR,
 
 incar<-cbind(incar, incartemp[,53:80])
 
+#AK 2013 is missing race data
+index<-which(incar$state==2 & incar$year==2013)
+incar[index,5:ncol(incar)]<-NA
+
 ucr<-read.csv("ucr2014.csv", head=TRUE, stringsAsFactors = FALSE)
 names(ucr)[1]<-"stname"
 
@@ -52,96 +56,6 @@ names(pov)<-c("stname" ,"year","food.insec", "GSP", "AFDCRec", "SNAPRec", "AFDCB
 	 "WIC.par", "NSLP.Total", "SBP.Total")
 pov$food.insec<-pov$food.insec/100 ## rescale to [0,1]
 
-#### State and local govt employment data from Annual Survey of Public Employment and Payroll 
-### https://www.census.gov//govs/apes/
-
-# emp<-read.csv("emp-dat.csv", head=TRUE)
-# emp<-emp[-(which(emp$state=="US")),]
-# emp$gov.function<-ifelse(
-# 	(emp$gov.function=="Police with power of arrest")|
-# 	(emp$gov.function=="Persons with power of arrest ")|
-# 	(emp$gov.function=="Police Protection - Officers")|
-# 	(emp$gov.function=="Police Officers Only"),
-# 	"Police Officers", as.character(emp$gov.function))
-# 
-# police<-emp[which(emp$gov.function=="Police Officers"),]
-# names(police)<-c("year", "state", "drop", "police.ft.emp", "police.tot.pay")
-# welfare<-emp[which(emp$gov.function=="Public Welfare"),]
-# names(welfare)<-c("year", "state", "drop", "welfare.ft.emp", "welfare.tot.pay")
-# corrections<-emp[which(emp$gov.function=="Correction"),]
-# names(corrections)<-c("year", "state", "drop", "cor.ft.emp", "cor.tot.pay")
-# total<-emp[which(emp$gov.function=="Total"),]
-# names(total)<-c("year", "state", "drop", "tot.ft.emp", "tot.tot.pay")
-# edu<-emp[which(emp$gov.function=="Education Total"),]
-# names(edu)<-c("year", "state", "drop", "edu.ft.emp", "edu.tot.pay")
-# 
-# 
-# 
-# spend<-join_all(list(police, welfare, corrections, edu, total), by=c("state", "year"))
-# spend<-spend[-(which(spend$state=="DC")),]
-# names(spend)[2]<-"stname"
-# spend<-spend[,-(grep("drop", names(spend)))]
-
-
-# ### Death sentences from DPIC
-# death<-read.csv("dpic-sentences.csv")
-# names(death)[1]<-"stname"
-# d.g<-gather(death, "stname","year", 2:39)
-# names(d.g)<-c("stname", "year", "death.sent")
-# d.g$year<-as.numeric(substring(d.g$year,2))
-# 
-# sp.pol<-join_all(list(d.g,spend, pol),  
-# 	by=c("stname", "year"))
-# 
-# sp.pol$death.pen<-!(is.na(sp.pol$death.sent))
-# sp.pol[which(is.na(sp.pol$death.sent)), "death.sent"]<-0
-
-### Regional Price Parity Index from BEA 
-### http://www.bea.gov/iTable/iTableHtml.cfm?reqid=70&step=30&isuri=1&7022=101&7023=8&7024=non-industry&7033=-1&7025=0&7026=xx&7027=-1&7001=8101&7028=1&7031=0&7040=-1&7083=levels&7029=101&7090=70
-# 
-# rpp<-read.csv("rpp.csv", head=TRUE)
-# ### Construct average Regional Price Parity for 2008=2013 by state
-# 
-# rpp$rpp<-apply(rpp[,3:8], MARGIN=1, FUN=mean)
-# rpp$rpp<-rpp$rpp/100
-# names(rpp)[1]<-"state"
-# rp.out<-rpp[,c(1,9)]
-
-### Deportation proceedings data from TRAC (http://trac.syr.edu/phptools/immigration/charges/deport_filing_charge.php, accessed 6/20/16)
-## scraper in trac-scrape.r in this repo
-# 
-deport<-read.csv("deport-proceedings.csv", stringsAsFactors = FALSE)
-deport$St<-deport$state
-deport<-cleanpol2(deport)
-deport$state<-as.numeric(deport$state)
-deport<-deport[-c(which(deport$St%in%(c("US Virgin Islands", "Guam", "Puerto Rico")))),]
-deport$ct.region<-ifelse(deport$St=="Alabama", "Georgia", 
-             ifelse(deport$St=="Alaska", "Oregon",
-              ifelse(deport$St=="Arkansas", "Tennessee",
-               ifelse(deport$St=="Delaware", "Maryland",
-                ifelse(deport$St=="Idaho", "Oregon",
-                 ifelse(deport$St=="Indiana", "Illinois",
-                  ifelse(deport$St=="Iowa", "Nebraska",
-                   ifelse(deport$St=="Kansas", "Missouri",
-                    ifelse(deport$St=="Kentucky", "Tennessee",
-                     ifelse(deport$St=="Maine", "Massachusetts",
-                      ifelse(deport$St=="Mississippi", "Louisiana",
-                       ifelse(deport$St=="Montana", "Oregon",
-                        ifelse(deport$St=="New Hampshire", "Massachusetts",
-                         ifelse(deport$St=="New Mexico", "Texas",
-                          ifelse(deport$St=="North Dakota", "Minnesota",
-                           ifelse(deport$St=="Oklahoma", "Texas",
-                            ifelse(deport$St=="Rhode Island", "Massachusetts",
-                             ifelse(deport$St=="South Carolina", "North Carolina",
-                              ifelse(deport$St=="South Dakota", "Minnesota",
-                               ifelse(deport$St=="Vermont", "Massachusetts",
-                                ifelse(deport$St=="West Virginia", "Virginia",
-                                 ifelse(deport$St=="Wisconsin", "Illinois",
-                                  ifelse(deport$St=="Wyoming", "Colorado",
-                                         deport$St)))))))))))))))))))))))
-
-
-
 names(pop)[1:2]<-c("state", "year")
 
 fc<-left_join(pop, incar, by=c("state", "year"))
@@ -154,31 +68,7 @@ names(fc.new)[1:2]<-c("stname", "year")
 fc<-left_join(fc.new, fc, by=c("stname", "year"))
 fc<-left_join(fc, pov, by=c("stname", "year"))
 fc<-left_join(fc, pol, by=c("state", "year"))
-fc<-left_join(fc, deport%>%dplyr::select(-St), by=c("state", "year"))
 fc<-left_join(fc, ucr, by=c("stname", "year"))
-
-fc<-fc%>%filter(year>2006)%>%filter(stname!="PR")%>%filter(stname!="DC")
-fc$deport.adj<-NA
-
-
-deport.match<-function(x){
-  for(y in unique(x$year)){
-    for(c in unique(x$ct.region)){
-      z.y<-which((x$year==y) & (x$ct.region==c))
-      all.cases<-x[z.y[which(x[z.y, "statename"]==c)], "cases"]
-      pct.foreign<-x[z.y, "foreign"]/sum(x[z.y, "foreign"])
-      for(z in 1:length(z.y)){
-        x$deport.adj[z.y[z]]<-all.cases*pct.foreign[z]
-      }
-    }  
-  }
-  return(x)
-}
-
-fc<-deport.match(fc)
-fc$deport.pc<-fc$deport.adj/fc$foreign
-
-deport.ts<-ggplot(fc, aes(x=year, y=deport.pc))+geom_line()+facet_wrap(~stname)
 
 fc[which(fc$amind.child.pov==0), "amind.child.pov"]<-NA
 fc[which(fc$stname=="HI" & fc$year==2010), "amind.child"]<-NA
@@ -189,7 +79,6 @@ fc<-fc%>%mutate(cl.wht.pc=cl.white/wht.child, cl.blk.pc=cl.blk/blk.child,
                 ent.wht.pc=ent.white/wht.child, ent.blk.pc=ent.blk/blk.child,
                 ent.amind.pc=ent.nat.am/amind.child, ent.lat.pc=ent.latino/latino.child,
                 chpov.wht.pc=wht.child.pov/wht.child, chpov.blk.pc=blk.child.pov/blk.child,
-                chpov.amind.pc=amind.child.pov/amind.child, chpov.latino.pc=latino.child.pov/latino.child
-                )%>%
-  filter(year>2006)%>%filter(stname!=("PR"))%>%filter(stname!="DC")
+                chpov.amind.pc=amind.child.pov/amind.child, chpov.latino.pc=latino.child.pov/latino.child)%>%
+                filter(stname!="PR")%>%filter(stname!="DC")
 

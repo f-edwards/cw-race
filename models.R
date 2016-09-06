@@ -1,5 +1,4 @@
 #########
-# These models replicate models from "Saving Children" for racial inequalities. Expanding to Nat. Am., Latino and working through separate outcomes (i.e LOS, Nplacement, placement setting, casegoal) at the individual level is the next step
 rm(list=ls())
 set.seed(1)
 library(plyr)
@@ -12,17 +11,19 @@ library(dplyr)
 library(arm)
 library(rstanarm)
 library(xtable)
+library(stargazer)
 
-# setwd("C:/Users/kilgore/Dropbox/cw-race/data/")
-# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
-# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
-# setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
+setwd("C:/Users/kilgore/Dropbox/cw-race/data/")
+source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
+source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
+setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
 
 # ## for laptop
-setwd("~/Dropbox/cw-race/data/")
-source("~/Dropbox/cw-race/cw-race-functions.r")
-source("~/Dropbox/cw-race/cw-race-read.r")
-setwd("~/Dropbox/cw-race/")
+# setwd("~/Dropbox/cw-race/data/")
+# source("~/Dropbox/cw-race/cw-race-functions.r")
+# source("~/Dropbox/cw-race/cw-race-read.r")
+# ##for output
+# setwd("~/Dropbox/cw-race-paper/")
 
 # ### for libra
 # setwd("~/cw-race/data/")
@@ -30,24 +31,10 @@ setwd("~/Dropbox/cw-race/")
 # source("~/cw-race/cw-race-read.r")
 # setwd("~/cw-race/")
 
+fc<-fc%>%filter(fc$year>2006)
+
 fc$bw.disp<-fc$cl.blk.pc/fc$cl.wht.pc
-fc$lw.disp<-fc$cl.lat.pc/fc$cl.wht.pc
 fc$ami.disp<-fc$cl.amind.pc/fc$cl.wht.pc
-
-###big dip in HI 2010, unrealistic, impute it
-fc[which(fc$stname=="MI"), c("HISPM", "HISPF") ]<-0
-index<-names(fc)[grep("amind", names(fc))]
-fc[which(fc$stname=="HI"), index]
-##DON'T TRUST THE ZEROES, NA
-
-
-##PROBLEMATIC LATINO INCAR DATA:
-##MI under, MD no data
-###FIX DROPPED HAWAII
-
-###HI IS WEIRD, IMPUTE NATAM VALUES
-# fc.ineq[fc.ineq$stname=="HI", c(grep("ami", colnames(fc.ineq)))]<-NA
-# fc.ineq[fc.ineq$stname=="HI", "cl.nat.am"]<-NA
 
 fc2014<-fc%>%filter(year==2014)%>%summarise(blkcl=sum(cl.blk), whtcl=sum(cl.white),
                                             amicl=sum(cl.nat.am, na.rm=TRUE), latcl=sum(cl.latino),
@@ -55,9 +42,6 @@ fc2014<-fc%>%filter(year==2014)%>%summarise(blkcl=sum(cl.blk), whtcl=sum(cl.whit
                                             amich=sum(amind.child, na.rm=TRUE), latch=sum(latino.child))%>%
   mutate(blkcl.pc=blkcl/blkch, whtcl.pc=whtcl/whtch, amicl.pc=amicl/amich, latcl.pc=latcl/latch)
 
-### BOARDING SCHOOL DATA
-### FROM http://www.archives.gov/research/native-americans/bia-guide/schools.html
-### SAVING CHILDREN VARS
 fc<-fc%>%mutate(obs=1:nrow(fc), 
  chpovrt=child.pov/child, 
  pctblk=blk/tot,
@@ -99,8 +83,6 @@ fc.ineq<-fc
 ### SOME MISSING INCARCERATION DATA REPORTED AS 0 - AK in 2013
 fc$year.p<-fc$year-2000
 ##TS PLOTS
-
-
 
 # race.pc.ts<-ggplot(data=fc, aes(x=year.p, y=cl.blk.pc))+geom_line(aes(color="Black"))+
 #   geom_line(aes(y=cl.amind.pc, color="Native Am"))+
@@ -174,9 +156,9 @@ fc.ineq<-fc.ineq%>%
          b.m.incarrt, b.f.incarrt, a.m.incarrt, a.f.incarrt)
 
 ### Descriptive table
-# fc.desc1<-fc.ineq%>%select(-stname, -obs, -chpovrt, -incarrt, -eitc.st, -child.pov, 
+# fc.desc1<-fc.ineq%>%select(-stname, -obs, -chpovrt, -incarrt, -eitc.st, -child.pov,
 #                           -year.c)
-
+# 
 # fc.desc<-fc.desc1%>%mutate("Black foster care caseloads per 100,000")
 # Mean<-round(sapply(na.omit(fc.desc), mean),3)
 # SD<-round(sapply(na.omit(fc.desc), sd),3)
@@ -211,6 +193,9 @@ for(i in 1:m){
 
 
 
+###WITHIN MODELS MAKE MOST SENSE ON ENTRIES
+###COULD THINK ABOUT REUNIFICATION EXITS OR LOS TOO
+
 b.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~1+scale(b.incarrt)+
         scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
         scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
@@ -219,7 +204,7 @@ b.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~1+scale(b.incarrt)+
         (1|stname) + (1|obs), family=poisson, offset=log(blk.child),
       data=d, control=glmerControl(optCtrl=list(maxfun=2e5))))
 
-##REWRITE AS NEGBIN OR PSEUDO POIS
+#REWRITE AS NEGBIN OR PSEUDO POIS
 b.cl.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.incarrt)+
         scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
         scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
@@ -244,13 +229,6 @@ b.cl.f.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.f.incarrt
         factor(stname) , family=quasipoisson, offset=log(blk.child),
       data=d))
 
-# w.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.white~1+scale(w.incarrt)+scale(incarrt)+
-#           scale(w.unemp.rt)+scale(w.singpar.rt)+scale(wht.lessHS)+
-#           scale(chpov.wht.pc)+scale(pctwht)+scale(w.welf.incl)+
-#           scale(inst6014_nom)+scale(v.crime.rt)+
-#           year.c+
-#           (1|stname) + (1|obs), family=poisson, offset=log(wht.child),
-#         data=d, control=glmerControl(optCtrl=list(maxfun=2e5))))
 
 a.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~1+scale(a.incarrt)+
         scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
@@ -285,6 +263,8 @@ a.cl.f.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~1+scale(a.f.inca
         data=d))
 
 ## Disproportion models
+## AS PLACE TO GO AFTER INEQ EFFECTS
+
 b.disp<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~1+scale(b.incardisp)+
         scale(bdisp.chpov)+
         scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
@@ -294,17 +274,6 @@ b.disp<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~1+scale(b.incar
         year.c+
         (1|stname),
         data=d))
-
-b.disp.fe<-lapply(fc.imp$imputations, function(d) lm(log(bw.disp)~1+scale(b.incardisp)+
-        scale(bdisp.chpov)+
-        scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
-        scale(I(blk.lessHS/wht.lessHS))+scale(I(b.welf.incl/w.welf.incl))+
-        scale(pctblk)+
-        scale(inst6014_nom)+scale(v.crime.rt)+
-        year.c+
-        factor(stname),
-        data=d))
-
 
 a.disp<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~1+scale(a.incardisp)+
         scale(adisp.chpov)+
@@ -316,58 +285,82 @@ a.disp<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~1+scale(a.inca
         (1|stname),
         data=d))
 
-a.disp.fe<-lapply(fc.imp$imputations, function(d) lm(log(ami.disp)~1+scale(a.incardisp)+
-        scale(adisp.chpov)+
-        scale(I(a.unemp.rt/w.unemp.rt))+scale(I(a.singpar.rt/w.singpar.rt))+
-        scale(I(amind.lessHS/wht.lessHS))+scale(I(a.welf.incl/w.welf.incl))+
-        scale(pctami)+
-        scale(inst6014_nom)+scale(v.crime.rt)+
-        year.c+
-        factor(stname),
-        data=d))
 
 b.c.tab<-makeMIRegTab(b.ineq)
-row.names(b.c.tab)<- c("Intercept", "Black incarceration rate", "Black unemployment rate", "Black single parent rate",
-                       "Black adults w/o HS rate", "Black child poverty rate", "Percent Black population",
-                       "Black welfare enrollment per child poverty",
-                       "Leg. ideology", "Violent crime rate", "Year", "Variance of gamma")
-
-print(xtable(b.c.tab, caption="Black foster care caseloads. Poisson multilevel regression (overdispersed), 
-             offset by Black child population with state intercepts. 
-             All predictors mean-centered and transformed into standard deviation units.
-             Results combined across imputations (m=12).", label="b.c.tab", digits=3),  
-      type="latex", file="b_c_tab.tex", caption.placement="top")
-
 a.c.tab<-makeMIRegTab(a.ineq)
-row.names(a.c.tab)<- c("Intercept", "Native Am. incarceration rate", "Native Am. unemployment rate", "Native Am. single parent rate",
-                       "Native Am. adults w/o HS rate", "Native Am. child poverty rate", "Percent Native Am. population",
-                       "Native Am. welfare enrollment per child poverty",
-                       "Leg. ideology", "Violent crime rate", "Year", "Variance of gamma")
-print(xtable(a.c.tab, caption="Native American foster care caseloads. Poisson multilevel regression, 
-             offset by Native American child population with state intercepts. 
-             All predictors mean-centered and transformed into standard deviation units. 
-             Results combined across imputations (m=12).", label="a.c.tab", digits=3),
-      type="latex", file="a_c_tab.tex", caption.placement="top")
+
+
+### For html file output of results
+texreg(list(b.ineq[[1]],a.ineq[[1]]),
+	override.coef=list(b.c.tab[1:nrow(b.c.tab)-1,1], a.c.tab[1:nrow(b.c.tab)-1,1]),
+	override.se=list(b.c.tab[1:nrow(b.c.tab)-1,2], a.c.tab[1:nrow(b.c.tab)-1,2]),
+	custom.coef.names=c("Intercept",
+	                   "Afr. Am. Incarceration rate", 
+	                   "Afr. Am. Unemployment rate", 
+	                   "Afr. Am. Single parent rate",
+	                   "Afr. Am. Adults w/o HS rate", 
+	                   "Afr. Am. Child poverty rate", 
+	                   "Percent Afr. Am. population",
+	                   "Afr. Am. Welfare per child poverty",
+	                   "Leg. ideology", 
+	                   "Violent crime rate", 
+	                   "Year",
+	                   "Nat. Am. Incarceration rate", 
+	                   "Nat. Am. Unemployment rate", 
+	                   "Nat. Am. Single parent rate",
+	                   "Nat. Am. Adults w/o HS rate", 
+	                   "Nat. Am. Child poverty rate", 
+	                   "Percent Nat. Am. population",
+	                   "Nat. Am. Welfare per child poverty"),
+	custom.model.names=c("Afr. Am. Caseload", "Nat. Am. Caseload"),
+	caption="Foster care caseloads, Poisson multilevel regression (overdispersed),
+offset by child population with state intercepts. Predictors mean-
+centered and transformed into standard deviation units. Results combined across
+imputations (m=3).",
+	caption.above=TRUE,
+	label="count-models",
+	include.aic=FALSE,
+	include.bic=FALSE,
+	include.loglik=FALSE,
+	file="count-models.tex"
+	)
+	
 
 b.d.tab<-makeMIRegTab(b.disp)
-row.names(b.d.tab)<- c("Intercept", "Black/White Incarceration rate", "Black/White Unemployment rate", "Black/White Single parent rate",
-                       "Black/White Adults w/o HS rate", "Black/White Child poverty rate", "Black/White welfare enroll. ",
-                       "Percent Black population",
-                       "Leg. Ideology", "Violent crime rate", "Year", "Variance of gamma")
-print(xtable(b.d.tab, caption="Black/White foster care caseload disproportion. Multilevel linear regression with state intercepts. 
-             All predictors mean-centered and transformed into standard deviation units.
-             Results combined across imputations (m=12).", label="b.d.tab", digits=3),
-      type="latex", file="b_d_tab.tex", caption.placement="top")
-
 a.d.tab<-makeMIRegTab(a.disp)
-row.names(a.d.tab)<- c("Intercept", "Native Am./White Incarceration rate", "Native Am./White Unemployment rate", "Native Am./White Single parent rate",
-                       "Native Am./White Adults w/o HS rate", "Native Am./White Child poverty rate", "Native Am./White welfare enroll.",
-                       "Percent Native Am.",
-                       "Leg. Ideology", "Violent crime rate", "Year", "Variance of gamma")
-print(xtable(a.d.tab, caption="Native American/White foster care caseload disproportion. Multilevel linear regression with state intercepts. 
-             All predictors mean-centered and transformed into standard deviation units.
-             Results combined across imputations (m=12).", label="a.d.tab", digits=3),
-      type="latex", file="a_d_tab.tex", caption.placement="top")
+
+texreg(list(b.disp[[1]],a.disp[[1]]),
+       override.coef=list(b.d.tab[1:nrow(b.c.tab)-1,1], a.d.tab[1:nrow(b.c.tab)-1,1]),
+       override.se=list(b.d.tab[1:nrow(b.c.tab)-1,2], a.d.tab[1:nrow(b.c.tab)-1,2]),
+       custom.coef.names=c("Intercept",
+                           "Afr. Am. Incarceration disp.", 
+                           "Afr. Am. Child poverty disp.",
+                           "Afr. Am. Unemployment disp.", 
+                           "Afr. Am. Single parent disp.",
+                           "Afr. Am. Adults w/o HS disp.", 
+                           "Afr. Am. Welfare disp.",
+                           "Percent Afr. Am. population",
+                           "Leg. ideology", 
+                           "Violent crime disp.", 
+                           "Year",
+                           "Nat. Am. Incarceration disp.", 
+                           "Nat. Am. Child poverty disp.", 
+                           "Nat. Am. Unemployment disp.", 
+                           "Nat. Am. Single parent disp.",
+                           "Nat. Am. Adults w/o HS disp.", 
+                           "Nat. Am. Welfare disp.",
+                           "Percent Nat. Am. population"),
+       custom.model.names=c("Afr. Am. Disproportion", "Nat. Am. Disproportion"),
+       caption="Foster care caseload disproportion, multilevel linear
+regression with state intercepts. All predictors mean-centered and transformed
+into standard deviation units. Results combined across imputations (m=3).",
+       caption.above=TRUE,
+       label="disp-models",
+       include.aic=FALSE,
+       include.bic=FALSE,
+       include.loglik=FALSE,
+       file="disp-models.tex"
+)
 
 ###PAPER DESCRIPTIVES
 fc.avg<-fc.ineq%>%group_by(stname)%>%summarise("bcl"=mean(cl.blk/blk.child), 
@@ -405,12 +398,15 @@ row.names(blk.desc)<-c("Caseload", "Incar. rate",
                        "Caseload disp.", "Incar. disp.", "Caseloads per capita")
 
 desc<-as.data.frame(cbind(blk.desc, a.desc))
-names(desc)<-c("Mean:AA", "SD:AA", "Mean:NA", 
-  "SD:NA")
+names(desc)<-c("Mean:AfrAm", "SD:AfrAm", "Mean:NatAm", 
+  "SD:NatAm")
 
 print(xtable(desc, label="descriptives",
   caption="Means and Standard Deviations for predictors by Race / Ethnicity. U.S. States 2007 - 2014."), 
   file="descriptives.tex", type="latex", caption.placement="top")
+
+##forest plots
+source("cw-forest.r")
 
 ##FOR MAX MIN VALUES, BIVAR CORRELATIONS
 fc.avg[which(fc.avg$ldisp==max(fc.avg$ldisp, na.rm=TRUE)),]
