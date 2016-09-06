@@ -1,7 +1,6 @@
 #########
 rm(list=ls())
 set.seed(1)
-library(plyr)
 library(merTools)
 library(lme4)
 library(Amelia)
@@ -45,36 +44,29 @@ fc2014<-fc%>%filter(year==2014)%>%summarise(blkcl=sum(cl.blk), whtcl=sum(cl.whit
 fc<-fc%>%mutate(obs=1:nrow(fc), 
  chpovrt=child.pov/child, 
  pctblk=blk/tot,
- pctlat=latino/tot,
  pctami=amind/tot,
  pctwht=wht/tot,
  incarrt=ifelse(TOTRACEM>0, (TOTRACEM+TOTRACEF)/adult, NA),
  b.incarrt=ifelse(BLACKM>0, (BLACKM+BLACKF)/b.adult, NA),
  b.m.incarrt=ifelse(BLACKM>0, (BLACKM)/b.adult, NA),
  b.f.incarrt=ifelse(BLACKM>0, (BLACKF)/b.adult, NA),
- l.incarrt=ifelse(HISPM>0, (HISPM+HISPF)/l.adult,NA),
  a.incarrt=ifelse(AIANM>0, (AIANM+AIANF)/a.adult,NA),
  a.m.incarrt=ifelse(AIANM>0, (AIANM)/a.adult,NA),
  a.f.incarrt=ifelse(AIANM>0, (AIANF)/a.adult,NA),
  w.incarrt=ifelse(WHITEM>0, (WHITEM+WHITEF)/w.adult,NA),
  b.incardisp=ifelse(BLACKM>0, b.incarrt/w.incarrt,NA),
- l.incardisp=ifelse(HISPM>0, l.incarrt/w.incarrt,NA),
  a.incardisp=ifelse(AIANM>0, a.incarrt/w.incarrt,NA),
  bdisp.chpov=(blk.child.pov/blk.child)/(wht.child.pov/wht.child),
- ldisp.chpov=(chpov.latino.pc/chpov.wht.pc),
  adisp.chpov=(chpov.amind.pc/chpov.wht.pc),
  b.welf.incl=blk.welf/blk.child.pov,
- l.welf.incl=latino.welf/latino.child.pov,
  a.welf.incl=amind.welf/amind.child.pov,
  w.welf.incl=wht.welf/wht.child.pov,
  w.unemp.rt=wht.unemp/(wht.emp+wht.unemp),
  b.unemp.rt=blk.unemp/(blk.emp+blk.unemp),
  a.unemp.rt=amind.unemp/(amind.unemp+amind.emp),
- l.unemp.rt=latino.unemp/(latino.emp+latino.unemp),
  w.singpar.rt=wht.singpar/wht.child,
  b.singpar.rt=blk.singpar/blk.child,
  a.singpar.rt=amind.singpar/amind.child,
- l.singpar.rt=latino.singpar/latino.child,
  year.c=year-2007
  )
 
@@ -139,7 +131,6 @@ fc$year.p<-fc$year-2000
 fc.ineq<-fc.ineq%>%
   dplyr::select(cl.blk, b.incarrt, chpov.blk.pc, chpovrt, 
          incarrt, 
-         eitc.st, 
          child.pov, 
          inst6014_nom, year.c, pctblk, stname, obs, 
          blk.child, cl.nat.am, 
@@ -153,7 +144,9 @@ fc.ineq<-fc.ineq%>%
          wht.lessHS, blk.lessHS, amind.lessHS, latino.lessHS,
          v.crime.rt,
          cl.white, wht.child, chpov.wht.pc, pctwht,
-         b.m.incarrt, b.f.incarrt, a.m.incarrt, a.f.incarrt)
+         b.m.incarrt, b.f.incarrt, a.m.incarrt, a.f.incarrt,
+         board, pctblk1900, pctblk1930, pctblk1960, pctami1900, pctami1930, pctami1960, 
+         pctimm1900, pctimm1930, pctimm1960)
 
 ### Descriptive table
 # fc.desc1<-fc.ineq%>%select(-stname, -obs, -chpovrt, -incarrt, -eitc.st, -child.pov,
@@ -275,6 +268,20 @@ b.disp<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~1+scale(b.incar
         (1|stname),
         data=d))
 
+b.disp.hist<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~1+scale(b.incardisp)+
+          scale(bdisp.chpov)+
+          scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
+          scale(I(blk.lessHS/wht.lessHS))+scale(I(b.welf.incl/w.welf.incl))+
+          scale(pctblk)+
+          scale(inst6014_nom)+scale(v.crime.rt)+
+          year.c+
+          scale(board)+
+          scale(pop.blk.1910)+
+          scale(pop.ami.1910)+
+          scale(pop.imm.1910)+
+          (1|stname),
+          data=d))
+
 a.disp<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~1+scale(a.incardisp)+
         scale(adisp.chpov)+
         scale(I(a.unemp.rt/w.unemp.rt))+scale(I(a.singpar.rt/w.singpar.rt))+
@@ -283,6 +290,20 @@ a.disp<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~1+scale(a.inca
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
         (1|stname),
+        data=d))
+
+a.disp.hist<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~1+scale(a.incardisp)+
+          scale(adisp.chpov)+
+          scale(I(a.unemp.rt/w.unemp.rt))+scale(I(a.singpar.rt/w.singpar.rt))+
+          scale(I(amind.lessHS/wht.lessHS))+scale(I(a.welf.incl/w.welf.incl))+
+          scale(pctami)+
+          scale(inst6014_nom)+scale(v.crime.rt)+
+          year.c+
+            scale(board)+
+            scale(pop.blk.1910)+
+            scale(pop.ami.1910)+
+            scale(pop.imm.1910)+
+          (1|stname),
         data=d))
 
 

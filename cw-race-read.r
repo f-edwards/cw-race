@@ -39,24 +39,14 @@ incar[index,5:ncol(incar)]<-NA
 ucr<-read.csv("ucr2014.csv", head=TRUE, stringsAsFactors = FALSE)
 names(ucr)[1]<-"stname"
 
-### University of Kentucky Center for Poverty research data - http://www.ukcpr.org/data
-pov<-read.csv("UKCPR_National_Welfare_Data_01202016_0.csv", na.strings=c("-", ""))
-names(pov)[1]<-"stname"
-keeps<-c("stname","year","AFDC.TANF.Recipients", "Food.Stamp.SNAP.Recipients", "AFDC.TANF.Benefit.for.3.person.family",
-	"FS.SNAP.Benefit.for.3.person.family", "AFDC.TANF_FS.3.Person.Benefit", "Total.SSI",
-	"NSLP.Total.Participation", "SBP.Total.Participation", "WIC.participation",
-	"Number.of.Poor..thousands.", "Food.Insecure",
-	"Gross.State.Product",
-	"Medicaid.beneficiaries", "State.EITC.Rate")
-
-pov<-pov[,names(pov)%in%keeps]
-
-names(pov)<-c("stname" ,"year","food.insec", "GSP", "AFDCRec", "SNAPRec", "AFDCBen3",
-	"SNAPBen3", "AFDCFS3Ben", "Total.SSI", "npoor", "eitc.st","medicaidrec",
-	 "WIC.par", "NSLP.Total", "SBP.Total")
-pov$food.insec<-pov$food.insec/100 ## rescale to [0,1]
-
 names(pop)[1:2]<-c("state", "year")
+
+###historical pop data
+hist<-read.csv("hist-pop.csv")
+
+###boarding school data
+board<-read.csv("boardingschool.csv")
+board$board<-board$boarding.n>0
 
 fc<-left_join(pop, incar, by=c("state", "year"))
 
@@ -66,9 +56,10 @@ fc<-stnames(fc)
 fc.new<-read.csv("fc-race-state.csv")
 names(fc.new)[1:2]<-c("stname", "year")
 fc<-left_join(fc.new, fc, by=c("stname", "year"))
-fc<-left_join(fc, pov, by=c("stname", "year"))
 fc<-left_join(fc, pol, by=c("state", "year"))
 fc<-left_join(fc, ucr, by=c("stname", "year"))
+fc<-left_join(fc, hist, by="state")
+fc<-left_join(fc, board, by="stname")
 
 fc[which(fc$amind.child.pov==0), "amind.child.pov"]<-NA
 fc[which(fc$stname=="HI" & fc$year==2010), "amind.child"]<-NA
