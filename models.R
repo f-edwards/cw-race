@@ -12,25 +12,23 @@ library(rstanarm)
 library(xtable)
 library(stargazer)
 
-setwd("C:/Users/kilgore/Dropbox/cw-race/data/")
-source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
-source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
-setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
+# setwd("C:/Users/kilgore/Dropbox/cw-race/data/")
+# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
+# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-read.r")
+# setwd("C:/Users/kilgore/Dropbox/cw-race-paper/")
 
 # ## for laptop
-# setwd("~/Dropbox/cw-race/data/")
-# source("~/Dropbox/cw-race/cw-race-functions.r")
-# source("~/Dropbox/cw-race/cw-race-read.r")
-# ##for output
-# setwd("~/Dropbox/cw-race-paper/")
+setwd("~/Dropbox/cw-race/data/")
+source("~/Dropbox/cw-race/cw-race-functions.r")
+source("~/Dropbox/cw-race/cw-race-read.r")
+##for output
+setwd("~/Dropbox/cw-race-paper/")
 
 # ### for libra
 # setwd("~/cw-race/data/")
 # source("~/cw-race/cw-race-functions.r")
 # source("~/cw-race/cw-race-read.r")
 # setwd("~/cw-race/")
-
-fc<-fc%>%filter(fc$year>2006)
 
 fc$bw.disp<-fc$cl.blk.pc/fc$cl.wht.pc
 fc$ami.disp<-fc$cl.amind.pc/fc$cl.wht.pc
@@ -67,66 +65,10 @@ fc<-fc%>%mutate(obs=1:nrow(fc),
  w.singpar.rt=wht.singpar/wht.child,
  b.singpar.rt=blk.singpar/blk.child,
  a.singpar.rt=amind.singpar/amind.child,
- year.c=year-2007
+ year.c=year-2000
  )
 
 fc.ineq<-fc
-
-### SOME MISSING INCARCERATION DATA REPORTED AS 0 - AK in 2013
-fc$year.p<-fc$year-2000
-##TS PLOTS
-
-# race.pc.ts<-ggplot(data=fc, aes(x=year.p, y=cl.blk.pc))+geom_line(aes(color="Black"))+
-#   geom_line(aes(y=cl.amind.pc, color="Native Am"))+
-#   geom_line(aes(y=cl.lat.pc, color="Latino"))+
-#   xlab("Year")+ylab("Caseload per cap")+
-#   ylim(0, 0.20)+
-#   facet_wrap(~stname)
-
-# welf.pc.ts<-ggplot(data=fc, aes(x=year, y=b.welf.incl))+geom_line(aes(color="Black"))+
-#   geom_line(aes(y=a.welf.incl, color="Native Am"))+
-#   geom_line(aes(y=l.welf.incl, color="Latino"))+
-#   xlab("Year")+ylab("Cash welfare recipients per children in poverty")+
-#   ylim(0, 0.5)+
-#   facet_wrap(~stname)
-
-# welf.disp.ts<-ggplot(data=fc, aes(x=year, y=b.welf.incl/w.welf.incl))+geom_line(aes(color="B/W"))+
-#   geom_line(aes(y=a.welf.incl/w.welf.incl, color="Native Am/W"))+
-#   geom_line(aes(y=l.welf.incl/w.welf.incl, color="Latino/W"))+
-#   xlab("Year")+ylab("Welfare inequality")+
-#   ylim(0, 1)+
-#   facet_wrap(~stname)
-
-# ggsave("race-pc-ts.pdf", race.pc.ts, width=11, height=8)
-
-# disp.ts<-ggplot(data=fc, aes(x=year.p, y=bw.disp))+geom_line(aes(color="Afr.Am./W"))+
-#   geom_line(aes(y=ami.disp, color="Nat.Am./W"))+
-#   xlab("Year")+ylab("Caseload disproportion")+
-#   coord_cartesian(ylim=c(0,25))+theme_bw()+
-#   facet_wrap(~stname, ncol=10)
-# ggsave("race-disp-ts.pdf", disp.ts, width=11, height=8)
-
-
-# disp.incar.ts<-ggplot(data=fc, aes(x=year.p, y=b.incardisp))+geom_line(aes(color="B/W"))+
-#   geom_line(aes(y=l.incardisp, color="L/W"))+
-#   geom_line(aes(y=a.incardisp, color="Nat.Am./W"))+
-#   xlab("Year")+ylab("Incarceration disproportion")+
-#   facet_wrap(~stname)
-# ggsave("race-incardisp-ts.pdf", disp.incar.ts, width=11, height=8)
-
-
-# incar.ts<-ggplot(data=fc, aes(x=year.p, y=b.incarrt))+geom_line(aes(color="Black"))+
-#   geom_line(aes(y=l.incarrt, color="Latino"))+
-#   geom_line(aes(y=a.incarrt, color="Native Am."))+
-#   xlab("Year")+ylab("Incarceration rates")+
-#   facet_wrap(~stname)
-#   #scale_x_continuous(breaks=c(2008,2013))
-# ggsave("race-incarpc-ts.pdf", incar.ts, width=11, height=8)
-
-
-### HAWAII COUNTS AMIND DIFFERENTLY IN AFCARS / CENSUS. MAYBE NATIVE HAWAIIAN ARE INCLUDED IN AFCARS, NOT CENSUS COUNTS? DROPPING FOR NOW
-###MI
-###select vars to include
 
 fc.ineq<-fc.ineq%>%
   dplyr::select(cl.blk, b.incarrt, chpov.blk.pc, chpovrt, 
@@ -141,12 +83,19 @@ fc.ineq<-fc.ineq%>%
          w.welf.incl, 
          #a.snap.incl, b.snap.incl, l.snap.incl, w.snap.incl,
          w.unemp.rt, b.unemp.rt, a.unemp.rt,  w.singpar.rt, b.singpar.rt, a.singpar.rt, 
-         wht.lessHS, blk.lessHS, amind.lessHS, latino.lessHS,
+         wht.lessHS, blk.lessHS, amind.lessHS, 
          v.crime.rt,
          cl.white, wht.child, chpov.wht.pc, pctwht,
          b.m.incarrt, b.f.incarrt, a.m.incarrt, a.f.incarrt,
-         board, pctblk1900, pctblk1930, pctblk1960, pctami1900, pctami1930, pctami1960, 
-         pctimm1900, pctimm1930, pctimm1960)
+         board, pctblk1930, pctblk1960,  pctami1930, pctami1960, 
+         pctimm1930, pctimm1960)
+
+fc.ineq<-fc.ineq%>%group_by(stname)%>%arrange(year.c)%>%
+  mutate(incarrt.lag=lag(incarrt), b.incarrt.lag=lag(b.incarrt), a.incarrt.lag=lag(a.incarrt),
+         b.m.incarrt.lag=lag(b.m.incarrt), b.f.incarrt.lag=lag(b.m.incarrt),
+         a.m.incarrt.lag=lag(a.m.incarrt), a.f.incarrt.lag=lag(a.f.incarrt))%>%
+  filter(year.c>2)
+
 
 ### Descriptive table
 # fc.desc1<-fc.ineq%>%select(-stname, -obs, -chpovrt, -incarrt, -eitc.st, -child.pov,
@@ -160,30 +109,52 @@ fc.ineq<-fc.ineq%>%
 # descriptives<-xtable(cbind(Mean, SD, Minimum, Maximum), caption="Descriptive Statistics")
 # print(descriptives, file="desctable.tex")
 
+# colClass<-sapply(fc.ineq, class)
+# 
+# bounds<-cbind(1:ncol(fc.ineq),
+#               rep(0.0001, ncol(fc.ineq)),
+#               rep(Inf, ncol(fc.ineq)))
+# 
+# m=ceiling(max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))/nrow(fc.ineq)*100)
+# 
+# fc.imp<-amelia(fc.ineq, m=m,
+#          ts="year.c", cs="stname", polytime=1, bounds=bounds, p2s=0,
+#          idvars=c("b.f.incarrt", "a.f.incarrt"))
+# 
+# # OItest<-overimpute(fc.imp, "l.incarrt")
+# 
+# 
+# for(i in 1:m){
+#   for(j in 1:ncol(fc.ineq)){
+#     if(colClass[j]=="integer"){
+#       fc.imp$imputations[[i]][,j]<-ceiling(fc.imp$imputations[[i]][,j])
+#     }
+#   }
+# }
 
-colClass<-sapply(fc.ineq, class)
+###SANS IMPUTED DATA
 
-bounds<-cbind(1:ncol(fc.ineq),
-              rep(0.001, ncol(fc.ineq)),
-              rep(Inf, ncol(fc.ineq)))
-
-m=ceiling(max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))/nrow(fc.ineq)*100)
-
-fc.imp<-amelia(fc.ineq, m=m,
-         ts="year.c", cs="stname", polytime=1, bounds=bounds, p2s=0,
-         idvars=c("b.f.incarrt", "a.f.incarrt"))
-
-# OItest<-overimpute(fc.imp, "l.incarrt")
+b.cl.fe<-glm(cl.blk~-1+b.incarrt+b.incarrt.lag+
+                      b.unemp.rt+b.singpar.rt+blk.lessHS+
+                      chpov.blk.pc+pctblk+b.welf.incl+
+                      inst6014_nom+v.crime.rt+
+                      year.c*factor(stname), family=quasipoisson, offset=log(blk.child),
+                    data=fc.ineq)
 
 
-for(i in 1:m){
-  for(j in 1:ncol(fc.ineq)){
-    if(colClass[j]=="integer"){
-      fc.imp$imputations[[i]][,j]<-ceiling(fc.imp$imputations[[i]][,j])
-    }
-  }
-}
+b.cl.m.fe<-glm(cl.blk~-1+b.m.incarrt+b.m.incarrt.lag+
+               b.unemp.rt+b.singpar.rt+blk.lessHS+
+               chpov.blk.pc+pctblk+b.welf.incl+
+               inst6014_nom+v.crime.rt+
+               year.c*factor(stname), family=quasipoisson, offset=log(blk.child),
+             data=fc.ineq)
 
+b.cl.f.fe<-glm(cl.blk~-1+b.f.incarrt+b.f.incarrt.lag+
+                 b.unemp.rt+b.singpar.rt+blk.lessHS+
+                 chpov.blk.pc+pctblk+b.welf.incl+
+                 inst6014_nom+v.crime.rt+
+                 year.c*factor(stname), family=quasipoisson, offset=log(blk.child),
+               data=fc.ineq)
 
 
 ###WITHIN MODELS MAKE MOST SENSE ON ENTRIES
@@ -198,7 +169,14 @@ b.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.blk~1+scale(b.incarrt)+
       data=d, control=glmerControl(optCtrl=list(maxfun=2e5))))
 
 #REWRITE AS NEGBIN OR PSEUDO POIS
-b.cl.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.incarrt)+
+b.cl.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~-1+scale(b.incarrt)+
+        scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
+        scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
+        scale(inst6014_nom)+scale(v.crime.rt)+
+        year.c*factor(stname) , family=quasipoisson, offset=log(blk.child),
+      data=d))
+
+b.cl.m.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~-1+scale(b.m.incarrt)+
         scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
         scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
         scale(inst6014_nom)+scale(v.crime.rt)+
@@ -206,22 +184,13 @@ b.cl.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.incarrt)+
         factor(stname) , family=quasipoisson, offset=log(blk.child),
       data=d))
 
-b.cl.m.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.m.incarrt)+
+b.cl.f.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~-1+scale(b.f.incarrt)+
         scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
         scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
         factor(stname) , family=quasipoisson, offset=log(blk.child),
       data=d))
-
-b.cl.f.fe<-lapply(fc.imp$imputations, function(d) glm(cl.blk~1+scale(b.f.incarrt)+
-        scale(b.unemp.rt)+scale(b.singpar.rt)+scale(blk.lessHS)+
-        scale(chpov.blk.pc)+scale(pctblk)+scale(b.welf.incl)+
-        scale(inst6014_nom)+scale(v.crime.rt)+
-        year.c+
-        factor(stname) , family=quasipoisson, offset=log(blk.child),
-      data=d))
-
 
 a.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~1+scale(a.incarrt)+
         scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
@@ -229,7 +198,7 @@ a.ineq<-lapply(fc.imp$imputations, function(d) glmer(cl.nat.am~1+scale(a.incarrt
         scale(inst6014_nom)+scale(v.crime.rt)+
         year.c+
         (1|stname) + (1|obs), family=poisson, offset=log(amind.child),
-        data=d, control=glmerControl(optCtrl=list(maxfun=2e5))))
+        data=d, control=glmerControl(optCtrl=list(maxfun=2e10))))
 
 a.cl.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~1+scale(a.incarrt)+
         scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
@@ -239,7 +208,7 @@ a.cl.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~1+scale(a.incarrt)
         factor(stname), family=quasipoisson, offset=log(amind.child),
         data=d))
 
-a.cl.m.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~1+scale(a.m.incarrt)+
+a.cl.m.fe<-lapply(fc.imp$imputations, function(d) glm(cl.nat.am~-1+scale(a.m.incarrt)+
         scale(a.unemp.rt)+scale(a.singpar.rt)+scale(amind.lessHS)+
         scale(chpov.amind.pc)+scale(pctami)+scale(a.welf.incl)+
         scale(inst6014_nom)+scale(v.crime.rt)+
@@ -276,9 +245,9 @@ b.disp.hist<-lapply(fc.imp$imputations, function(d) lmer(log(bw.disp)~1+scale(b.
           scale(inst6014_nom)+scale(v.crime.rt)+
           year.c+
           scale(board)+
-          scale(pop.blk.1910)+
-          scale(pop.ami.1910)+
-          scale(pop.imm.1910)+
+          scale(pctblk1930)+
+          scale(pctami1930)+
+          scale(pctimm1930)+
           (1|stname),
           data=d))
 
@@ -300,9 +269,9 @@ a.disp.hist<-lapply(fc.imp$imputations, function(d) lmer(log(ami.disp)~1+scale(a
           scale(inst6014_nom)+scale(v.crime.rt)+
           year.c+
             scale(board)+
-            scale(pop.blk.1910)+
-            scale(pop.ami.1910)+
-            scale(pop.imm.1910)+
+            scale(pctblk1930)+
+            scale(pctami1930)+
+            scale(pctimm1930)+
           (1|stname),
         data=d))
 
