@@ -10,7 +10,7 @@ library(Amelia)
 
 #IPUMS ACS 2000-2011 - File created using CensusTransform.r in this repository
 pop<-read.csv("pop-race-2000-2014.csv", head=TRUE)
-
+names(pop)[1:2]<-c("state", "year")
 
 temp<-pop[pop$year<2007,]
 states<-unique(pop$state)
@@ -32,7 +32,7 @@ for(s in 1:length(states)){
 mov.ave<-as.data.frame(mov.ave)
 names(mov.ave)<-names(pop)
 mov.ave<-mov.ave%>%filter(year>2001)
-popmerge<-rbind(pop[pop$year>2006, ], mov.ave, pop[pop$year==2000, ])
+popmerge<-rbind(pop[pop$year>2006, ], mov.ave, pop[pop$year<2002, ])
 # popmerge[popmerge==0]<-NA
 pop<-popmerge
 
@@ -60,6 +60,8 @@ incar<-cbind(incar, incartemp[,53:80])
 #AK 2013 is missing race data
 index<-which(incar$state==2 & incar$year==2013)
 incar[index,5:ncol(incar)]<-NA
+
+incar[incar<0]<-NA
 
 ucr<-read.csv("ucr2014.csv", head=TRUE, stringsAsFactors = FALSE)
 names(ucr)[1]<-"stname"
@@ -123,7 +125,12 @@ fc$stname<-NA
 fc<-stnames(fc)
 
 fc.new<-read.csv("fc-race-state.csv")
+fc.new[is.na(fc.new)]<-0
 names(fc.new)[1:2]<-c("stname", "year")
+
+##MICHIGAN 2000,2001 data is terrible, treating as missing
+fc.new[which((fc.new$stname=="MI")&(fc.new$year<=2001)),3:ncol(fc.new)]<-NA
+
 fc<-left_join(fc.new, fc, by=c("stname", "year"))
 fc<-left_join(fc, pol, by=c("state", "year"))
 fc<-left_join(fc, crime, by=c("stname", "year"))
@@ -134,12 +141,6 @@ fc<-left_join(fc, board, by="stname")
 # fc[which(fc$amind.child.pov==0), "amind.child.pov"]<-NA
 # fc[which(fc$stname=="HI" & fc$year==2010), "amind.child"]<-NA
 
-### CREATE VARS
-fc<-fc%>%mutate(cl.wht.pc=cl.white/wht.child, cl.blk.pc=cl.blk/blk.child, 
-                cl.amind.pc=cl.nat.am/amind.child, cl.lat.pc=cl.latino/latino.child,
-                ent.wht.pc=ent.white/wht.child, ent.blk.pc=ent.blk/blk.child,
-                ent.amind.pc=ent.nat.am/amind.child, ent.lat.pc=ent.latino/latino.child,
-                chpov.wht.pc=wht.child.pov/wht.child, chpov.blk.pc=blk.child.pov/blk.child,
-                chpov.amind.pc=amind.child.pov/amind.child, chpov.latino.pc=latino.child.pov/latino.child)%>%
-                filter(stname!="PR")%>%filter(stname!="DC")
+fc<-fc%>%filter(stname!="DC")%>%filter(stname!="PR")
 
+write.csv(fc, "fc.csv", row.names=FALSE)
