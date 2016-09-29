@@ -9,10 +9,11 @@ makeMIRegTab<-function(x){
   beta<-t(r[[1]])
   se<-t(r[[2]])
   z<-beta/se
+  p<-2*pnorm(-abs(z))
   ### TO SUMMARIZE VARIANCE OF REs ACROSS IMPUTATIONS
-  ranefs.disp<-matrix(ncol=nrow(fc.ineq), nrow=m)
-  ranefs.disp.se<-matrix(ncol=nrow(fc.ineq), nrow=m)
-  ranefs.st<-ranefs.st.se<-matrix(ncol=length(unique(fc.ineq$stname)), nrow=m)
+  ranefs.disp<-matrix(ncol=nrow(fc), nrow=m)
+  ranefs.disp.se<-matrix(ncol=nrow(fc), nrow=m)
+  ranefs.st<-ranefs.st.se<-matrix(ncol=length(unique(fc$stname)), nrow=m)
   for(i in 1:m){
   	if(length(ranef(x[[i]]))>1){ 	
     ranefs.disp[i,]<-ranef(x[[i]])[[1]][,1]
@@ -32,10 +33,10 @@ makeMIRegTab<-function(x){
   # names(Sig2.ep)<-"Sig2.ep"
   Sig2.gam<-var(t(re.s[[1]]))
   names(Sig2.gam)<-"Sig2.gam"
-  results<-as.data.frame(cbind(beta, se, z))
-  names(results)<-c("Beta", "SE", "z")
+  results<-as.data.frame(cbind(beta, se, z,p))
+  names(results)<-c("Beta", "SE", "z","p")
   # results[11,1]<-Sig2.ep
-  results[12,1]<-Sig2.gam
+  # results[12,1]<-Sig2.gam
   return(results)
 }
 
