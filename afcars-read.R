@@ -1,6 +1,6 @@
 rm(list=ls())
 
-setwd("H:/AFCARS-new")
+setwd("U:/AFCARS-new")
 
 library(data.table)
 library(dplyr)
@@ -41,16 +41,26 @@ fc2000<-data.frame(make.race(names.funct(fread("fc2000.csv"))))
 makeState<-function(x){
     r<-unique(x$race)
     for(i in 1:length(r)){
-      out<-x%>%filter(race==r[i])%>%group_by(st, datayear)%>%dplyr::summarise(cl=sum(served==1), ent=sum(entered==1), 
-                                                                              lifelos=mean(lifelos, na.rm=TRUE),
-                                                                              grp.inst=sum(curplset==4|curplset==5))
+      out<-x%>%filter(race==r[i])%>%group_by(st, datayear)%>%dplyr::summarise(cl=sum(served==1), ent=sum(entered==1) 
+                                                                              #lifelos=mean(lifelos, na.rm=TRUE),
+                                                                              #grp.inst=sum(curplset==4|curplset==5),
+                                                                              #kin.fc=sum(curplset==2)) THESE ARE ARTIFICALLY ZERO DUE TO MISSINGNESS, NEED OBS LEVEL IMPUTATION TO CORRECT
+      )
       names(out)[3:ncol(out)]<-paste(names(out)[3:ncol(out)], r[i], sep=".")
       out[is.na(out)]<-0
       if(i==1){r.out<-out}  
       if(i>1){r.out<-full_join(r.out, out, by=c("st", "datayear"))}
     }
+  tot<-x%>%group_by(st, datayear)%>%dplyr::summarise(cl=sum(served==1), ent=sum(entered==1)
+                                                     # lifelos=mean(lifelos, na.rm=TRUE),
+                                                     # grp.inst=sum(curplset==4|curplset==5),
+                                                     # kin.fc=sum(curplset==2))
+  )
+  r.out<-full_join(r.out, tot, by=c("st", "datayear"))
   return(r.out)
 }
+
+
 
 state.out<-rbind(makeState(fc2014), makeState(fc2013), makeState(fc2012), 
                  makeState(fc2011), makeState(fc2010), makeState(fc2009),
@@ -60,25 +70,25 @@ state.out<-rbind(makeState(fc2014), makeState(fc2013), makeState(fc2012),
 
 write.csv(state.out, "fc-race-state.csv", row.names=FALSE)
 
-makeCounty<-function(x){
-  r<-unique(x$race)
-  for(i in 1:length(r)){
-    out<-x%>%filter(race==r[i])%>%group_by(fipscode, datayear, st)%>%dplyr::summarise(cl=sum(served==1), ent=sum(entered==1), 
-                                                                            lifelos=mean(lifelos, na.rm=TRUE),
-                                                                            grp.inst=sum(curplset==4|curplset==5))
-    names(out)[4:ncol(out)]<-paste(names(out)[4:ncol(out)], r[i], sep=".")
-    out[is.na(out)]<-0
-    if(i==1){r.out<-out}  
-    if(i>1){r.out<-full_join(r.out, out, by=c("fipscode", "st", "datayear"))}
-  }
-  return(r.out)
-}
-
-
-county.out<-rbind(makeCounty(fc2014), makeCounty(fc2013), makeCounty(fc2012), 
-                 makeCounty(fc2011), makeCounty(fc2010), makeCounty(fc2009),
-                 makeCounty(fc2008), makeCounty(fc2007), makeCounty(fc2006),
-                 makeCounty(fc2005), makeCounty(fc2004), makeCounty(fc2003),
-                 makeCounty(fc2002), makeCounty(fc2001), makeCounty(fc2000))
-
-write.csv(county.out, "fc-race-county.csv", row.names=FALSE)
+# makeCounty<-function(x){
+#   r<-unique(x$race)
+#   for(i in 1:length(r)){
+#     out<-x%>%filter(race==r[i])%>%group_by(fipscode, datayear, st)%>%dplyr::summarise(cl=sum(served==1), ent=sum(entered==1), 
+#                                                                             lifelos=mean(lifelos, na.rm=TRUE),
+#                                                                             grp.inst=sum(curplset==4|curplset==5))
+#     names(out)[4:ncol(out)]<-paste(names(out)[4:ncol(out)], r[i], sep=".")
+#     out[is.na(out)]<-0
+#     if(i==1){r.out<-out}  
+#     if(i>1){r.out<-full_join(r.out, out, by=c("fipscode", "st", "datayear"))}
+#   }
+#   return(r.out)
+# }
+# 
+# 
+# county.out<-rbind(makeCounty(fc2014), makeCounty(fc2013), makeCounty(fc2012), 
+#                  makeCounty(fc2011), makeCounty(fc2010), makeCounty(fc2009),
+#                  makeCounty(fc2008), makeCounty(fc2007), makeCounty(fc2006),
+#                  makeCounty(fc2005), makeCounty(fc2004), makeCounty(fc2003),
+#                  makeCounty(fc2002), makeCounty(fc2001), makeCounty(fc2000))
+# 
+# write.csv(county.out, "fc-race-county.csv", row.names=FALSE)
