@@ -9,16 +9,19 @@ library(texreg)
 library(dplyr)
 library(arm)
 library(MASS)
+library(rstanarm)
 
-# setwd("C:/Users/kilgore/Dropbox/cw-race/")
-# source("C:/Users/kilgore/Dropbox/cw-race/cw-race-functions.r")
-# fc<-read.csv("fc.csv")
+options(mc.cores = parallel::detectCores())
 
-
-# for laptop
-setwd("~/Dropbox/cw-race/")
-source("~/Dropbox/cw-race/cw-race-functions.r")
+setwd("D:/sync/cw-race/")
+source("D:/sync/cw-race/cw-race-functions.r")
 fc<-read.csv("fc.csv")
+
+
+# # for laptop
+# setwd("~/sync/cw-race/")
+# source("~/sync/cw-race/cw-race-functions.r")
+# fc<-read.csv("fc.csv")
 ##for output
 # setwd("~/Dropbox/cw-race-paper/")
 fc$inst6014_nom<-fc$inst6014_nom/100
@@ -87,13 +90,14 @@ create.prior<-function(x){
   st<-fc[oi[x,1], "stname"]
   var<-oi[x,2]
   year<-fc[oi[x,1], "year"]
+  pop<-fc[oi[x,1], "tot"]
   strong.2000<-fc[which((fc$year==2000)&(fc$stname==st)), var]
   strong.2009<-fc[which((fc$year==2009)&(fc$stname==st)), var]
   strong.set<-fc[which((fc$year%in%strong)&(fc$stname==st)), var]
   ###WEIGHT ON PROXIMITY TO OBS, with obs - Weight is 0.1 on obs, 0.75 on 2000 at 2001, linear to 0.15 at 2009
   pr.E<-((0.9-(year-2001)*0.12))*strong.2000+(1-(0.9-(year-2001)*0.12))*strong.2009
   all.set<-fc[fc$stname==st,var]
-  pr.SD<-sd(strong.set)/sqrt(9)
+  pr.SD<-sd(strong.set) * (1+(1/(pop/100000)))##as invese pop penalized - heteroskedastic error
   return(c(pr.E, pr.SD))
 }
 
@@ -107,7 +111,7 @@ m<-15
 fc.imp<-amelia(fc, m=m,
                ts="year", cs="stname", polytime=1, 
                bounds=bounds, overimp=oi,  
-               priors=oi.priors, p2s=0,
+               priors=oi.priors, p2s=1,
                idvars=c("state", "statename","adult", "w.adult", "b.adult", "a.adult", 
                         "pctblk1930", "pctimm1930", "pctami1930", "pctblk1960", "pctami1960", 
                         "pctimm1960", "boarding.n", "board"))
@@ -152,7 +156,7 @@ fc.imp$imputations[[i]]<-
   year.c=year-2000)
 }
 
-post.imp.plot<-ggplot(fc.imp$imputations[[1]])+geom_line(aes(x=year, y=log(a.unemp.rt)))+facet_wrap(~stname)+ggtitle("After overimputation")
+post.imp.plot<-ggplot(fc.imp$imputations[[2]])+geom_line(aes(x=year, y=log(a.unemp.rt)))+facet_wrap(~stname)+ggtitle("After overimputation")
 
 
 #### TO SET INTEGERS IF DOING COUNT MODELS
@@ -238,6 +242,29 @@ b.d.tab<-makeMIRegTab(b.disp)
 a.d.tab<-makeMIRegTab(a.disp)
 b.dh.tab<-makeMIRegTab(b.disp.hist)
 a.dh.tab<-makeMIRegTab(a.disp.hist)
+
+
+b.d.bayes<-lapply(fc.imp$imputations, function(d) stan_glmer(log(bw.disp)~log(b.incardisp)+
+       log(bdisp.chpov)+
+       log(I(b.unemp.rt/w.unemp.rt))+log(I(b.singpar.rt/w.singpar.rt))+
+       log(I(blk.lessHS/wht.lessHS))+
+       log(pctblk)+
+       scale(inst6014_nom)+log(v.crime.rt)+
+       year.c+
+       (1|stname),
+     data=d))
+
+a.d.bayes<-lapply(fc.imp$imputations, function(d) 
+  stan_glmer(I(ami.disp^(1/2))~I(a.incardisp^(1/2))+
+         log(adisp.chpov)+
+         log(a.unemp.rt/w.unemp.rt)+log(a.singpar.rt/w.singpar.rt)+
+         log(amind.lessHS/wht.lessHS)+
+         log(pctami)+
+         scale(inst6014_nom)+log(v.crime.rt)+
+         year.c+
+         (1|stname),
+       data=d))
+
 ########## PREPARE TABLE OUTPUT, PREPARE SIMULATION / PREDICTION
 
 ################
@@ -246,10 +273,10 @@ a.dh.tab<-makeMIRegTab(a.disp.hist)
 fe.data<-fc.imp$imputations
 source("FE-models.r", print.eval=TRUE)
 
-within.models<-list("FE.models"=FE.models, "lag.models"=lag.models, 
-                "fd.models"=fd.models, "rob.models"=rob.models, 
-                "FE.ent.models"=FE.ent.models, "lag.ent.models"=lag.ent.models, 
-                "fd.ent.models"=fd.ent.models, "rob.ent.models"=rob.ent.models)
+# within.models<-list("FE.models"=FE.models, "lag.models"=lag.models, 
+#                 "fd.models"=fd.models, "rob.models"=rob.models, 
+#                 "FE.ent.models"=FE.ent.models, "lag.ent.models"=lag.ent.models, 
+#                 "fd.ent.models"=fd.ent.models, "rob.ent.models"=rob.ent.models)
 
 
 ####################
@@ -301,7 +328,6 @@ texreg(list(within.models$FE.models$b$models[[1]], within.models$FE.models$a$mod
                                within.models$rob.models$b$merge[[1]][,4], 
                                within.models$rob.models$a$merge[[1]][,4]),
        custom.coef.names=c(
-         "Intercept",
          "Afr. Am. incarceration rate",
          "Afr. Am. incarceration (lag)",
          "Afr. Am. Unemployment rate",
