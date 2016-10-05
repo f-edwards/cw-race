@@ -62,7 +62,7 @@ merge.mi.fd<-function(model.imp){
 ###PLM CL FE models, PCSE (Beck and Katz)
 
 FE.models<-list()
-model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+log(b.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+#log(b.incarrt.lag)+
                                                     log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                                     log(chpov.blk.pc)+log(pctblk)+
                                                     inst6014_nom+log(v.crime.rt),
@@ -72,7 +72,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+log(b.incar
                                                   data=d))
 FE.models$b<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+sqrt(a.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+#sqrt(a.incarrt.lag)+
                                                     log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                                     sqrt(chpov.amind.pc)+log(pctami)+
                                                     inst6014_nom+log(v.crime.rt),
@@ -83,7 +83,7 @@ model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+sqrt(a.
 FE.models$a<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 
-model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+log(b.m.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+#log(b.m.incarrt.lag)+
                                                       log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                                       log(chpov.blk.pc)+log(pctblk)+
                                                       inst6014_nom+log(v.crime.rt),
@@ -93,7 +93,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+log(b.m.i
                                                     data=d))
 FE.models$b.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+sqrt(a.m.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+#sqrt(a.m.incarrt.lag)+
                                                       log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                                       sqrt(chpov.amind.pc)+log(pctami)+
                                                       inst6014_nom+log(v.crime.rt),
@@ -103,7 +103,7 @@ model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+sqrt(
                                                     data=d))
 FE.models$a.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+sqrt(b.f.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+#sqrt(b.f.incarrt.lag)+
                                                       log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                                       log(chpov.blk.pc)+log(pctblk)+
                                                       inst6014_nom+log(v.crime.rt),
@@ -113,7 +113,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+sqrt(b.f
                                                     data=d))
 FE.models$b.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.f.incarrt)+sqrt(a.f.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.f.incarrt)+#sqrt(a.f.incarrt.lag)+
                                                       log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                                       sqrt(chpov.amind.pc)+log(pctami)+
                                                       inst6014_nom+log(v.crime.rt),
@@ -269,7 +269,7 @@ FE.models$a.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) c
 ###PLM CL FE models, PCSE (Beck and Katz)
 rob.models<-list()
 
-model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+log(b.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+#log(b.incarrt.lag)+
                                          +log(w.incarrt)+
                                          log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                          log(chpov.blk.pc)+log(pctblk)+
@@ -280,7 +280,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+log(b.incar
                                        data=d))
 rob.models$b<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+sqrt(a.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+#sqrt(a.incarrt.lag)+
                                          +log(w.incarrt)+
                                          log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                          sqrt(chpov.amind.pc)+log(pctami)+
@@ -291,7 +291,7 @@ model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+sqrt(a.
                                        data=d))
 rob.models$a<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+log(b.m.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+#log(b.m.incarrt.lag)+
                                            +log(w.incarrt)+
                                            log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                            log(chpov.blk.pc)+log(pctblk)+
@@ -302,7 +302,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+log(b.m.i
                                          data=d))
 rob.models$b.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+sqrt(a.m.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+#sqrt(a.m.incarrt.lag)+
                                            +log(w.incarrt)+
                                            log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                            sqrt(chpov.amind.pc)+log(pctami)+
@@ -313,7 +313,7 @@ model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+sqrt(
                                          data=d))
 rob.models$a.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+sqrt(b.f.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+#sqrt(b.f.incarrt.lag)+
                                            +log(w.incarrt)+
                                            log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                            log(chpov.blk.pc)+log(pctblk)+
@@ -324,7 +324,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+sqrt(b.f
                                          data=d))
 rob.models$b.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
-model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.f.incarrt)+sqrt(a.f.incarrt.lag)+
+model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.f.incarrt)+#sqrt(a.f.incarrt.lag)+
                                            +log(w.incarrt)+
                                            log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                            sqrt(chpov.amind.pc)+log(pctami)+

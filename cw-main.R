@@ -8,13 +8,17 @@ library(texreg)
 library(dplyr)
 library(arm)
 library(MASS)
-library(rstanarm)
+# library(rstanarm)
+# 
+# options(mc.cores = parallel::detectCores())
 
-options(mc.cores = parallel::detectCores())
+# setwd("U:/cw-race/")
+# source("U:/cw-race/cw-race-functions.r")
+# fc<-read.csv("U:/cw-race/data/fc.csv")
 
-setwd("U:/cw-race/")
-source("U:/cw-race/cw-race-functions.r")
-fc<-read.csv("U:/cw-race/data/fc.csv")
+setwd("D:/sync/cw-race/")
+source("D:/sync/cw-race/cw-race-functions.r")
+fc<-read.csv("D:/sync/cw-race/data/fc.csv")
 
 
 # # for laptop
@@ -292,15 +296,15 @@ a.dh.tab<-makeMIRegTab(a.disp.hist)
 fe.data<-fc.imp$imputations
 source("FE-models.r", print.eval=TRUE)
 
-within.models<-list("FE.models"=FE.models, 
-                    #"lag.models"=lag.models,
-                    #"fd.models"=fd.models, 
-                    "rob.models"=rob.models)
-                    
-                #"FE.ent.models"=FE.ent.models, 
-                #"lag.ent.models"=lag.ent.models,
-                #"fd.ent.models"=fd.ent.models, 
-                #"rob.ent.models"=rob.ent.models)
+# within.models<-list("FE.models"=FE.models, 
+#                     #"lag.models"=lag.models,
+#                     #"fd.models"=fd.models, 
+#                     "rob.models"=rob.models)
+#                     
+#                 #"FE.ent.models"=FE.ent.models, 
+#                 #"lag.ent.models"=lag.ent.models,
+#                 #"fd.ent.models"=fd.ent.models, 
+#                 #"rob.ent.models"=rob.ent.models)
 
 
 ####################
@@ -336,24 +340,18 @@ regression with state intercepts. Results combined across imputations (m=15).",
        include.loglik=FALSE,
        file="re-models.tex"
 )
-# 
-texreg(list(within.models$FE.models$b$models[[1]], within.models$FE.models$a$models[[1]],
-            within.models$rob.models$b$models[[1]], within.models$rob.models$a$models[[1]]),
-       override.coef=list(within.models$FE.models$b$merge[[1]][,1], 
-                          within.models$FE.models$a$merge[[1]][,1], 
-                          within.models$rob.models$b$merge[[1]][,1], 
-                          within.models$rob.models$a$merge[[1]][,1]),
-       override.se=list(within.models$FE.models$b$merge[[1]][,2], 
-                        within.models$FE.models$a$merge[[1]][,2], 
-                        within.models$rob.models$b$merge[[1]][,2], 
-                        within.models$rob.models$a$merge[[1]][,2]),
-       override.pvalues = list(within.models$FE.models$b$merge[[1]][,4], 
-                               within.models$FE.models$a$merge[[1]][,4], 
-                               within.models$rob.models$b$merge[[1]][,4], 
-                               within.models$rob.models$a$merge[[1]][,4]),
+#
+texreg(list(FE.models$b$models[[1]], FE.models$a$models[[1]]),
+       override.coef=list(FE.models$b$merge[[1]][,1],
+                          FE.models$a$merge[[1]][,1]),
+       override.se=list(FE.models$b$merge[[1]][,2],
+                        FE.models$a$merge[[1]][,2]
+                       ),
+       override.pvalues = list(FE.models$b$merge[[1]][,4],
+                               FE.models$a$merge[[1]][,4]
+                               ),
        custom.coef.names=c(
          "Afr. Am. incarceration rate",
-         "Afr. Am. incarceration (lag)",
          "Afr. Am. Unemployment rate",
          "Afr. Am. Single parent rate",
          "Afr. Am. Adults w/o HS rate",
@@ -362,13 +360,10 @@ texreg(list(within.models$FE.models$b$models[[1]], within.models$FE.models$a$mod
          "Leg. ideology",
          "Violent crime rate",
          "Nat. Am. Incarceration rate",
-         "Nat. Am. Incarceration (lag)",
          "Nat. Am. Unemployment rate",
          "Nat. Am. Single parent rate",
          "Nat. Am. Adults w/o HS rate",
          "Nat. Am. child poverty rate",
-         "Percent Nat. Am. population",
-         "White incarceration rate"),
-       custom.model.names=c("Afr. Am. State FE", "Nat. Am. State FE",
-                            "Afr. Am. State/Year FE", "Nat. Am. State/Year FE"),
+         "Percent Nat. Am. population"),
+       custom.model.names=c("Afr. Am. State FE", "Nat. Am. State FE"),
        file="fe-models.tex")
