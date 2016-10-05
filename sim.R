@@ -1,5 +1,3 @@
-source("~/Dropbox/cw-race/models.R",)
-
 library(arm)
 set.seed(1)
 
@@ -13,17 +11,17 @@ extractSim<-function(x){
 
 nsims<-1000
 
-b.count.sim<-matrix(nrow=nsims*m, ncol=nrow(b.c.tab)-1)
-for(i in 1:m){
-	s.temp<-fixef(sim(b.ineq[[i]], nsims))
-	b.count.sim[(((i-1)*1000)+1):(i*1000),]<-s.temp
-}
-
-a.count.sim<-matrix(nrow=nsims*m, ncol=nrow(a.c.tab)-1)
-for(i in 1:m){
-	s.temp<-fixef(sim(a.ineq[[i]], nsims))
-	a.count.sim[(((i-1)*1000)+1):(i*1000),]<-s.temp
-}
+# b.count.sim<-matrix(nrow=nsims*m, ncol=nrow(b.c.tab)-1)
+# for(i in 1:m){
+# 	s.temp<-fixef(sim(b.ineq[[i]], nsims))
+# 	b.count.sim[(((i-1)*1000)+1):(i*1000),]<-s.temp
+# }
+# 
+# a.count.sim<-matrix(nrow=nsims*m, ncol=nrow(a.c.tab)-1)
+# for(i in 1:m){
+# 	s.temp<-fixef(sim(a.ineq[[i]], nsims))
+# 	a.count.sim[(((i-1)*1000)+1):(i*1000),]<-s.temp
+# }
 # 
 # l.count.sim<-matrix(nrow=nsims*m, ncol=nrow(l.c.tab)-1)
 # for(i in 1:m){
@@ -58,24 +56,24 @@ counter[,1]<-1
 counter[,3:11]<-0
 q.seq<-seq(from=0.05, to=0.95, length.out=ncount)
 
-sim.bc<-data.frame("e"=rep(NA, ncount), "upper"=rep(NA, ncount), "lower"=rep(NA, ncount), "x"=rep(NA, ncount), "p"=rep(NA, ncount))
-bi.scale<-na.omit(scale(fc.ineq$b.incarrt))
-counter[,2]<-quantile(bi.scale, q.seq)
-
-for(i in 1:ncount){
-	sim.bc[i,1:3]<-extractSim(exp(b.count.sim%*%counter[i,]))
-	sim.bc[i,4]<-counter[i,2]
-	sim.bc[i,5]<-q.seq[i]
-}
-
-sim.ac<-data.frame("e"=rep(NA, ncount), "upper"=rep(NA, ncount), "lower"=rep(NA, ncount), "x"=rep(NA, ncount), "p"=rep(NA, ncount))
-ai.scale<-na.omit(scale(fc.ineq$a.incarrt))
-counter[,2]<-quantile(ai.scale, q.seq)
-for(i in 1:ncount){
-	sim.ac[i,1:3]<-extractSim(exp(a.count.sim%*%counter[i,]))
-	sim.ac[i,4]<-counter[i,2]
-	sim.ac[i,5]<-q.seq[i]
-}
+# sim.bc<-data.frame("e"=rep(NA, ncount), "upper"=rep(NA, ncount), "lower"=rep(NA, ncount), "x"=rep(NA, ncount), "p"=rep(NA, ncount))
+# bi.scale<-na.omit(scale(fc.ineq$b.incarrt))
+# counter[,2]<-quantile(bi.scale, q.seq)
+# 
+# for(i in 1:ncount){
+# 	sim.bc[i,1:3]<-extractSim(exp(b.count.sim%*%counter[i,]))
+# 	sim.bc[i,4]<-counter[i,2]
+# 	sim.bc[i,5]<-q.seq[i]
+# }
+# 
+# sim.ac<-data.frame("e"=rep(NA, ncount), "upper"=rep(NA, ncount), "lower"=rep(NA, ncount), "x"=rep(NA, ncount), "p"=rep(NA, ncount))
+# ai.scale<-na.omit(scale(fc.ineq$a.incarrt))
+# counter[,2]<-quantile(ai.scale, q.seq)
+# for(i in 1:ncount){
+# 	sim.ac[i,1:3]<-extractSim(exp(a.count.sim%*%counter[i,]))
+# 	sim.ac[i,4]<-counter[i,2]
+# 	sim.ac[i,5]<-q.seq[i]
+# }
 # 
 # sim.lc<-data.frame("e"=rep(NA, ncount), "upper"=rep(NA, ncount), "lower"=rep(NA, ncount), "x"=rep(NA, ncount), "p"=rep(NA, ncount))
 # li.scale<-na.omit(scale(fc.ineq$l.incarrt))
