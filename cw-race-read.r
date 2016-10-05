@@ -143,4 +143,7 @@ fc<-left_join(fc, board, by="stname")
 
 fc<-fc%>%filter(stname!="DC")%>%filter(stname!="PR")
 
+###FILTER USELESS VARS OUT
+
+
 write.csv(fc, "fc.csv", row.names=FALSE)
