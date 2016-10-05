@@ -68,7 +68,7 @@ state.out<-rbind(makeState(fc2014), makeState(fc2013), makeState(fc2012),
                  makeState(fc2005), makeState(fc2004), makeState(fc2003),
                  makeState(fc2002), makeState(fc2001), makeState(fc2000))
 
-write.csv(state.out, "fc-race-state.csv", row.names=FALSE)
+write.csv(state.out, "U:/cw-race/data/fc-race-state.csv", row.names=FALSE)
 
 # makeCounty<-function(x){
 #   r<-unique(x$race)

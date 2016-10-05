@@ -1,7 +1,6 @@
 #########
 rm(list=ls())
 set.seed(1)
-library(merTools)
 library(lme4)
 library(Amelia)
 library(ggplot2)
@@ -13,9 +12,9 @@ library(rstanarm)
 
 options(mc.cores = parallel::detectCores())
 
-setwd("D:/sync/cw-race/")
-source("D:/sync/cw-race/cw-race-functions.r")
-fc<-read.csv("fc.csv")
+setwd("U:/cw-race/")
+source("U:/cw-race/cw-race-functions.r")
+fc<-read.csv("U:/cw-race/data/fc.csv")
 
 
 # # for laptop
@@ -24,6 +23,7 @@ fc<-read.csv("fc.csv")
 # fc<-read.csv("fc.csv")
 ##for output
 # setwd("~/Dropbox/cw-race-paper/")
+
 fc$inst6014_nom<-fc$inst6014_nom/100
 
 no.imp.plot<-ggplot(fc)+geom_line(aes(x=year, y=log(amind.unemp/(amind.unemp+amind.emp))))+facet_wrap(~stname)+ggtitle("Without transformation")
@@ -47,9 +47,8 @@ for(i in 1:ncol(fc)){
   }
 }
 
-m<-5
+m<-15
 
-# m=ceiling(max(apply(fc.ineq, 2, function(x){sum(is.na(x))}))/nrow(fc.ineq)*100)
 blk.acs<-which(colnames(fc)%in%c("blk.child", "blk.child.pov", "blk.lessHS", "blk.unemp", "blk.emp", "blk.singpar"))
 amind.acs<-which(colnames(fc)%in%c("amind.child", "amind.child.pov", "amind.lessHS", "amind.unemp", "amind.emp" , "amind.singpar"))
 
@@ -68,7 +67,7 @@ for(i in 1:length(amind.thresh)){
 }
 
 ###MANUALLY add HI 2007 (AMIND Child Pov observed at 0)
-amind.oi<-rbind(amind.oi, c(361, 27))
+amind.oi<-rbind(amind.oi, c(361, 23))
 
 blk.oi<-matrix(nrow=length(blk.acs)*length(blk.thresh), ncol=2)
 blk.oi[,2]<-rep(blk.acs, length(blk.thresh))
@@ -85,19 +84,41 @@ oi<-rbind(amind.oi, blk.oi)
 oi.priors<-matrix(nrow=nrow(oi), ncol=4)
 oi.priors[,1:2]<-oi[,1:2]
 
+
+####THIS IS TO IMPLEMENT A SAMPLE SIZE WEIGHTED VARIANCE BY POP
+####WOULD REQUIRE COUNTING SAMPLED INDIVIDUALS FROM EACH GROUP FROM ACS
+####IF I GET COMMENTS, CAN GO BACK AND IMPLEMENT TO MAKE
+####Var=pop*(p*(1-p)/samplesize)
+# amind.child<-which(names(fc)%in%c("amind.child", "amind.child.pov", "amind.singpar"))
+# amind.adult<-which(names(fc)%in%c("amind.lessHS", "amind.unemp", "amind.emp"))
+# blk.child<-which(names(fc)%in%c("blk.child", "blk.child.pov", "blk.singpar"))
+# blk.adult<-which(names(fc)%in%c("blk.lesSHS", "blk.unemp", "blk.emp"))
+
 create.prior<-function(x){
   ##function receives row,column pair to set prior based on strong observation years, compute mean and sd based on observed strong periods
   st<-fc[oi[x,1], "stname"]
   var<-oi[x,2]
   year<-fc[oi[x,1], "year"]
-  pop<-fc[oi[x,1], "tot"]
+  ###set pop based on underlying pop of interest
   strong.2000<-fc[which((fc$year==2000)&(fc$stname==st)), var]
   strong.2009<-fc[which((fc$year==2009)&(fc$stname==st)), var]
   strong.set<-fc[which((fc$year%in%strong)&(fc$stname==st)), var]
+  # if(var%in%amind.child){
+  #   pop<-fc[which((fc$year==2009)&(fc$stname==st)), "amind.child"]
+  # }
+  # if(var%in%amind.adult){
+  #   pop<-fc[which((fc$year==2009)&(fc$stname==st)), "a.adult"]
+  # }
+  # if(var%in%blk.child){
+  #   pop<-fc[which((fc$year==2009)&(fc$stname==st)), "blk.child"]
+  # }
+  # if(var%in%blk.adult){
+  #   pop<-fc[which((fc$year==2009)&(fc$stname==st)), "b.adult"]
+  # }
   ###WEIGHT ON PROXIMITY TO OBS, with obs - Weight is 0.1 on obs, 0.75 on 2000 at 2001, linear to 0.15 at 2009
   pr.E<-((0.9-(year-2001)*0.12))*strong.2000+(1-(0.9-(year-2001)*0.12))*strong.2009
   all.set<-fc[fc$stname==st,var]
-  pr.SD<-sd(strong.set) * (1+(1/(pop/100000)))##as invese pop penalized - heteroskedastic error
+  pr.SD<-1/2*(max(all.set)-min(all.set))##as invese pop penalized - heteroskedastic error
   return(c(pr.E, pr.SD))
 }
 
@@ -112,10 +133,8 @@ fc.imp<-amelia(fc, m=m,
                ts="year", cs="stname", polytime=1, 
                bounds=bounds, overimp=oi,  
                priors=oi.priors, p2s=1,
-               idvars=c("state", "statename","adult", "w.adult", "b.adult", "a.adult", 
-                        "pctblk1930", "pctimm1930", "pctami1930", "pctblk1960", "pctami1960", 
-                        "pctimm1960", "boarding.n", "board"))
-
+               idvars=c("state", "statename", "St", "adult", "w.adult", "b.adult", "a.adult", "l.adult",
+                        "pctblk1930", "pctimm1930", "pctami1930", "boarding.n", "board"))
 
 for(i in 1:m){
 fc.imp$imputations[[i]]<-
@@ -133,7 +152,7 @@ fc.imp$imputations[[i]]<-
   pctblk=blk/tot,
   pctami=amind/tot,
   pctwht=wht/tot,
-  incarrt=(TOTRACEM+TOTRACEF)/adult,
+  incarrt=incartot/adult,
   b.incarrt=(BLACKM+BLACKF)/b.adult,
   b.m.incarrt=(BLACKM)/(b.adult-blk.f),
   b.f.incarrt=(BLACKF)/blk.f,
@@ -156,7 +175,7 @@ fc.imp$imputations[[i]]<-
   year.c=year-2000)
 }
 
-post.imp.plot<-ggplot(fc.imp$imputations[[2]])+geom_line(aes(x=year, y=log(a.unemp.rt)))+facet_wrap(~stname)+ggtitle("After overimputation")
+post.imp.plot<-ggplot(fc.imp$imputations[[1]])+geom_line(aes(x=year, y=log(a.unemp.rt)))+facet_wrap(~stname)+ggtitle("After overimputation")
 
 
 #### TO SET INTEGERS IF DOING COUNT MODELS
@@ -243,27 +262,27 @@ a.d.tab<-makeMIRegTab(a.disp)
 b.dh.tab<-makeMIRegTab(b.disp.hist)
 a.dh.tab<-makeMIRegTab(a.disp.hist)
 
-
-b.d.bayes<-lapply(fc.imp$imputations, function(d) stan_glmer(log(bw.disp)~log(b.incardisp)+
-       log(bdisp.chpov)+
-       log(I(b.unemp.rt/w.unemp.rt))+log(I(b.singpar.rt/w.singpar.rt))+
-       log(I(blk.lessHS/wht.lessHS))+
-       log(pctblk)+
-       scale(inst6014_nom)+log(v.crime.rt)+
-       year.c+
-       (1|stname),
-     data=d))
-
-a.d.bayes<-lapply(fc.imp$imputations, function(d) 
-  stan_glmer(I(ami.disp^(1/2))~I(a.incardisp^(1/2))+
-         log(adisp.chpov)+
-         log(a.unemp.rt/w.unemp.rt)+log(a.singpar.rt/w.singpar.rt)+
-         log(amind.lessHS/wht.lessHS)+
-         log(pctami)+
-         scale(inst6014_nom)+log(v.crime.rt)+
-         year.c+
-         (1|stname),
-       data=d))
+# 
+# b.d.bayes<-lapply(fc.imp$imputations, function(d) stan_glmer(log(bw.disp)~log(b.incardisp)+
+#        log(bdisp.chpov)+
+#        log(I(b.unemp.rt/w.unemp.rt))+log(I(b.singpar.rt/w.singpar.rt))+
+#        log(I(blk.lessHS/wht.lessHS))+
+#        log(pctblk)+
+#        scale(inst6014_nom)+log(v.crime.rt)+
+#        year.c+
+#        (1|stname),
+#      data=d))
+# 
+# a.d.bayes<-lapply(fc.imp$imputations, function(d) 
+#   stan_glmer(I(ami.disp^(1/2))~I(a.incardisp^(1/2))+
+#          log(adisp.chpov)+
+#          log(a.unemp.rt/w.unemp.rt)+log(a.singpar.rt/w.singpar.rt)+
+#          log(amind.lessHS/wht.lessHS)+
+#          log(pctami)+
+#          scale(inst6014_nom)+log(v.crime.rt)+
+#          year.c+
+#          (1|stname),
+#        data=d))
 
 ########## PREPARE TABLE OUTPUT, PREPARE SIMULATION / PREDICTION
 
@@ -273,19 +292,24 @@ a.d.bayes<-lapply(fc.imp$imputations, function(d)
 fe.data<-fc.imp$imputations
 source("FE-models.r", print.eval=TRUE)
 
-# within.models<-list("FE.models"=FE.models, "lag.models"=lag.models, 
-#                 "fd.models"=fd.models, "rob.models"=rob.models, 
-#                 "FE.ent.models"=FE.ent.models, "lag.ent.models"=lag.ent.models, 
-#                 "fd.ent.models"=fd.ent.models, "rob.ent.models"=rob.ent.models)
+within.models<-list("FE.models"=FE.models, 
+                    #"lag.models"=lag.models,
+                    #"fd.models"=fd.models, 
+                    "rob.models"=rob.models)
+                    
+                #"FE.ent.models"=FE.ent.models, 
+                #"lag.ent.models"=lag.ent.models,
+                #"fd.ent.models"=fd.ent.models, 
+                #"rob.ent.models"=rob.ent.models)
 
 
 ####################
 #Table output
 ####################
 texreg(list(b.disp[[1]],a.disp[[1]]),
-       override.coef=list(b.d.tab[,1], a.d.tab[,1]),
-       override.se=list(b.d.tab[,2], a.d.tab[,2]),
-       override.pvalues = list(b.d.tab[,4], a.d.tab[,4]),
+       override.coef=list(b.d.tab[1:nrow(b.d.tab)-1,1], a.d.tab[1:nrow(b.d.tab)-1,1]),
+       override.se=list(b.d.tab[1:nrow(b.d.tab)-1,2], a.d.tab[1:nrow(b.d.tab)-1,2]),
+       override.pvalues = list(b.d.tab[1:nrow(b.d.tab)-1,4], a.d.tab[1:nrow(b.d.tab)-1,4]),
        custom.coef.names=c("Intercept",
                            "Afr. Am. Incarceration disp.",
                            "Afr. Am. Child poverty disp.",

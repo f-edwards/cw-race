@@ -3,6 +3,8 @@ library(dplyr)
 library(tidyr)
 library(Amelia)
 
+setwd("U:/cw-race/data")
+source("U:/cw-race/cw-race-functions.r")
 ##############################################################
 ### Read Foster Care Entry Data - State-year panel produced from AFCARS
 ### produced with FC_AFCARS_indTOstate.r in this repository
@@ -43,6 +45,7 @@ ideo<-read.csv("ideo6014.csv")
 ideo$state<-NULL
 pol<-cleanpol2(ideo)
 pol$year<-pol$year
+pol<-pol%>%select(statename, year, inst6014_nom, St, state)
 
 ### NATIONAL PRISONER STATISTICS http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/34540
 incartemp<-read.delim("36281-0001-Data.tsv", head=TRUE)
@@ -55,7 +58,7 @@ incar<-(data.frame(state=incartemp$STATEID, year=incartemp$YEAR,
   incartot=incartemp$CWPRIVM+incartemp$CWPRIVF,
   new.incar=incartemp$ADTOTM+incartemp$ADTOTF))  
 
-incar<-cbind(incar, incartemp[,53:80])
+incar<-cbind(incar, incartemp[,c(53:56, 59:60)])
 
 #AK 2013 is missing race data
 index<-which(incar$state==2 & incar$year==2013)
@@ -110,6 +113,8 @@ crime.temp$v.crime.rt<-crime.temp$viol/crime.temp$tot*100000
 ###historical pop data
 hist<-read.csv("hist-pop.csv")
 
+hist<-hist%>%select(state, pctblk1930, pctimm1930, pctami1930)
+
 ###boarding school data
 board<-read.csv("boardingschool.csv")
 board$board<-board$boarding.n>0
@@ -127,6 +132,7 @@ fc<-stnames(fc)
 fc.new<-read.csv("fc-race-state.csv")
 fc.new[is.na(fc.new)]<-0
 names(fc.new)[1:2]<-c("stname", "year")
+fc.new<-fc.new%>%select(stname, year, cl.blk, ent.blk, cl.white, ent.white, cl.nat.am, ent.nat.am, cl, ent)
 
 ##MICHIGAN 2000,2001 data is terrible, treating as missing
 fc.new[which((fc.new$stname=="MI")&(fc.new$year<=2001)),3:ncol(fc.new)]<-NA
@@ -144,3 +150,4 @@ fc<-left_join(fc, board, by="stname")
 fc<-fc%>%filter(stname!="DC")%>%filter(stname!="PR")
 
 write.csv(fc, "fc.csv", row.names=FALSE)
+

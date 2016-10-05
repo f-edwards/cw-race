@@ -5,7 +5,7 @@
 ### Merges imputation results according to Rubin for beta, se
 
 makeMIRegTab<-function(x){
-  r<-mi.meld(ldply(x, fixef)[,-1], ldply(x, se.fixef)[,-1])
+  r<-mi.meld(t(sapply(x, fixef)), t(sapply(x, se.fixef)))
   beta<-t(r[[1]])
   se<-t(r[[2]])
   z<-beta/se
@@ -27,14 +27,16 @@ makeMIRegTab<-function(x){
 	}
 
   }
-  # re.d<-mi.meld(ranefs.disp, ranefs.disp.se)
+  #re.d<-mi.meld(ranefs.disp, ranefs.disp.se)
   re.s<-mi.meld(ranefs.st, ranefs.st.se)
   # Sig2.ep<-var(t(re.d[[1]]))
   # names(Sig2.ep)<-"Sig2.ep"
-  Sig2.gam<-var(t(re.s[[1]]))
+  Sig2.gam<-c(var(t(re.s[[1]])), NA, NA, NA)
   names(Sig2.gam)<-"Sig2.gam"
   results<-as.data.frame(cbind(beta, se, z,p))
   names(results)<-c("Beta", "SE", "z","p")
+  results<-rbind(results, Sig2.gam)
+  row.names(results)[nrow(results)]<-"RE Variance"
   # results[11,1]<-Sig2.ep
   # results[12,1]<-Sig2.gam
   return(results)
