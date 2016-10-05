@@ -150,4 +150,3 @@ fc<-left_join(fc, board, by="stname")
 fc<-fc%>%filter(stname!="DC")%>%filter(stname!="PR")
 
 write.csv(fc, "fc.csv", row.names=FALSE)
-
