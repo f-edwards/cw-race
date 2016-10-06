@@ -45,7 +45,7 @@ bd.scale<-log(fc.imp$imputations[[1]]$b.incardisp)
 counterb[,2]<-quantile(bd.scale, q.seq)
 for(i in 1:ncount){
 	sim.bd[i,1:3]<-extractSim(exp(b.disp.sim%*%counterb[i,]))
-	sim.bd[i,4]<-counterb[i,2]
+	sim.bd[i,4]<-exp(counterb[i,2])
 	sim.bd[i,5]<-q.seq[i]
 }
 
@@ -68,11 +68,9 @@ countera[,2]<-quantile(ad.scale, q.seq)
 
 
 sim.ad<-data.frame("e"=rep(NA, ncount), "upper"=rep(NA, ncount), "lower"=rep(NA, ncount), "x"=rep(NA, ncount), "p"=rep(NA, ncount))
-ad.scale<-sqrt(fc.imp$imputations[[1]]$b.incardisp)
-counter[,2]<-quantile(ad.scale, q.seq)
 for(i in 1:ncount){
 	sim.ad[i,1:3]<-extractSim((a.disp.sim%*%countera[i,])^2)
-	sim.ad[i,4]<-countera[i,2]
+	sim.ad[i,4]<-countera[i,2]^2
 	sim.ad[i,5]<-q.seq[i]
 }
 
@@ -92,14 +90,44 @@ disp.plot<-ggplot(as.data.frame(sim.disp), aes(y=e, x=p))+geom_line()+
   facet_wrap(~m)+
 	theme_bw()
 
-ggsave("disp-sim-plot.pdf", disp.plot, width=9, height=3)
+ggsave("disp-sim-plot.pdf", disp.plot, width=7, height=3)
 
 ###point estimates
+sink("exp-out.txt")
+print("RE Sims")
 rbind(sim.bd[500,], sim.bd[223,], sim.bd[778,])
-quantile(fc.imp$imputations[[1]]$b.incardisp, c(0.25, .5, 0.75), na.rm=TRUE)
 rbind(sim.ad[500,], sim.ad[223,], sim.ad[778,])
-quantile(fc.imp$imputations[[1]]$a.incardisp, c(0.25, .5, 0.75), na.rm=TRUE)
 # rbind(sim.ld[500,], sim.ld[223,], sim.ld[778,])
 # quantile(fc$l.incardisp, c(0.25, .5, 0.75), na.rm=TRUE)
 
 ### FE Expected values
+"FE Expected Values for 10 per 1,000 increase in incar from mean"
+
+beta.b<-FE.models$b$merge[[1]][1,1]
+se.b<-FE.models$b$merge[[1]][1,2]
+beta.CI<-c(beta.b, beta.b+1.96*se.b, beta.b-1.96*se.b)
+
+median.b<-median(fc.imp$imputations[[1]]$b.incarrt)
+within.bincar.sd<-mean(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd(b.incarrt)))[,2])
+delta.b<-median.b+0.005
+FC.0<-exp(beta.CI*log(median.b))
+FC.1<-exp(beta.CI*log(delta.b))
+delta.FCb<-FC.1-FC.0
+pct.FCb<-FC.1/FC.0
+print(c("Black FC Caseload pc", "For within state 0.005 increase (5 per 1,000), within state sd", within.bincar.sd, "Over median", median.b,
+        "Caseload PC increase", delta.FCb, "Caseload pct increase", pct.FCb))
+
+beta.a<-FE.models$a$merge[[1]][1,1]
+se.a<-FE.models$a$merge[[1]][1,2]
+beta.CI<-c(beta.a, beta.a+1.96*se.a, beta.a-1.96*se.a)
+
+median.a<-median(fc.imp$imputations[[1]]$a.incarrt)
+within.aincar.sd<-mean(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd(a.incarrt)))[,2])
+delta.a<-median.a+0.005
+FC.0<-exp(beta.CI*log(median.a))
+FC.1<-exp(beta.CI*log(delta.a))
+delta.FCa<-FC.1-FC.0
+pct.FCa<-FC.1/FC.0
+print(c("NatAM FC Caseload pc", "For within state 0.005 increase (5 per 1,000), within state sd", within.aincar.sd, "Over median", median.a,
+        "Caseload PC increase", delta.FCa, "Caseload pct increase", pct.FCa))
+sink()

@@ -1,0 +1,36 @@
+[1] "RE Sims"
+           e    upper    lower         x         p                m
+500 3.942813 4.441733 3.504234  7.393315 0.4995495 African American
+223 3.601279 4.205720 3.119030  5.446008 0.2500000 African American
+778 4.324687 4.831478 3.858178 10.069644 0.7500000 African American
+           e    upper    lower         x         p               m
+500 3.503710 4.913010 2.369837 2.0833123 0.4995495 Native American
+223 2.672161 4.125209 1.597375 0.8655754 0.2500000 Native American
+778 4.592883 6.146039 3.199937 4.0913553 0.7500000 Native American
+[1] "FE Expected Values for 10 per 1,000 increase in incar from mean"
+ [1] "Black FC Caseload pc"                                          
+ [2] "For within state 0.005 increase (5 per 1,000), within state sd"
+ [3] "0.00395734800935294"                                           
+ [4] "Over median"                                                   
+ [5] "0.0249364920516979"                                            
+ [6] "Caseload PC increase"                                          
+ [7] "0.018542146364994"                                             
+ [8] "0.0127356457652941"                                            
+ [9] "0.00470891932468198"                                           
+[10] "Caseload pct increase"                                         
+[11] "1.05877992500451"                                              
+[12] "1.11517982344022"                                              
+[13] "1.00523243519089"                                              
+ [1] "NatAM FC Caseload pc"                                          
+ [2] "For within state 0.005 increase (5 per 1,000), within state sd"
+ [3] "0.00247947160301009"                                           
+ [4] "Over median"                                                   
+ [5] "0.00689560255815564"                                           
+ [6] "Caseload PC increase"                                          
+ [7] "0.0374573052475989"                                            
+ [8] "0.0152312707067717"                                            
+ [9] "0.000938701747999926"                                          
+[10] "Caseload pct increase"                                         
+[11] "1.2041781726189"                                               
+[12] "1.4486734018856"                                               
+[13] "1.00094684524781"                                              

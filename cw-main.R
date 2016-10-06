@@ -12,13 +12,13 @@ library(MASS)
 # 
 # options(mc.cores = parallel::detectCores())
 
-# setwd("U:/cw-race/")
-# source("U:/cw-race/cw-race-functions.r")
-# fc<-read.csv("U:/cw-race/data/fc.csv")
+setwd("U:/cw-race/")
+source("U:/cw-race/cw-race-functions.r")
+fc<-read.csv("U:/cw-race/data/fc.csv")
 
-setwd("D:/sync/cw-race/")
-source("D:/sync/cw-race/cw-race-functions.r")
-fc<-read.csv("D:/sync/cw-race/data/fc.csv")
+# setwd("D:/sync/cw-race/")
+# source("D:/sync/cw-race/cw-race-functions.r")
+# fc<-read.csv("D:/sync/cw-race/data/fc.csv")
 
 
 # # for laptop
