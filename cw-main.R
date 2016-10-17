@@ -251,7 +251,7 @@ fe.count<-glm.nb(as.integer(cl.blk)~ log(b.incarrt)+
                          log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                          log(chpov.blk.pc)+log(pctblk)+
                          inst6014_nom+log(v.crime.rt)+
-                   factor(stname),
+                   factor(stname)+factor(year.c),
                  offset(log(test$blk.child)), data=test)
 
 # 
