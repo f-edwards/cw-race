@@ -1,8 +1,17 @@
-library(RColorBrewer)
+library(albersusa)
+#devtools::install_github("hrbrmstr/albersusa")
+library(sp)
+library(rgeos)
+library(maptools)
 library(ggplot2)
-library(maps)
+library(ggalt)
+library(ggthemes)
+library(viridis)
+library(scales)
+library(RColorBrewer)
 
-setwd("~/Dropbox/cw-race-paper/")
+
+setwd("~/sync/cw-race-paper/")
 
 ### Depends on transformed data from FCmodels.r
 #source("FCmodels.r")
@@ -18,22 +27,22 @@ returnquant<-function(x){
   return(as.factor(quant))
 }
 
-fc14<-fc.ineq%>%filter(year.c==7)
+fc14<-fc.imp$imputations[[1]]%>%filter(year.c==7)
 fcmap<-fc14%>%dplyr::select(stname, bw.disp, ami.disp, b.incardisp, a.incardisp, 
                      b.incarrt, a.incarrt, cl.blk, cl.nat.am, blk.child, amind.child)%>%
                      mutate("bcl.rt"=cl.blk/blk.child, "acl.rt"=cl.nat.am/amind.child)
 
 fcmap$state<-fcmap$St<-fcmap$stname
 fcmap<-StateNames(fcmap)
-fcmap$region<-tolower(fcmap$state)
+fcmap$name<-tolower(fcmap$state)
 
 states<-map_data("state")
 n<-nrow(fcmap)
 
 fclong<-with(fcmap, 
-             data.frame(region=rep(region, 4),
-              q=as.factor(c(returnquant(bcl.rt), returnquant(acl.rt), returnquant(b.incarrt), returnquant(a.incarrt)))))
-              
+             data.frame(name=rep(name, 4),
+                        q=as.factor(c(returnquant(bcl.rt), returnquant(acl.rt), returnquant(b.incarrt), returnquant(a.incarrt)))))
+
 fclong$c<-c(rep("Black children in foster care per capita", n), 
             rep("Native American children in foster care per capita", n), 
             rep("Black Incarceration per capita", n),
@@ -42,43 +51,41 @@ fclong$c<-factor(fclong$c, levels=c("Black children in foster care per capita",
                                     "Native American children in foster care per capita", 
                                     "Black Incarceration per capita", "Native American incarceration per capita"))
 
-choro<-merge(states, fclong, by="region")
-choro <- choro[order(choro$order), ]
 
-gray.pal<-c("gray90", "gray65", "gray40", "gray15", "gray1")
+us <- usa_composite()
+us_map <- fortify(us, region="name")
+us_map$name<-tolower(us_map$id)
+map.merge<-merge(us_map, fclong, by="name")
 
-MapPlot <- ggplot(choro,
-                  aes(x = long, y = lat, group = group, fill = q))
-MapPlot <- MapPlot + geom_polygon(aes(fill = q), colour = "gray20", size = 0.2) +
-  scale_fill_manual(values = gray.pal,
-                    name="Average\nState Value\n2002-2011", labels=c("Lowest 20%", " ", " ", " ", "Highest 20%"))
+blue.pal<-c("#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d")
 
-MapPlot <- MapPlot + coord_map(project="albers", at0 = 45.5, lat1 = 29.5)  # Changes the projection to something other than Mercator.
 
-MapPlot <- MapPlot +  theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
-                            panel.border = element_blank(), panel.background=element_blank())+
+gg <- ggplot()+ geom_map(data=map.merge, map=us_map,
+                    aes(x=long, y=lat, map_id=id, fill=q),
+                    color="black", size=0.2)+theme_map()+ coord_proj(us_laea_proj)+
+  facet_wrap(~c)+
+  scale_fill_manual(values = blue.pal,
+                    name="State Value\n2014", labels=c("Lowest 20%", " ", " ", " ", "Highest 20%"))
+
+gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
+              panel.border = element_blank(), panel.background=element_blank())+
   scale_y_continuous(name="", breaks=NULL)+
   scale_x_continuous(name="", breaks=NULL)+
   theme(legend.title=element_text(size=10))+
   theme(legend.text=element_text(size=10))+
   theme(legend.position="bottom")+
-  theme(legend.key.size= unit(0.3, "cm"))
+  theme(legend.key.size= unit(0.3, "cm"))+
+  theme(strip.background=element_blank(), 
+        strip.text.x=element_text(size=10),
+        strip.text.y=element_blank())
 
-MapPlot<- MapPlot + theme(strip.background=element_blank(), 
-                          strip.text.x=element_text(size=10),
-                          strip.text.y=element_blank())
+print(gg)
 
-MapPlot <- MapPlot + xlab(NULL) + ylab(NULL)
-
-MapPlot <- MapPlot + facet_wrap(~c, ncol=2)
-
-print(MapPlot)
-
-ggsave(plot = MapPlot, "RateMapGray.pdf", h = 8, w = 8)
+ggsave(plot = gg, "RateMapBlue.pdf", h = 8, w = 8)
 
 
 fclong<-with(fcmap, 
-             data.frame(region=rep(region, 4),
+             data.frame(name=rep(name, 4),
               q=as.factor(c(returnquant(bw.disp), returnquant(ami.disp), returnquant(b.incardisp), returnquant(a.incardisp)))))
               
 fclong$c<-c(rep("Black/White foster care disproportion", n), 
@@ -89,36 +96,81 @@ fclong$c<-factor(fclong$c, levels=c("Black/White foster care disproportion",
                                     "Native American/White foster care disproportion", 
                                     "Black/White Incarceration disproportion", "Native American/White incarceration disproportion"))
 
-choro<-merge(states, fclong, by="region")
-choro <- choro[order(choro$order), ]
+map.merge<-merge(us_map, fclong, by="name")
 
 gray.pal<-c("gray90", "gray65", "gray40", "gray15", "gray1")
+blue.pal<-c("#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d")
 
-MapPlot <- ggplot(choro,
-                  aes(x = long, y = lat, group = group, fill = q))
-MapPlot <- MapPlot + geom_polygon(aes(fill = q), colour = "gray20", size = 0.2) +
-  scale_fill_manual(values = gray.pal,
-                    name="Average\nState Value\n2002-2011", labels=c("Lowest 20%", " ", " ", " ", "Highest 20%"))
 
-MapPlot <- MapPlot + coord_map(project="albers", at0 = 45.5, lat1 = 29.5)  # Changes the projection to something other than Mercator.
+gg <- ggplot()+ geom_map(data=map.merge, map=us_map,
+                         aes(x=long, y=lat, map_id=id, fill=q),
+                         color="black", size=0.2)+theme_map()+ coord_proj(us_laea_proj)+
+  facet_wrap(~c)+
+  scale_fill_manual(values = blue.pal,
+                    name="State Value\n2014", labels=c("Lowest 20%", " ", " ", " ", "Highest 20%"))
 
-MapPlot <- MapPlot +  theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
-                            panel.border = element_blank(), panel.background=element_blank())+
+gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
+              panel.border = element_blank(), panel.background=element_blank())+
   scale_y_continuous(name="", breaks=NULL)+
   scale_x_continuous(name="", breaks=NULL)+
   theme(legend.title=element_text(size=10))+
   theme(legend.text=element_text(size=10))+
   theme(legend.position="bottom")+
-  theme(legend.key.size= unit(0.3, "cm"))
+  theme(legend.key.size= unit(0.3, "cm"))+
+  theme(strip.background=element_blank(), 
+        strip.text.x=element_text(size=10),
+        strip.text.y=element_blank())
 
-MapPlot<- MapPlot + theme(strip.background=element_blank(), 
-                          strip.text.x=element_text(size=10),
-                          strip.text.y=element_blank())
+print(gg)
 
-MapPlot <- MapPlot + xlab(NULL) + ylab(NULL)
+ggsave(plot = MapPlot, "DispMapBlue.pdf", h = 8, w = 8)
 
-MapPlot <- MapPlot + facet_wrap(~c, ncol=2)
+fc14<-fc.imp$imputations[[1]]%>%filter(year.c==7)
+fcmap<-fc14%>%dplyr::select(stname, cl, child, child.pov)%>%
+  mutate("cl.rt"=cl/child, "pov.rt"=child.pov/child)
 
-print(MapPlot)
+fcmap$state<-fcmap$St<-fcmap$stname
+fcmap<-StateNames(fcmap)
+fcmap$name<-tolower(fcmap$state)
 
-ggsave(plot = MapPlot, "DispMapGray.pdf", h = 8, w = 8)
+n<-nrow(fcmap)
+
+fclong<-with(fcmap, 
+             data.frame(name=rep(name, 2),
+                        q=as.factor(c(returnquant(pov.rt), returnquant(cl.rt)))))
+
+fclong$c<-c(rep("Child poverty per capita", n), 
+            rep("Children in foster care per capita", n))
+fclong$c<-factor(fclong$c, levels=c("Child poverty per capita", 
+                                    "Children in foster care per capita"))
+
+us <- usa_composite()
+us_map <- fortify(us, region="name")
+us_map$name<-tolower(us_map$id)
+map.merge<-merge(us_map, fclong, by="name")
+
+blue.pal<-c("#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d")
+
+
+gg <- ggplot()+ geom_map(data=map.merge, map=us_map,
+                         aes(x=long, y=lat, map_id=id, fill=q),
+                         color="black", size=0.2)+theme_map()+ coord_proj(us_laea_proj)+
+  facet_wrap(~c)+
+  scale_fill_manual(values = blue.pal,
+                    name="State Value\n2014", labels=c("Lowest 20%", " ", " ", " ", "Highest 20%"))
+
+gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
+              panel.border = element_blank(), panel.background=element_blank())+
+  scale_y_continuous(name="", breaks=NULL)+
+  scale_x_continuous(name="", breaks=NULL)+
+  theme(legend.title=element_text(size=10))+
+  theme(legend.text=element_text(size=10))+
+  theme(legend.position="bottom")+
+  theme(legend.key.size= unit(0.3, "cm"))+
+  theme(strip.background=element_blank(), 
+        strip.text.x=element_text(size=10),
+        strip.text.y=element_blank())
+
+print(gg)
+
+ggsave(plot = gg, "PovMapBlue.pdf", h = 8, w = 8)

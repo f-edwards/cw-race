@@ -63,8 +63,10 @@ merge.mi.fd<-function(model.imp){
 
 FE.models<-list()
 model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+#log(b.incarrt.lag)+
+                                         log(w.incarrt)+
                                                     log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-                                                    log(chpov.blk.pc)+log(pctblk)+
+                                                    log(chpov.blk.pc)+
+                                         log(pctblk)+
                                                     inst6014_nom+log(v.crime.rt),
                                                   index=c("stname", "year.c"),
                                                   effect="individual",
@@ -72,7 +74,9 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+#log(b.inca
                                                   data=d))
 FE.models$b<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
+
 model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+#sqrt(a.incarrt.lag)+
+                                         log(w.incarrt)+
                                                     log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                                     sqrt(chpov.amind.pc)+log(pctami)+
                                                     inst6014_nom+log(v.crime.rt),
@@ -84,6 +88,7 @@ FE.models$a<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coe
 
 
 model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+#log(b.m.incarrt.lag)+
+                                         log(w.incarrt)+
                                                       log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                                       log(chpov.blk.pc)+log(pctblk)+
                                                       inst6014_nom+log(v.crime.rt),
@@ -94,6 +99,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+#log(b.m.
 FE.models$b.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+#sqrt(a.m.incarrt.lag)+
+                                         log(w.incarrt)+
                                                       log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                                       sqrt(chpov.amind.pc)+log(pctami)+
                                                       inst6014_nom+log(v.crime.rt),
@@ -104,6 +110,7 @@ model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+#sqrt
 FE.models$a.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+#sqrt(b.f.incarrt.lag)+
+                                         log(w.incarrt)+
                                                       log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                                       log(chpov.blk.pc)+log(pctblk)+
                                                       inst6014_nom+log(v.crime.rt),
@@ -114,6 +121,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+#sqrt(b.
 FE.models$b.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.f.incarrt)+#sqrt(a.f.incarrt.lag)+
+                                         log(w.incarrt)+
                                                       log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                                       sqrt(chpov.amind.pc)+log(pctami)+
                                                       inst6014_nom+log(v.crime.rt),
@@ -270,7 +278,7 @@ FE.models$a.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) c
 rob.models<-list()
 
 model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+#log(b.incarrt.lag)+
-                                         +log(w.incarrt)+
+                                         log(w.incarrt)+
                                          log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                          log(chpov.blk.pc)+log(pctblk)+
                                          inst6014_nom+log(v.crime.rt),
@@ -281,7 +289,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.incarrt)+#log(b.inca
 rob.models$b<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+#sqrt(a.incarrt.lag)+
-                                         +log(w.incarrt)+
+                                         log(w.incarrt)+
                                          log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                          sqrt(chpov.amind.pc)+log(pctami)+
                                          inst6014_nom+log(v.crime.rt),
@@ -292,7 +300,7 @@ model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.incarrt)+#sqrt(a
 rob.models$a<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+#log(b.m.incarrt.lag)+
-                                           +log(w.incarrt)+
+                                         log(w.incarrt)+
                                            log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                            log(chpov.blk.pc)+log(pctblk)+
                                            inst6014_nom+log(v.crime.rt),
@@ -303,7 +311,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~log(b.m.incarrt)+#log(b.m.
 rob.models$b.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+#sqrt(a.m.incarrt.lag)+
-                                           +log(w.incarrt)+
+                                         log(w.incarrt)+
                                            log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                            sqrt(chpov.amind.pc)+log(pctami)+
                                            inst6014_nom+log(v.crime.rt),
@@ -314,7 +322,7 @@ model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.m.incarrt)+#sqrt
 rob.models$a.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+#sqrt(b.f.incarrt.lag)+
-                                           +log(w.incarrt)+
+                                         log(w.incarrt)+
                                            log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
                                            log(chpov.blk.pc)+log(pctblk)+
                                            inst6014_nom+log(v.crime.rt),
@@ -325,7 +333,7 @@ model<-lapply(fe.data, function(d) plm(log(cl.blk.pc)~sqrt(b.f.incarrt)+#sqrt(b.
 rob.models$b.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
 
 model<-lapply(fe.data, function(d) plm(sqrt(cl.amind.pc)~sqrt(a.f.incarrt)+#sqrt(a.f.incarrt.lag)+
-                                           +log(w.incarrt)+
+                                         log(w.incarrt)+
                                            log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
                                            sqrt(chpov.amind.pc)+log(pctami)+
                                            inst6014_nom+log(v.crime.rt),
@@ -338,72 +346,78 @@ rob.models$a.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) 
 # ###################################################
 # ###PLM ENTRIES FE models, PCSE (Beck and Katz)
 # ###################################################
-# FE.ent.models<-list()
-# 
-# model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~log(b.incarrt)+log(b.incarrt.lag)+
-#                                                     log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-#                                                     log(chpov.blk.pc)+log(pctblk)+
-#                                                     inst6014_nom+log(v.crime.rt),
-#                                                   index=c("stname", "year.c"),
-#                                                   effect="individual",
-#                                                   model="within",
-#                                                   data=d))
-# FE.ent.models$b<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# 
-# model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.incarrt)+sqrt(a.incarrt.lag)+
-#                                                     log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-#                                                     sqrt(chpov.amind.pc)+log(pctami)+
-#                                                     inst6014_nom+log(v.crime.rt),
-#                                                   index=c("stname", "year.c"),
-#                                                   effect="individual",
-#                                                   model="within",
-#                                                   data=d))
-# FE.ent.models$a<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# 
-# model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~log(b.m.incarrt)+log(b.m.incarrt.lag)+
-#                                                       log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-#                                                       log(chpov.blk.pc)+log(pctblk)+
-#                                                       inst6014_nom+log(v.crime.rt),
-#                                                     index=c("stname", "year.c"),
-#                                                     effect="individual",
-#                                                     model="within",
-#                                                     data=d))
-# FE.ent.models$b.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.m.incarrt)+sqrt(a.m.incarrt.lag)+
-#                                                       log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-#                                                       sqrt(chpov.amind.pc)+log(pctami)+
-#                                                       inst6014_nom+log(v.crime.rt),
-#                                                     index=c("stname", "year.c"),
-#                                                     effect="individual",
-#                                                     model="within",
-#                                                     data=d))
-# FE.ent.models$a.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~sqrt(b.f.incarrt)+sqrt(b.f.incarrt.lag)+
-#                                                       log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-#                                                       log(chpov.blk.pc)+log(pctblk)+
-#                                                       inst6014_nom+log(v.crime.rt),
-#                                                     index=c("stname", "year.c"),
-#                                                     effect="individual",
-#                                                     model="within",
-#                                                     data=d))
-# FE.ent.models$b.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.f.incarrt)+sqrt(a.f.incarrt.lag)+
-#                                                       log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-#                                                       sqrt(chpov.amind.pc)+log(pctami)+
-#                                                       inst6014_nom+log(v.crime.rt),
-#                                                     index=c("stname", "year.c"),
-#                                                     effect="individual",
-#                                                     model="within",
-#                                                     data=d))
-# FE.ent.models$a.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# 
-# 
+FE.ent.models<-list()
+
+model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~log(b.incarrt)+
+                                         log(w.incarrt)+
+                                                    log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+                                                    log(chpov.blk.pc)+log(pctblk)+
+                                                    inst6014_nom+log(v.crime.rt),
+                                                  index=c("stname", "year.c"),
+                                                  effect="individual",
+                                                  model="within",
+                                                  data=d))
+FE.ent.models$b<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+
+model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.incarrt)+
+                                         log(w.incarrt)+
+                                                    log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+                                                    sqrt(chpov.amind.pc)+log(pctami)+
+                                                    inst6014_nom+log(v.crime.rt),
+                                                  index=c("stname", "year.c"),
+                                                  effect="individual",
+                                                  model="within",
+                                                  data=d))
+FE.ent.models$a<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+
+model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~log(b.m.incarrt)+
+                                         log(w.incarrt)+
+                                                      log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+                                                      log(chpov.blk.pc)+log(pctblk)+
+                                                      inst6014_nom+log(v.crime.rt),
+                                                    index=c("stname", "year.c"),
+                                                    effect="individual",
+                                                    model="within",
+                                                    data=d))
+FE.ent.models$b.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.m.incarrt)+
+                                         log(w.incarrt)+
+                                                      log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+                                                      sqrt(chpov.amind.pc)+log(pctami)+
+                                                      inst6014_nom+log(v.crime.rt),
+                                                    index=c("stname", "year.c"),
+                                                    effect="individual",
+                                                    model="within",
+                                                    data=d))
+FE.ent.models$a.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~sqrt(b.f.incarrt)+
+                                         log(w.incarrt)+
+                                                      log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+                                                      log(chpov.blk.pc)+log(pctblk)+
+                                                      inst6014_nom+log(v.crime.rt),
+                                                    index=c("stname", "year.c"),
+                                                    effect="individual",
+                                                    model="within",
+                                                    data=d))
+FE.ent.models$b.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.f.incarrt)+
+                                         log(w.incarrt)+
+                                                      log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+                                                      sqrt(chpov.amind.pc)+log(pctami)+
+                                                      inst6014_nom+log(v.crime.rt),
+                                                    index=c("stname", "year.c"),
+                                                    effect="individual",
+                                                    model="within",
+                                                    data=d))
+FE.ent.models$a.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+
+
 # ################################# 
 # # ###LAGGED DV
 # ################################# 
@@ -551,79 +565,81 @@ rob.models$a.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) 
 # fd.ent.models$a.f<-list("models"=model, "merge"=merge.mi.fd(model))
 # 
 # 
-# ################################
-# ##Kitchen sink ENT
-# ################################
-# 
-# ###PLM CL FE models, PCSE (Beck and Katz)
-# rob.ent.models<-list()
-# 
-# model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~log(b.incarrt)+log(b.incarrt.lag)+
-#                                          log(w.incarrt)+
-#                                          log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-#                                          log(chpov.blk.pc)+log(pctblk)+
-#                                          inst6014_nom+log(v.crime.rt),
-#                                        index=c("stname", "year.c"),
-#                                        effect="twoways",
-#                                        model="within",
-#                                        data=d))
-# rob.ent.models$b<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# 
-# model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.incarrt)+sqrt(a.incarrt.lag)+
-#                                          log(w.incarrt)+
-#                                          log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-#                                          sqrt(chpov.amind.pc)+log(pctami)+
-#                                          inst6014_nom+log(v.crime.rt),
-#                                        index=c("stname", "year.c"),
-#                                        effect="twoways",
-#                                        model="within",
-#                                        data=d))
-# rob.ent.models$a<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# 
-# model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~log(b.m.incarrt)+log(b.m.incarrt.lag)+
-#                                            +log(w.incarrt)+
-#                                            log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-#                                            log(chpov.blk.pc)+log(pctblk)+
-#                                            inst6014_nom+log(v.crime.rt),
-#                                          index=c("stname", "year.c"),
-#                                          effect="twoways",
-#                                          model="within",
-#                                          data=d))
-# rob.ent.models$b.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# 
-# model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.m.incarrt)+sqrt(a.m.incarrt.lag)+
-#                                            +log(w.incarrt)+
-#                                            log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-#                                            sqrt(chpov.amind.pc)+log(pctami)+
-#                                            inst6014_nom+log(v.crime.rt),
-#                                          index=c("stname", "year.c"),
-#                                          effect="twoways",
-#                                          model="within",
-#                                          data=d))
-# rob.ent.models$a.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~sqrt(b.f.incarrt)+sqrt(b.f.incarrt.lag)+
-#                                            +log(w.incarrt)+
-#                                            log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-#                                            log(chpov.blk.pc)+log(pctblk)+
-#                                            inst6014_nom+log(v.crime.rt),
-#                                          index=c("stname", "year.c"),
-#                                          effect="twoways",
-#                                          model="within",
-#                                          data=d))
-# rob.ent.models$b.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-# 
-# 
-# model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.f.incarrt)+sqrt(a.f.incarrt.lag)+
-#                                            +log(w.incarrt)+
-#                                            log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-#                                            sqrt(chpov.amind.pc)+log(pctami)+
-#                                            inst6014_nom+log(v.crime.rt),
-#                                          index=c("stname", "year.c"),
-#                                          effect="twoways",
-#                                          model="within",
-#                                          data=d))
-# rob.ent.models$a.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+################################
+##Kitchen sink ENT
+################################
+
+###PLM CL FE models, PCSE (Beck and Katz)
+rob.ent.models<-list()
+
+model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~log(b.incarrt)+
+                                         log(w.incarrt)+
+                                         log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+                                         log(chpov.blk.pc)+log(pctblk)+
+                                         inst6014_nom+log(v.crime.rt),
+                                       index=c("stname", "year.c"),
+                                       effect="twoways",
+                                       model="within",
+                                       data=d))
+rob.ent.models$b<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+
+model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.incarrt)+
+                                         log(w.incarrt)+
+                                         log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+                                         sqrt(chpov.amind.pc)+log(pctami)+
+                                         inst6014_nom+log(v.crime.rt),
+                                       index=c("stname", "year.c"),
+                                       effect="twoways",
+                                       model="within",
+                                       data=d))
+rob.ent.models$a<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+
+model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~log(b.m.incarrt)+
+                                           +log(w.incarrt)+
+                                           log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+                                           log(chpov.blk.pc)+log(pctblk)+
+                                           inst6014_nom+log(v.crime.rt),
+                                         index=c("stname", "year.c"),
+                                         effect="twoways",
+                                         model="within",
+                                         data=d))
+rob.ent.models$b.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+
+model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.m.incarrt)+
+                                           +log(w.incarrt)+
+                                           log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+                                           sqrt(chpov.amind.pc)+log(pctami)+
+                                           inst6014_nom+log(v.crime.rt),
+                                         index=c("stname", "year.c"),
+                                         effect="twoways",
+                                         model="within",
+                                         data=d))
+rob.ent.models$a.m<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+model<-lapply(fe.data, function(d) plm(log(ent.blk.pc)~sqrt(b.f.incarrt)+
+                                           +log(w.incarrt)+
+                                           log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+                                           log(chpov.blk.pc)+log(pctblk)+
+                                           inst6014_nom+log(v.crime.rt),
+                                         index=c("stname", "year.c"),
+                                         effect="twoways",
+                                         model="within",
+                                         data=d))
+rob.ent.models$b.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+
+model<-lapply(fe.data, function(d) plm(sqrt(ent.amind.pc)~sqrt(a.f.incarrt)+
+                                           +log(w.incarrt)+
+                                           log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+                                           sqrt(chpov.amind.pc)+log(pctami)+
+                                           inst6014_nom+log(v.crime.rt),
+                                         index=c("stname", "year.c"),
+                                         effect="twoways",
+                                         model="within",
+                                         data=d))
+rob.ent.models$a.f<-list("models"=model, "merge"=merge.mi(lapply(model, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
+
+

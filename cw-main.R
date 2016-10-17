@@ -11,10 +11,10 @@ library(MASS)
 # library(rstanarm)
 # 
 # options(mc.cores = parallel::detectCores())
-
-setwd("U:/cw-race/")
-source("U:/cw-race/cw-race-functions.r")
-fc<-read.csv("U:/cw-race/data/fc.csv")
+# 
+# setwd("U:/cw-race/")
+# source("U:/cw-race/cw-race-functions.r")
+# fc<-read.csv("U:/cw-race/data/fc.csv")
 
 # setwd("D:/sync/cw-race/")
 # source("D:/sync/cw-race/cw-race-functions.r")
@@ -22,18 +22,18 @@ fc<-read.csv("U:/cw-race/data/fc.csv")
 
 
 # # for laptop
-# setwd("~/sync/cw-race/")
-# source("~/sync/cw-race/cw-race-functions.r")
-# fc<-read.csv("fc.csv")
+setwd("~/sync/cw-race/")
+source("~/sync/cw-race/cw-race-functions.r")
+fc<-read.csv("fc.csv")
 ##for output
 # setwd("~/Dropbox/cw-race-paper/")
 
 fc$inst6014_nom<-fc$inst6014_nom/100
 
-no.imp.plot<-ggplot(fc)+geom_line(aes(x=year, y=log(amind.unemp/(amind.unemp+amind.emp))))+facet_wrap(~stname)+ggtitle("Without transformation")
+no.imp.plot<-ggplot(fc)+geom_line(aes(x=year, y=log(amind.child.pov/amind.child)))+facet_wrap(~stname)+ggtitle("Without transformation")
 
 bounds<-cbind(1:ncol(fc),
-              rep(0, ncol(fc)),
+              rep(0.0000001, ncol(fc)),
               rep(Inf, ncol(fc)))
 ratios<-which(names(fc)%in%c("blk.lessHS", "wht.lessHS", "amind.lessHS"))
 bounds[ratios, 3]<-1
@@ -53,8 +53,9 @@ for(i in 1:ncol(fc)){
 
 m<-15
 
-blk.acs<-which(colnames(fc)%in%c("blk.child", "blk.child.pov", "blk.lessHS", "blk.unemp", "blk.emp", "blk.singpar"))
-amind.acs<-which(colnames(fc)%in%c("amind.child", "amind.child.pov", "amind.lessHS", "amind.unemp", "amind.emp" , "amind.singpar"))
+###THINK ABT IMPUTATION OF CHILD POP - DENOM IS REALLY IMPORTANT, MAYBE PRESERVE?
+blk.acs<-which(colnames(fc)%in%c( "blk.child.pov", "blk.lessHS", "blk.unemp", "blk.emp", "blk.singpar"))
+amind.acs<-which(colnames(fc)%in%c("amind.child.pov", "amind.lessHS", "amind.unemp", "amind.emp" , "amind.singpar"))
 
 strong<-c(2000,2007:2014)
 amind.thresh<-which((fc$amind.child<100000)&(!(fc$year%in%strong)))
@@ -71,7 +72,12 @@ for(i in 1:length(amind.thresh)){
 }
 
 ###MANUALLY add HI 2007 (AMIND Child Pov observed at 0)
+###MANUALLY ADD PROBLEMATIC CHILD POP AND CHILD POV OBS FOR OI
+### HI 2007, NH amind child 2001
+
+
 amind.oi<-rbind(amind.oi, c(361, 23))
+amind.oi<-rbind(amind.oi, c(680, 22))
 
 blk.oi<-matrix(nrow=length(blk.acs)*length(blk.thresh), ncol=2)
 blk.oi[,2]<-rep(blk.acs, length(blk.thresh))
@@ -222,20 +228,6 @@ b.disp<-lapply(fc.imp$imputations, function(d)
   (1|stname),
   data=d))
 
-b.disp.hist<-lapply(fc.imp$imputations, function(d) 
-  lmer(log(bw.disp)~log(b.incardisp)+
-  log(bdisp.chpov)+
-  log(I(b.unemp.rt/w.unemp.rt))+log(I(b.singpar.rt/w.singpar.rt))+
-  log(I(blk.lessHS/wht.lessHS))+
-  log(pctblk)+
-  scale(inst6014_nom)+log(v.crime.rt)+
-  year.c+
-  factor(board)+
-  log(pctblk1930)+
-  log(pctimm1930)+
-  (1|stname),
-  data=d))
-
 a.disp<-lapply(fc.imp$imputations, function(d) 
   lmer(I(ami.disp^(1/2))~I(a.incardisp^(1/2))+
   log(adisp.chpov)+
@@ -247,24 +239,20 @@ a.disp<-lapply(fc.imp$imputations, function(d)
   (1|stname),
   data=d))
 
-a.disp.hist<-lapply(fc.imp$imputations, function(d) 
-  lmer(I(ami.disp^(1/2))~I(a.incardisp^(1/2))+
-  log(adisp.chpov)+
-  log(I(a.unemp.rt/w.unemp.rt))+log(I(a.singpar.rt/w.singpar.rt))+
-  log(I(amind.lessHS/wht.lessHS))+
-  log(pctami)+
-  scale(inst6014_nom)+log(v.crime.rt)+
-  year.c+
-  factor(board)+
-  log(pctblk1930)+
-  log(pctimm1930)+
-  (1|stname),
-  data=d))
-
 b.d.tab<-makeMIRegTab(b.disp)
 a.d.tab<-makeMIRegTab(a.disp)
-b.dh.tab<-makeMIRegTab(b.disp.hist)
-a.dh.tab<-makeMIRegTab(a.disp.hist)
+
+ggplot(data=fc.imp$imputations[[1]], aes(x=year.c, y=log(bw.disp)))+geom_line()+facet_wrap(~stname)
+
+
+test<-fc.imp$imputations[[1]]
+fe.count<-glm.nb(as.integer(cl.blk)~ log(b.incarrt)+
+                         log(w.incarrt)+
+                         log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+                         log(chpov.blk.pc)+log(pctblk)+
+                         inst6014_nom+log(v.crime.rt)+
+                   factor(stname),
+                 offset(log(test$blk.child)), data=test)
 
 # 
 # b.d.bayes<-lapply(fc.imp$imputations, function(d) stan_glmer(log(bw.disp)~log(b.incardisp)+
@@ -295,75 +283,147 @@ a.dh.tab<-makeMIRegTab(a.disp.hist)
 ################
 fe.data<-fc.imp$imputations
 source("FE-models.r", print.eval=TRUE)
-
-# within.models<-list("FE.models"=FE.models, 
-#                     #"lag.models"=lag.models,
-#                     #"fd.models"=fd.models, 
-#                     "rob.models"=rob.models)
-#                     
-#                 #"FE.ent.models"=FE.ent.models, 
-#                 #"lag.ent.models"=lag.ent.models,
-#                 #"fd.ent.models"=fd.ent.models, 
-#                 #"rob.ent.models"=rob.ent.models)
-
-
-####################
-#Table output
-####################
-texreg(list(b.disp[[1]],a.disp[[1]]),
-       override.coef=list(b.d.tab[1:nrow(b.d.tab)-1,1], a.d.tab[1:nrow(b.d.tab)-1,1]),
-       override.se=list(b.d.tab[1:nrow(b.d.tab)-1,2], a.d.tab[1:nrow(b.d.tab)-1,2]),
-       override.pvalues = list(b.d.tab[1:nrow(b.d.tab)-1,4], a.d.tab[1:nrow(b.d.tab)-1,4]),
-       custom.coef.names=c("Intercept",
-                           "Afr. Am. Incarceration disp.",
-                           "Afr. Am. Child poverty disp.",
-                           "Afr. Am. Unemployment disp.",
-                           "Afr. Am. Single parent disp.",
-                           "Afr. Am. Adults w/o HS disp.",
-                           "Percent Afr. Am. population",
-                           "Leg. ideology",
-                           "Violent crime rate",
-                           "Year",
-                           "Nat. Am. Incarceration disp.",
-                           "Nat. Am. Child poverty disp.",
-                           "Nat. Am. Unemployment disp.",
-                           "Nat. Am. Single parent disp.",
-                           "Nat. Am. Adults w/o HS disp.",
-                           "Percent Nat. Am. population"),
-       custom.model.names=c("Afr. Am. Disproportion", "Nat. Am. Disproportion"),
-       caption="Foster care caseload disproportion, multilevel linear
-regression with state intercepts. Results combined across imputations (m=15).",
-       caption.above=TRUE,
-       label="disp-models",
-       include.aic=FALSE,
-       include.bic=FALSE,
-       include.loglik=FALSE,
-       file="re-models.tex"
-)
-#
-texreg(list(FE.models$b$models[[1]], FE.models$a$models[[1]]),
-       override.coef=list(FE.models$b$merge[[1]][,1],
-                          FE.models$a$merge[[1]][,1]),
-       override.se=list(FE.models$b$merge[[1]][,2],
-                        FE.models$a$merge[[1]][,2]
-                       ),
-       override.pvalues = list(FE.models$b$merge[[1]][,4],
-                               FE.models$a$merge[[1]][,4]
-                               ),
-       custom.coef.names=c(
-         "Afr. Am. incarceration rate",
-         "Afr. Am. Unemployment rate",
-         "Afr. Am. Single parent rate",
-         "Afr. Am. Adults w/o HS rate",
-         "Afr. Am. child poverty rate",
-         "Percent Afr. Am. population",
-         "Leg. ideology",
-         "Violent crime rate",
-         "Nat. Am. Incarceration rate",
-         "Nat. Am. Unemployment rate",
-         "Nat. Am. Single parent rate",
-         "Nat. Am. Adults w/o HS rate",
-         "Nat. Am. child poverty rate",
-         "Percent Nat. Am. population"),
-       custom.model.names=c("Afr. Am. State FE", "Nat. Am. State FE"),
-       file="fe-models.tex")
+# 
+# # within.models<-list("FE.models"=FE.models, 
+# #                     #"lag.models"=lag.models,
+# #                     #"fd.models"=fd.models, 
+# #                     "rob.models"=rob.models)
+# #                     
+# #                 #"FE.ent.models"=FE.ent.models, 
+# #                 #"lag.ent.models"=lag.ent.models,
+# #                 #"fd.ent.models"=fd.ent.models, 
+# #                 #"rob.ent.models"=rob.ent.models)
+# 
+# 
+# ####################
+# #Table output
+# ####################
+# texreg(list(b.disp[[1]],a.disp[[1]]),
+#        override.coef=list(b.d.tab[1:nrow(b.d.tab)-1,1], a.d.tab[1:nrow(b.d.tab)-1,1]),
+#        override.se=list(b.d.tab[1:nrow(b.d.tab)-1,2], a.d.tab[1:nrow(b.d.tab)-1,2]),
+#        override.pvalues = list(b.d.tab[1:nrow(b.d.tab)-1,4], a.d.tab[1:nrow(b.d.tab)-1,4]),
+#        custom.coef.names=c("Intercept",
+#                            "Afr. Am. Incarceration disp.",
+#                            "Afr. Am. Child poverty disp.",
+#                            "Afr. Am. Unemployment disp.",
+#                            "Afr. Am. Single parent disp.",
+#                            "Afr. Am. Adults w/o HS disp.",
+#                            "Percent Afr. Am. population",
+#                            "Leg. ideology",
+#                            "Violent crime rate",
+#                            "Year",
+#                            "Nat. Am. Incarceration disp.",
+#                            "Nat. Am. Child poverty disp.",
+#                            "Nat. Am. Unemployment disp.",
+#                            "Nat. Am. Single parent disp.",
+#                            "Nat. Am. Adults w/o HS disp.",
+#                            "Percent Nat. Am. population"),
+#        custom.model.names=c("Afr. Am. Disproportion", "Nat. Am. Disproportion"),
+#        caption="Foster care caseload disproportion, multilevel linear
+# regression with state intercepts. Results combined across imputations (m=15).",
+#        caption.above=TRUE,
+#        label="disp-models",
+#        include.aic=FALSE,
+#        include.bic=FALSE,
+#        include.loglik=FALSE,
+#        file="re-models.tex"
+# )
+# #
+# texreg(list(FE.models$b$models[[1]], FE.models$a$models[[1]]),
+#        override.coef=list(FE.models$b$merge[[1]][,1],
+#                           FE.models$a$merge[[1]][,1]),
+#        override.se=list(FE.models$b$merge[[1]][,2],
+#                         FE.models$a$merge[[1]][,2]
+#                        ),
+#        override.pvalues = list(FE.models$b$merge[[1]][,4],
+#                                FE.models$a$merge[[1]][,4]
+#                                ),
+#        custom.coef.names=c(
+#          "Afr. Am. incarceration rate",
+#          "Afr. Am. Unemployment rate",
+#          "Afr. Am. Single parent rate",
+#          "Afr. Am. Adults w/o HS rate",
+#          "Afr. Am. child poverty rate",
+#          "Percent Afr. Am. population",
+#          "Leg. ideology",
+#          "Violent crime rate",
+#          "Nat. Am. Incarceration rate",
+#          "Nat. Am. Unemployment rate",
+#          "Nat. Am. Single parent rate",
+#          "Nat. Am. Adults w/o HS rate",
+#          "Nat. Am. child poverty rate",
+#          "Percent Nat. Am. population"),
+#        custom.model.names=c("Afr. Am.", "Nat. Am."),
+#        caption="Foster care caseloads, OLS with state fixed effects. Results combined across imputations (m=15).",
+#        caption.above=TRUE,
+#        label="disp-models",
+#        include.aic=FALSE,
+#        include.bic=FALSE,
+#        include.loglik=FALSE,
+#        file="fe-models.tex")
+# 
+# texreg(list(FE.models$b.m$models[[1]], FE.models$a.m$models[[1]]),
+#        override.coef=list(FE.models$b.m$merge[[1]][,1],
+#                           FE.models$a.m$merge[[1]][,1]),
+#        override.se=list(FE.models$b.m$merge[[1]][,2],
+#                         FE.models$a.m$merge[[1]][,2]
+#        ),
+#        override.pvalues = list(FE.models$b.m$merge[[1]][,4],
+#                                FE.models$a.m$merge[[1]][,4]
+#        ),
+#        custom.coef.names=c(
+#          "Afr. Am. Male Incarceration rate",
+#          "Afr. Am. Unemployment rate",
+#          "Afr. Am. Single parent rate",
+#          "Afr. Am. Adults w/o HS rate",
+#          "Afr. Am. child poverty rate",
+#          "Percent Afr. Am. population",
+#          "Leg. ideology",
+#          "Violent crime rate",
+#          "Nat. Am. Male Incarceration rate",
+#          "Nat. Am. Unemployment rate",
+#          "Nat. Am. Single parent rate",
+#          "Nat. Am. Adults w/o HS rate",
+#          "Nat. Am. child poverty rate",
+#          "Percent Nat. Am. population"),
+#        custom.model.names=c("Afr. Am. State FE", "Nat. Am. State FE"),
+#         caption="Foster care caseloads, OLS with state fixed effects. Results combined across imputations (m=15).",
+#        caption.above=TRUE,
+#        label="disp-models",
+#        include.aic=FALSE,
+#        include.bic=FALSE,
+#        include.loglik=FALSE,
+#        file="fe-models-male.tex")
+# 
+# texreg(list(FE.models$b.f$models[[1]], FE.models$a.f$models[[1]]),
+#        override.coef=list(FE.models$b.f$merge[[1]][,1],
+#                           FE.models$a.f$merge[[1]][,1]),
+#        override.se=list(FE.models$b.f$merge[[1]][,2],
+#                         FE.models$a.f$merge[[1]][,2]
+#        ),
+#        override.pvalues = list(FE.models$b.f$merge[[1]][,4],
+#                                FE.models$a.f$merge[[1]][,4]
+#        ),
+#        custom.coef.names=c(
+#          "Afr. Am. Female Incarceration rate",
+#          "Afr. Am. Unemployment rate",
+#          "Afr. Am. Single parent rate",
+#          "Afr. Am. Adults w/o HS rate",
+#          "Afr. Am. child poverty rate",
+#          "Percent Afr. Am. population",
+#          "Leg. ideology",
+#          "Violent crime rate",
+#          "Nat. Am. Female Incarceration rate",
+#          "Nat. Am. Unemployment rate",
+#          "Nat. Am. Single parent rate",
+#          "Nat. Am. Adults w/o HS rate",
+#          "Nat. Am. child poverty rate",
+#          "Percent Nat. Am. population"),
+#        custom.model.names=c("Afr. Am. State FE", "Nat. Am. State FE"),
+#         caption="Foster care caseloads, OLS with state fixed effects. Results combined across imputations (m=15).",
+#        caption.above=TRUE,
+#        label="disp-models",
+#        include.aic=FALSE,
+#        include.bic=FALSE,
+#        include.loglik=FALSE,
+#        file="fe-models-male.tex")
