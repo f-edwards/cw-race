@@ -38,6 +38,8 @@ fc2002<-data.frame(make.race(names.funct(fread("fc2002.csv"))))
 fc2001<-data.frame(make.race(names.funct(fread("fc2001.csv"))))
 fc2000<-data.frame(make.race(names.funct(fread("fc2000.csv"))))
 
+##MAKE A REUNIFICATION EXIT VARIABLE
+
 makeState<-function(x){
     r<-unique(x$race)
     for(i in 1:length(r)){
