@@ -89,6 +89,7 @@ dat6<-dat5%>%
                    amind=sum((RACE==3)*PERWT), amind.child=sum((RACE==3)*(AGE<18)*PERWT),
                    amind.child.pov=sum((RACE==3)*(AGE<18)*(POVERTY<101)*PERWT),
                    amind.lessHS=sum((RACE==3)*(AGE>25)*(EDUCD<62)*PERWT) / sum((RACE==3)*(AGE>25)*PERWT),
+                   lessHS=sum((AGE>25)*(EDUCD<62)*PERWT) / sum((RACE==3)*(AGE>25)*PERWT),
                    latino=sum((HISPAN %in% c(1:4))*PERWT),
                    latino.child=sum((HISPAN %in% c(1:4))*(AGE<18)*PERWT),
                    latino.child.pov=sum((HISPAN %in% c(1:4))*(AGE<18)*(POVERTY<101)*PERWT),
@@ -114,13 +115,16 @@ dat6<-dat5%>%
                    blk.emp=sum((RACE==2)*(EMPSTAT==1)*PERWT),
                    latino.emp=sum((HISPAN %in% c(1:4))*PERWT*(EMPSTAT==1)),
                    amind.emp=sum((RACE==3)*PERWT*(EMPSTAT==1)),
+                   emp=sum(PERWT*(EMPSTAT==1)),
                    blk.singpar=sum((RACE==2)*(AGE<18)*PERWT*((NMOTHERS>0)+(NFATHERS>0)==1)),
                    latino.singpar=sum((AGE<18)*PERWT* (HISPAN %in% c(1:4))*((NMOTHERS>0)+(NFATHERS>0)==1)),
                    amind.singpar=sum((RACE==3)*(AGE<18)*PERWT*((NMOTHERS>0)+(NFATHERS>0)==1)),
                    wht.singpar=sum((RACE==1)*(HISPAN==0)*(AGE<18)*PERWT*((NMOTHERS>0)+(NFATHERS>0)==1)),
+                   singpar=sum((AGE<18)*PERWT*((NMOTHERS>0)+(NFATHERS>0)==1)),
                    wht.f=sum((RACE==1)*(HISPAN==0)*(AGE>17)*PERWT*(SEX==2)),
                    blk.f=sum((RACE==2)*(AGE>17)*PERWT*(SEX==2)),
-                   amind.f=sum((RACE==3)*(AGE>17)*PERWT*(SEX==2))
+                   amind.f=sum((RACE==3)*(AGE>17)*PERWT*(SEX==2)),
+                   f=sum((AGE>17)*PERWT*(SEX==2))
   )
 
-write.csv(dat6, "pop-census-2000-2010.csv", row.names=FALSE)
+write.csv(dat6, "U:/cw-race/data/pop-census-2000-2010.csv", row.names=FALSE)

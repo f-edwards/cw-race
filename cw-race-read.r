@@ -132,10 +132,13 @@ fc<-stnames(fc)
 fc.new<-read.csv("fc-race-state.csv")
 fc.new[is.na(fc.new)]<-0
 names(fc.new)[1:2]<-c("stname", "year")
-fc.new<-fc.new%>%select(stname, year, cl.blk, ent.blk, cl.white, ent.white, cl.nat.am, ent.nat.am, cl, ent)
+fc.new<-fc.new%>%select(stname, year, cl.blk, ent.blk, reun.blk, lifelos.blk, grp.inst.blk, 
+                        cl.white, ent.white, reun.white, lifelos.white, grp.inst.white, 
+                        cl.nat.am, ent.nat.am, reun.nat.am, lifelos.nat.am, grp.inst.nat.am, 
+                        cl, ent, reun, lifelos, grp.inst 
+                        )
 
 ##MICHIGAN 2000,2001 data is terrible, treating as missing
-fc.new[which((fc.new$stname=="MI")&(fc.new$year<=2001)),3:ncol(fc.new)]<-NA
 
 fc<-left_join(fc.new, fc, by=c("stname", "year"))
 fc<-left_join(fc, pol, by=c("state", "year"))

@@ -2,8 +2,10 @@ rm(list=ls())
 
 setwd("U:/AFCARS-new")
 
-library(data.table)
+library(data.table, lib.loc="C:/Users/fedwards/Documents/R/win-library/3.2")
 library(dplyr)
+library(tidyr, lib.loc="C:/Users/fedwards/Documents/R/win-library/3.2")
+
 
 names.funct<-function(x){
   names(x)<-tolower(names(x))
@@ -38,25 +40,30 @@ fc2002<-data.frame(make.race(names.funct(fread("fc2002.csv"))))
 fc2001<-data.frame(make.race(names.funct(fread("fc2001.csv"))))
 fc2000<-data.frame(make.race(names.funct(fread("fc2000.csv"))))
 
+
 makeState<-function(x){
     r<-unique(x$race)
+    x$disreasn<-ifelse(is.na(x$disreasn), 0, x$disreasn)
+    x$lifelos<-ifelse(is.na(x$lifelos), 0, x$lifelos)
+    x$curplset<-ifelse(is.na(x$curplset), 99, x$curplset)
     for(i in 1:length(r)){
-      out<-x%>%filter(race==r[i])%>%group_by(st, datayear)%>%dplyr::summarise(cl=sum(served==1), ent=sum(entered==1) 
-                                                                              #lifelos=mean(lifelos, na.rm=TRUE),
-                                                                              #grp.inst=sum(curplset==4|curplset==5),
-                                                                              #kin.fc=sum(curplset==2)) THESE ARE ARTIFICALLY ZERO DUE TO MISSINGNESS, NEED OBS LEVEL IMPUTATION TO CORRECT
-      )
+      out<-x%>%filter(race==r[i])%>%group_by(st, datayear)%>%
+        dplyr::summarise(cl=sum(served==1), ent=sum(entered==1),
+        reun=sum((disreasn==1)|(disreasn==2)|(disreasn==5)), 
+        lifelos=mean(lifelos, na.rm=TRUE),
+        grp.inst=sum(curplset==4|curplset==5),
+        kin.fc=sum(curplset==2))
       names(out)[3:ncol(out)]<-paste(names(out)[3:ncol(out)], r[i], sep=".")
-      out[is.na(out)]<-0
       if(i==1){r.out<-out}  
       if(i>1){r.out<-full_join(r.out, out, by=c("st", "datayear"))}
     }
-  tot<-x%>%group_by(st, datayear)%>%dplyr::summarise(cl=sum(served==1), ent=sum(entered==1)
-                                                     # lifelos=mean(lifelos, na.rm=TRUE),
-                                                     # grp.inst=sum(curplset==4|curplset==5),
-                                                     # kin.fc=sum(curplset==2))
-  )
+  tot<-x%>%group_by(st, datayear)%>%dplyr::summarise(cl=sum(served==1), ent=sum(entered==1), grp.inst=sum(curplset==4|curplset==5),
+                                                     reun=sum((disreasn==1)|(disreasn==2)|(disreasn==5)),
+                                                     lifelos=mean(lifelos, na.rm=TRUE),
+                                                     grp.inst=sum(curplset==4|curplset==5),
+                                                     kin.fc=sum(curplset==2))
   r.out<-full_join(r.out, tot, by=c("st", "datayear"))
+  
   return(r.out)
 }
 
@@ -67,6 +74,9 @@ state.out<-rbind(makeState(fc2014), makeState(fc2013), makeState(fc2012),
                  makeState(fc2008), makeState(fc2007), makeState(fc2006),
                  makeState(fc2005), makeState(fc2004), makeState(fc2003),
                  makeState(fc2002), makeState(fc2001), makeState(fc2000))
+
+state.out<-state.out%>%replace_na(replace=list(cl.nat.am=0, ent.nat.am=0, reun.nat.am=0, lifelos.nat.am=0, grp.inst.nat.am=0))
+state.out[which((state.out$st=="MI")&(state.out$datayear%in%(2000:2001))),3:(ncol(state.out)-6)]<-NA
 
 write.csv(state.out, "U:/cw-race/data/fc-race-state.csv", row.names=FALSE)
 
