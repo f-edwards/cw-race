@@ -11,7 +11,7 @@ source("U:/cw-race/cw-race-functions.r")
 
 
 #IPUMS ACS 2000-2011 - File created using CensusTransform.r in this repository
-pop<-read.csv("pop-race-2000-2014.csv", head=TRUE)
+pop<-read.csv("pop-census-2000-2010.csv", head=TRUE)
 names(pop)[1:2]<-c("state", "year")
 
 temp<-pop[pop$year<2007,]
