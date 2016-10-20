@@ -49,8 +49,8 @@ for(i in 1:length(amind.thresh)){
 ###MANUALLY ADD PROBLEMATIC CHILD POP AND CHILD POV OBS FOR OI
 ### HI 2007, NH amind child 2001
 
-amind.oi<-rbind(amind.oi, c(361, 35))
-amind.oi<-rbind(amind.oi, c(680, 34))
+amind.oi<-rbind(amind.oi, c(361, 37))
+amind.oi<-rbind(amind.oi, c(680, 36))
 
 blk.oi<-matrix(nrow=length(blk.acs)*length(blk.thresh), ncol=2)
 blk.oi[,2]<-rep(blk.acs, length(blk.thresh))
@@ -86,18 +86,6 @@ create.prior<-function(x){
   strong.2000<-fc[which((fc$year==2000)&(fc$stname==st)), var]
   strong.2009<-fc[which((fc$year==2009)&(fc$stname==st)), var]
   strong.set<-fc[which((fc$year%in%strong)&(fc$stname==st)), var]
-  # if(var%in%amind.child){
-  #   pop<-fc[which((fc$year==2009)&(fc$stname==st)), "amind.child"]
-  # }
-  # if(var%in%amind.adult){
-  #   pop<-fc[which((fc$year==2009)&(fc$stname==st)), "a.adult"]
-  # }
-  # if(var%in%blk.child){
-  #   pop<-fc[which((fc$year==2009)&(fc$stname==st)), "blk.child"]
-  # }
-  # if(var%in%blk.adult){
-  #   pop<-fc[which((fc$year==2009)&(fc$stname==st)), "b.adult"]
-  # }
   ###WEIGHT ON PROXIMITY TO OBS, with obs - Weight is 0.1 on obs, 0.75 on 2000 at 2001, linear to 0.15 at 2009
   pr.E<-((0.9-(year-2001)*0.12))*strong.2000+(1-(0.9-(year-2001)*0.12))*strong.2009
   all.set<-fc[fc$stname==st,var]
@@ -136,6 +124,8 @@ for(i in 1:m){
                                      pctami=amind/tot,
                                      pctwht=wht/tot,
                                      incarrt=incartot/adult,
+                                     incarrt.m=incartot/(adult-f),
+                                     incarrt.f=incartot/f,
                                      b.incarrt=(BLACKM+BLACKF)/b.adult,
                                      b.m.incarrt=(BLACKM)/(b.adult-blk.f),
                                      b.f.incarrt=(BLACKF)/blk.f,
@@ -150,9 +140,11 @@ for(i in 1:m){
                                      w.unemp.rt=wht.unemp/(wht.emp+wht.unemp),
                                      b.unemp.rt=blk.unemp/(blk.emp+blk.unemp),
                                      a.unemp.rt=amind.unemp/(amind.unemp+amind.emp),
+                                     unemp.rt=unemp/(unemp+emp),
                                      w.singpar.rt=wht.singpar/wht.child,
                                      b.singpar.rt=blk.singpar/blk.child,
                                      a.singpar.rt=amind.singpar/amind.child,
+                                     singpar.rt=singpar/child,
                                      bw.disp=cl.blk.pc/cl.wht.pc,
                                      ami.disp=ifelse((cl.amind.pc/cl.wht.pc)>0,cl.amind.pc/cl.wht.pc, 0),
                                      year.c=year-2000)
@@ -175,7 +167,8 @@ for(i in 1:m){
 ###lags and leads
 for(i in 1:m){
   fc.imp$imputations[[i]]<-fc.imp$imputations[[i]]%>%group_by(stname)%>%arrange(year.c)%>%
-    mutate(incarrt.lag=lag(incarrt), b.incarrt.lag=lag(b.incarrt), a.incarrt.lag=lag(a.incarrt), w.incarrt.lag=lag(w.incarrt),
+    mutate(incarrt.lag=lag(incarrt), incarrt.m.lag=lag(incarrt.m), incarrt.f.lag=lag(incarrt.f),  
+           b.incarrt.lag=lag(b.incarrt), a.incarrt.lag=lag(a.incarrt), w.incarrt.lag=lag(w.incarrt),
            b.m.incarrt.lag=lag(b.m.incarrt), b.f.incarrt.lag=lag(b.f.incarrt),
            a.m.incarrt.lag=lag(a.m.incarrt), a.f.incarrt.lag=lag(a.f.incarrt),
            cl.blk.lag=lag(cl.blk), cl.nat.am.lag=lag(cl.nat.am),

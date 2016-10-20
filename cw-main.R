@@ -99,37 +99,7 @@ nb.merge.rob<-function(model.imp){
   return(out)
 }
 
-rob.se<-function(x){
-  correction<-sqrt(deviance(x)/df.residual(x))
-  beta<-coef(x)
-  se<-summary(x)$coefficients[,2]*correction
-  out<-list()
-  out[["model"]]<-as.data.frame(cbind(beta, se))
-  out[["theta"]]<-data.frame("theta"=x$theta, "theta SE"=x$SE.theta)
-  return(out)
-}
-
-#### FOR CLUSTER ROBUST STANDARD ERRORS USING 
-coeftest(cl.count[[1]], cluster.vcov(cl.count[[1]], cbind(fc.imp$imputations[[1]]$stname,fc.imp$imputations[[1]]$year.c)))
-
-
-###############FOR TOTAL POP MODELS, NEED UNEMP, SINGPAR FOR ALL - rerun make-census and cw-read on TS3
-cl.count<-lapply(fc.imp$imputations, function(d) glm.nb(cl.white ~
-                         log(w.incarrt)+ log(w.incarrt.lag)+
-                         log(w.unemp.rt)+log(w.singpar.rt)+log(wht.lessHS)+
-                         log(chpov.wht.pc)+
-                         inst6014_nom+log(v.crime.rt)+
-                           log(pctwht)+
-                   factor(stname)+year.c+
-                   offset(log(wht.child)),
-                  data=d))
-
-
-model<-cl.white ~ log(w.incarrt)+ log(w.incarrt.lag)+log(w.unemp.rt)+log(w.singpar.rt)+log(wht.lessHS)+log(chpov.wht.pc)+
-  inst6014_nom+log(v.crime.rt)+log(pctwht)+factor(stname)+year.c+offset(log(wht.child))
-#specify formulas
-#apply for loop over imputation for results
-mi.robust<-function(model, data){
+mi.robust.nb<-function(model, data){
   results.biased<-list()
   theta<-as.data.frame(matrix(nrow=m, ncol=2))
   for(i in 1:m){
@@ -148,8 +118,46 @@ mi.robust<-function(model, data){
   row.names(out$model)<-row.names(results.biased[[1]])
   out$theta<-t(mi.meld(q=as.data.frame(theta[,1]), se=theta[,2]))
   row.names(out$theta)<-"Theta"
+  out$raw<-results.biased[[1]]
   return(out)
 }
+
+models<-list()
+
+models[["cl.all"]]<-mi.robust.nb(model=cl~log(incarrt)+log(incarrt.lag)+log(unemp.rt)+log(singpar.rt)+log(lessHS)+log(chpovrt)+inst6014_nom+
+  log(v.crime.rt)+factor(stname)+year.c+offset(log(child)), data=fc.imp$imputations)
+models[["cl.all.m"]]<-mi.robust.nb(model=cl~log(incarrt.m)+log(incarrt.m.lag)+log(unemp.rt)+log(singpar.rt)+log(lessHS)+log(chpovrt)+inst6014_nom+
+  log(v.crime.rt)+factor(stname)+year.c+offset(log(child)), data=fc.imp$imputations)
+models[["cl.all.f"]]<-mi.robust.nb(model=cl~log(incarrt.f)+log(incarrt.f.lag)+log(unemp.rt)+log(singpar.rt)+log(lessHS)+log(chpovrt)+inst6014_nom+
+                                     log(v.crime.rt)+factor(stname)+year.c+offset(log(child)), data=fc.imp$imputations)
+
+
+models[["cl.blk"]]<-cl.blk ~ log(b.incarrt)+ log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+  log(chpov.blk.pc)+log(pctblk)+inst6014_nom+log(v.crime.rt)+factor(stname)+year.c+offset(log(blk.child))
+models[["cl.wht"]]<-cl.white ~ log(w.incarrt)+ log(w.incarrt.lag)+log(w.unemp.rt)+log(w.singpar.rt)+log(wht.lessHS)+log(chpov.wht.pc)+
+  inst6014_nom+log(v.crime.rt)+log(pctwht)+factor(stname)+year.c+offset(log(wht.child))
+models[["cl.na"]]<-cl.nat.am ~ sqrt(a.incarrt)+ sqrt(a.incarrt.lag)+log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+  log(chpov.amind.pc)+log(pctami)+inst6014_nom+log(v.crime.rt)+factor(stname)+year.c+offset(log(amind.child))
+
+
+
+
+###############FOR TOTAL POP MODELS, NEED UNEMP, SINGPAR FOR ALL - rerun make-census and cw-read on TS3
+cl.count<-lapply(fc.imp$imputations, function(d) glm.nb(cl.white ~
+                         log(w.incarrt)+ log(w.incarrt.lag)+
+                         log(w.unemp.rt)+log(w.singpar.rt)+log(wht.lessHS)+
+                         log(chpov.wht.pc)+
+                         inst6014_nom+log(v.crime.rt)+
+                           log(pctwht)+
+                   factor(stname)+year.c+
+                   offset(log(wht.child)),
+                  data=d))
+
+
+
+#specify formulas
+#apply for loop over imputation for results
+
 
 nb.cl.w<-list("models"=cl.count, "merge"=nb.merge(cl.count))
 
