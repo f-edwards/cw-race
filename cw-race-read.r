@@ -59,6 +59,8 @@ incar<-(data.frame(state=incartemp$STATEID, year=incartemp$YEAR,
   new.incar=incartemp$ADTOTM+incartemp$ADTOTF))  
 
 incar<-cbind(incar, incartemp[,c(53:56, 59:60)])
+incar$incar.f<-incartemp$CWPRIVF
+incar$incar.m<-incartemp$CWPRIVM
 
 #AK 2013 is missing race data
 index<-which(incar$state==2 & incar$year==2013)
