@@ -4,7 +4,7 @@ fc$cl.blk<-as.integer(fc$cl.blk)
 fc$cl.nat.am<-as.integer(fc$cl.nat.am)
 fc$cl<-as.integer(fc$cl)
 
-fc$inst6014_nom<-fc$inst6014_nom/100
+
 
 bounds<-cbind(1:ncol(fc),
               rep(0.0000001, ncol(fc)),
@@ -105,7 +105,7 @@ fc.imp<-amelia(fc, m=m,
                bounds=bounds, overimp=oi,  
                priors=oi.priors, p2s=1,
                idvars=c("state", "statename", "St", "adult", "w.adult", "b.adult", "a.adult", "l.adult",
-                        "pctblk1930", "pctimm1930", "pctami1930", "boarding.n", "board"))
+                        "pctblk1930", "pctimm1930", "pctami1930", "boarding.n", "board", "incartot"))
 
 for(i in 1:m){
   fc.imp$imputations[[i]]<-
@@ -124,8 +124,8 @@ for(i in 1:m){
                                      pctami=amind/tot,
                                      pctwht=wht/tot,
                                      incarrt=incartot/adult,
-                                     incarrt.m=incartot/(adult-f),
-                                     incarrt.f=incartot/f,
+                                     incarrt.m=incar.m/(adult-f),
+                                     incarrt.f=incar.f/f,
                                      b.incarrt=(BLACKM+BLACKF)/b.adult,
                                      b.m.incarrt=(BLACKM)/(b.adult-blk.f),
                                      b.f.incarrt=(BLACKF)/blk.f,

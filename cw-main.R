@@ -12,322 +12,185 @@ library(rstanarm, options(mc.cores = parallel::detectCores()))
 library(multiwayvcov)
 library(lmtest)
 library(sandwich)
+library(plm)
 
 # 
 # setwd("U:/cw-race/")
 # source("U:/cw-race/cw-race-functions.r")
 # fc<-read.csv("U:/cw-race/data/fc.csv")
 
-setwd("D:/sync/cw-race/")
-source("D:/sync/cw-race/cw-race-functions.r")
-fc<-read.csv("D:/sync/cw-race/data/fc.csv")
+# setwd("D:/sync/cw-race/")
+# source("D:/sync/cw-race/cw-race-functions.r")
+# fc<-read.csv("D:/sync/cw-race/data/fc.csv")
 
-# # # for laptop
-# setwd("~/sync/cw-race/")
-# source("~/sync/cw-race/cw-race-functions.r")
-# fc<-read.csv("fc.csv")
+# # for laptop
+setwd("~/sync/cw-race/")
+source("~/sync/cw-race/cw-race-functions.r")
+fc<-read.csv("~/sync/cw-race/data/fc.csv")
 
 source("cw-imputation.r", echo=TRUE)
 
+### MAKE INCAR AND FC FIGURE
+
+
+### FILTER OUT THOSE W/NO BLACK, NA CASELOADS
+fcb.reun.imp<-list()
+fcn.reun.imp<-list()
+for(i in (1:m)){
+  fcb.reun.imp[[i]]<-fc.imp$imputations[[i]]%>%filter(cl.blk>1)
+  fcn.reun.imp[[i]]<-fc.imp$imputations[[i]]%>%filter(cl.nat.am>1)
+}
+
+######## MAIN STATE FE MODEL RESULTS
+#source("state-models.r")
+
+######################################
+## RE MODELS
+source("disp-models.r")
+
+#######################
+## Sim visuals
+setwd("D:/sync/cw-race/figures")
+#source("D:/sync/cw-race/sim.R")
+
+
+####################
+######## EXPECTED VALUES AND CIs
+####################
+## Retrieve reasonable within-state changes in incar
+## calculate mean within-state sd in incar for tot, B, NA, m, f
+
+# #####################
+# ## SET UP SCENARIOS
+# #####################
+# 
+# len<-1000
+# 
+# all.scen.m<-all.scen.f<-all.scen<-matrix(rep(with(fc.imp$imputations[[1]], c(1, 0, median(log(unemp.rt)), median(log(singpar.rt)), median(log(lessHS)),
+#                                           median(log(chpovrt)), median(inst6014_nom),
+#                                           median(log(v.crime.rt)), rep(0, 45), 1, rep(0, 3), 0)), each=len), nrow=len)
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(incarrt)))[,2])
+# median<-median(fc.imp$imputations[[1]]$incarrt)
+# all.scen[,2]<-log(seq(from=-2, to=2, length.out=len) * sd + median)
+# 
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(incarrt.m)))[,2])
+# median<-median(fc.imp$imputations[[1]]$incarrt.m)
+# all.scen.m[,2]<-log(seq(from=-2, to=2, length.out=len) * sd + median)
+# 
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(incarrt.f)))[,2])
+# median<-median(fc.imp$imputations[[1]]$incarrt.f)
+# all.scen.f[,2]<-log(seq(from=-2, to=2, length.out=len) * sd + median)
+# 
+# b.scen<-b.scen.m<-b.scen.f<-matrix(rep(with(fc.imp$imputations[[1]], c(1, 0, median(log(b.unemp.rt)), 
+#                                                  median(log(b.singpar.rt)), median(log(blk.lessHS)),
+#                                                  median(log(chpov.blk.pc)), median(log(pctblk)), median(inst6014_nom),
+#                                                  median(log(v.crime.rt)), rep(0, 45), 1, rep(0, 3), 0)), each=len), nrow=len)
+# 
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(b.incarrt)))[,2])
+# median<-median(fc.imp$imputations[[1]]$b.incarrt)
+# b.scen[,2]<-log(seq(from=-2, to=2, length.out=len) * sd + median)
+# 
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(b.m.incarrt)))[,2])
+# median<-median(fc.imp$imputations[[1]]$b.m.incarrt)
+# b.scen.m[,2]<-log(seq(from=-2, to=2, length.out=len) * sd + median)
+# 
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(b.f.incarrt)))[,2])
+# median<-median(fc.imp$imputations[[1]]$b.f.incarrt)
+# b.scen.f[,2]<-sqrt(seq(from=-2, to=2, length.out=len) * sd + median)
+# 
+# na.scen<-na.scen.m<-na.scen.f<-matrix(rep(with(fc.imp$imputations[[1]], c(1, 0, median(log(a.unemp.rt)), 
+#                                      median(log(a.singpar.rt)), median(log(amind.lessHS)),
+#                                      median(log(chpov.amind.pc)), median(log(pctami)), median(inst6014_nom),
+#                                      median(log(v.crime.rt)), rep(0, 45), 1, rep(0, 3), 0)), each=len), nrow=len)
+# 
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(a.incarrt)))[,2])
+# median<-median(fc.imp$imputations[[1]]$a.incarrt)
+# na.scen[,2]<-sqrt(seq(from=-2, to=2, length.out=len) * sd + median)
+# 
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(a.m.incarrt)))[,2])
+# median<-median(fc.imp$imputations[[1]]$a.m.incarrt)
+# na.scen.m[,2]<-sqrt(seq(from=-2, to=2, length.out=len) * sd + median)
+# 
+# sd<-median(as.data.frame(fc.imp$imputations[[1]]%>%group_by(stname)%>%summarise(sd=sd(a.f.incarrt)))[,2])
+# median<-median(fc.imp$imputations[[1]]$a.f.incarrt)
+# na.scen.f[,2]<-sqrt(seq(from=-2, to=2, length.out=len) * sd + median)
+
+
+##### EXPECTED VALS
+# 
+# model<-cl.models$cl.all$model
+# cl.all<-data.frame(yhat=(exp(all.scen%*%model[,1])), lower=exp(all.scen%*%(1.96*model[,2]+model[,1])), upper=exp(all.scen%*%(model[,1]-1.96*model[,2])),
+#                     sd=seq(from=-2, to=2, length.out=len), Group="All")
+# model<-cl.models$cl.blk$model
+# cl.blk<-data.frame(yhat=(exp(b.scen%*%model[,1])), lower=exp(b.scen%*%(1.96*model[,2]+model[,1])), upper=exp(b.scen%*%(model[,1]-1.96*model[,2])),
+#                    sd=seq(from=-2, to=2, length.out=len), Group="Afr. Am.")
+# model<-cl.models$cl.na$model
+# cl.na<-data.frame(yhat=(exp(na.scen%*%model[,1])), lower=exp(na.scen%*%(1.96*model[,2]+model[,1])), upper=exp(na.scen%*%(model[,1]-1.96*model[,2])),
+#                    sd=seq(from=-2, to=2, length.out=len), Group="Nat. Am.")
+# 
+# yhat.cl<-rbind(cl.all)
+# 
+# ggplot(yhat.cl, aes(y=yhat, x=sd))+geom_line(aes(y=lower), lty=2)+geom_line(aes(y=upper), lty=2)+geom_line()+facet_wrap(~Group)
+################
+##COMPUTE EXPECTATIONS
+################
+###### Computes expected values for changes in outcome for variation of [-2,2] sd of within state incarceration variation
+###### Supply with model object [2,] is incar var in model, and within state sd for variable
+# yhat.ci<-function(model, scen){
+#   beta<-model[2,1]
+#   b.up<-beta+(1.96*se)
+#   b.low<-beta-(1.96*se)
+#   yhat.median<-exp(beta*log(median))
+#   se<-model[2,2]
+#   yhat<-data.frame("delta.yhat"=yhat.median-exp(beta*incar.seq), "lower"=yhat.median-exp(b.low*log(incar.seq)), 
+#                    "upper" = yhat.median-exp(b.up*log(incar.seq)), "incar"=incar.seq, "sd"=seq(from=-2, to=2, length.out=len))
+# }
+# 
+# 
+# pred<-
+# tdat<-fc.imp$imputations[[1]]
+# tdat$obs<-1:nrow(tdat)
+# test<-glmer(cl.nat.am ~ sqrt(a.incarrt)+ log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+#   log(chpov.amind.pc)+log(pctami)+inst6014_nom+log(v.crime.rt)+year.c+offset(log(amind.child))+(1|stname)+(1|obs), data=tdat, family="poisson")
+  
+  
 ##########
 # RE MODELS
 ##########
 #source("disp-models.r")
-
-
-###################
-## NegBin FE Models
-###################
-
-##DEVIANCE SE CORRECTION FROM ALLISON &W 2002 - sqrt(deviance/df)
-nb.dev<-function(x){
-  correction<-sqrt(deviance(x)/df.residual(x))
-  beta<-coef(x)
-  se<-summary(x)$coefficients[,2]*correction
-  z<-beta/se
-  p<-round(2*pnorm(-abs(z)),3)
-  out<-list()
-  out[["model"]]<-as.data.frame(cbind(beta, se, z, p))
-  out[["theta"]]<-data.frame("theta"=x$theta, "theta SE"=x$SE.theta)
-  return(out)
-}
-
-nb.merge<-function(model.imp){
-  beta<-do.call(rbind, lapply(model.imp, function(d) d$model[,1]))
-  se<-do.call(rbind, lapply(model.imp, function(d)  d$model[,2]))
-  meld<-mi.meld(q=beta, se=se)
-  out<-list()
-  out$model<-as.data.frame(cbind(t(meld[[1]]),t(meld[[2]])))
-  out$model$z<-out$model[,1]/out$model[,2]
-  out$model$p<-round(2*pnorm(-abs(out$model$z)),3)
-  names(out$model)[1:2]<-c("Beta", "SE")
-  row.names(out$model)<-row.names(model.imp[[1]]$model)
-  theta<-do.call(rbind, lapply(model.imp, function(d) d$theta[1]))
-  theta.SE<-do.call(rbind, lapply(model.imp, function(d) d$theta[2]))
-  out$theta<-t(mi.meld(q=theta, se=theta.SE))
-  row.names(out$theta)<-"Theta"
-  return(out)
-}
-
-merge.mi<-function(model.imp){
-  beta<-do.call(rbind, lapply(model.imp, function(d) d[,1]))
-  se<-do.call(rbind, lapply(model.imp, function(d) d[,2]))
-  meld<-mi.meld(q=beta, se=se)
-  out<-as.data.frame(cbind(t(meld[[1]]),t(meld[[2]])))
-  out$z<-out[,1]/out[,2]
-  out$p<-round(2*pnorm(-abs(out$z)),3)
-  names(out)[1:2]<-c("Beta", "SE")
-  out<-list(out)
-  return(out)
-}
-
-
-nb.merge.rob<-function(model.imp){
-  beta<-do.call(rbind, lapply(model.imp, function(d) d$model[,1]))
-  se<-do.call(rbind, lapply(model.imp, function(d)  d$model[,2]))
-  meld<-mi.meld(q=beta, se=se)
-  out<-list()
-  out$model<-as.data.frame(cbind(t(meld[[1]]),t(meld[[2]])))
-  out$model$z<-out$model[,1]/out$model[,2]
-  out$model$p<-round(2*pnorm(-abs(out$model$z)),3)
-  names(out$model)[1:2]<-c("Beta", "SE")
-  row.names(out$model)<-row.names(model.imp[[1]]$model)
-  theta<-do.call(rbind, lapply(model.imp, function(d) d$theta[1]))
-  theta.SE<-do.call(rbind, lapply(model.imp, function(d) d$theta[2]))
-  out$theta<-t(mi.meld(q=theta, se=theta.SE))
-  row.names(out$theta)<-"Theta"
-  return(out)
-}
-
-mi.robust.nb<-function(model, data){
-  results.biased<-list()
-  theta<-as.data.frame(matrix(nrow=m, ncol=2))
-  for(i in 1:m){
-    mod<-glm.nb(model, data=data[[i]])
-    results.biased[[i]]<-coeftest(mod, cluster.vcov(mod, cbind(data[[i]]$stname, data[[i]]$year.c)))
-    theta[i,1]<-mod$theta; theta[i,2]<-mod$SE.theta
-  }
-  beta<-do.call(rbind, lapply(results.biased, function(d) d[,1]))
-  se<-do.call(rbind, lapply(results.biased, function(d)  d[,2]))
-  meld<-mi.meld(q=beta, se=se)
-  out<-list()
-  out$model<-as.data.frame(cbind(t(meld[[1]]),t(meld[[2]])))
-  out$model$z<-out$model[,1]/out$model[,2]
-  out$model$p<-round(2*pnorm(-abs(out$model$z)),3)
-  names(out$model)[1:2]<-c("Beta", "SE")
-  row.names(out$model)<-row.names(results.biased[[1]])
-  out$theta<-t(mi.meld(q=as.data.frame(theta[,1]), se=theta[,2]))
-  row.names(out$theta)<-"Theta"
-  out$raw<-results.biased[[1]]
-  return(out)
-}
-
-models<-list()
-
-models[["cl.all"]]<-mi.robust.nb(model=cl~log(incarrt)+log(incarrt.lag)+log(unemp.rt)+log(singpar.rt)+log(lessHS)+log(chpovrt)+inst6014_nom+
-  log(v.crime.rt)+factor(stname)+year.c+offset(log(child)), data=fc.imp$imputations)
-models[["cl.all.m"]]<-mi.robust.nb(model=cl~log(incarrt.m)+log(incarrt.m.lag)+log(unemp.rt)+log(singpar.rt)+log(lessHS)+log(chpovrt)+inst6014_nom+
-  log(v.crime.rt)+factor(stname)+year.c+offset(log(child)), data=fc.imp$imputations)
-models[["cl.all.f"]]<-mi.robust.nb(model=cl~log(incarrt.f)+log(incarrt.f.lag)+log(unemp.rt)+log(singpar.rt)+log(lessHS)+log(chpovrt)+inst6014_nom+
-                                     log(v.crime.rt)+factor(stname)+year.c+offset(log(child)), data=fc.imp$imputations)
-
-
-models[["cl.blk"]]<-cl.blk ~ log(b.incarrt)+ log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-  log(chpov.blk.pc)+log(pctblk)+inst6014_nom+log(v.crime.rt)+factor(stname)+year.c+offset(log(blk.child))
-models[["cl.wht"]]<-cl.white ~ log(w.incarrt)+ log(w.incarrt.lag)+log(w.unemp.rt)+log(w.singpar.rt)+log(wht.lessHS)+log(chpov.wht.pc)+
-  inst6014_nom+log(v.crime.rt)+log(pctwht)+factor(stname)+year.c+offset(log(wht.child))
-models[["cl.na"]]<-cl.nat.am ~ sqrt(a.incarrt)+ sqrt(a.incarrt.lag)+log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-  log(chpov.amind.pc)+log(pctami)+inst6014_nom+log(v.crime.rt)+factor(stname)+year.c+offset(log(amind.child))
-
-
-
-
-###############FOR TOTAL POP MODELS, NEED UNEMP, SINGPAR FOR ALL - rerun make-census and cw-read on TS3
-cl.count<-lapply(fc.imp$imputations, function(d) glm.nb(cl.white ~
-                         log(w.incarrt)+ log(w.incarrt.lag)+
-                         log(w.unemp.rt)+log(w.singpar.rt)+log(wht.lessHS)+
-                         log(chpov.wht.pc)+
-                         inst6014_nom+log(v.crime.rt)+
-                           log(pctwht)+
-                   factor(stname)+year.c+
-                   offset(log(wht.child)),
-                  data=d))
-
-
-
-#specify formulas
-#apply for loop over imputation for results
-
-
-nb.cl.w<-list("models"=cl.count, "merge"=nb.merge(cl.count))
-
-cl.count<-lapply(fc.imp$imputations, function(d) nb.dev(glm.nb(cl.blk ~ 
-                         log(b.incarrt)+ log(b.incarrt.lag)+
-                         log(w.incarrt)+
-                         log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-                         log(chpov.blk.pc)+log(pctblk)+
-                         inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(blk.child)),
-                  data=d)))
-nb.cl.b<-list("models"=cl.count, "merge"=nb.merge(cl.count))
-
-cl.count<-lapply(fc.imp$imputations, function(d) nb.dev(glm.nb(cl.nat.am ~ 
-                   sqrt(a.incarrt)+ sqrt(a.incarrt.lag)+
-                   log(w.incarrt)+
-                  log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-                  log(chpov.amind.pc)+log(pctami)+
-                  inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(amind.child)),
-                  data=d)))
-nb.cl.n<-list("models"=cl.count, "merge"=nb.merge(cl.count))
-
-ent.count<-lapply(fc.imp$imputations, function(d) nb.dev(glm.nb(ent ~
-                         log(incarrt)+ log(incarrt.lag)+
-                         log(unemp.rt)+log(singpar.rt)+log(lessHS)+
-                         log(chpovrt)+
-                         inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(child)),
-                  data=d)))
-nb.ent<-list("models"=ent.count, "merge"=nb.merge(ent.count))
-
-ent.count<-lapply(fc.imp$imputations, function(d) nb.dev(glm.nb(ent.blk ~ 
-                         log(b.incarrt)+ log(b.incarrt.lag)+
-                         log(w.incarrt)+
-                         log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-                         log(chpov.blk.pc)+log(pctblk)+
-                         inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(blk.child)),
-                  data=d)))
-
-nb.ent.b<-list("models"=ent.count, "merge"=nb.merge(ent.count))
-
-ent.count<-lapply(fc.imp$imputations, function(d) nb.dev(glm.nb(cl.nat.am ~ 
-                   sqrt(a.incarrt)+ sqrt(a.incarrt.lag)+
-                   log(w.incarrt)+
-                  log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-                  log(chpov.amind.pc)+log(pctami)+
-                  inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(amind.child)),
-                  data=d)))
-
-nb.ent.n<-list("models"=ent.count, "merge"=nb.merge(ent.count))
-
-fcb.reun.imp<-list()
-fcn.reun.imp<-list()
-for(i in (1:m)){
-  fcb.reun.imp[[i]]<-as.data.frame(fc.imp$imputations[[i]]%>%filter(cl.blk>1))
-  fcn.reun.imp[[i]]<-as.data.frame(fc.imp$imputations[[i]]%>%filter(cl.nat.am>1))
-}
-
-ex.count<-lapply(fc.imp$imputations, function(d) nb.dev(glm.nb(reun ~ 
-                         log(incarrt)+log(incarrt.lag)+
-                         log(unemp.rt)+log(singpar.rt)+log(lessHS)+
-                         log(chpovrt)+
-                         inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(child)),
-                  data=(d))))
-nb.ex<-list("models"=ex.count, "merge"=nb.merge(ex.count))
-
-ex.count<-lapply(fcb.reun.imp, function(d) nb.dev(glm.nb(reun.blk ~ 
-                         log(b.incarrt)+log(b.incarrt.lag)+
-                         log(w.incarrt)+
-                         log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-                         log(chpov.blk.pc)+log(pctblk)+
-                         inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(cl.blk)),
-                  data=(d))))
-
-nb.ex.b<-list("models"=ex.count, "merge"=nb.merge(ex.count))
-
-ex.count<-lapply(fcn.reun.imp, function(d) nb.dev(glm.nb(reun.nat.am ~ 
-                   sqrt(a.incarrt)+ sqrt(a.incarrt.lag)+
-                   log(w.incarrt)+
-                  log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-                  log(chpov.amind.pc)+log(pctami)+
-                  inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(cl.nat.am)),
-                  data=d)))
-
-nb.ex.n<-list("models"=ex.count, "merge"=nb.merge(ex.count))
-
-inst.count<-lapply(fc.imp$imputations, function(d) nb.dev(glm.nb(grp.inst ~ 
-                         log(incarrt)+log(incarrt.lag)+
-                         log(unemp.rt)+log(singpar.rt)+log(lessHS)+
-                         log(chpovrt)+
-                         inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(child)),
-                  data=(d))))
-nb.inst<-list("models"=inst.count, "merge"=nb.merge(inst.count))
-
-inst.count<-lapply(fcb.reun.imp, function(d) nb.dev(glm.nb(grp.inst.blk ~ 
-                         log(b.incarrt)+log(b.incarrt.lag)+
-                         log(w.incarrt)+
-                         log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-                         log(chpov.blk.pc)+log(pctblk)+
-                         inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(cl.blk)),
-                  data=(d))))
-
-nb.inst.b<-list("models"=inst.count, "merge"=nb.merge(inst.count))
-
-inst.count<-lapply(fcn.reun.imp, function(d) nb.dev(glm.nb(grp.inst.nat.am ~ 
-                   sqrt(a.incarrt)+ sqrt(a.incarrt.lag)+
-                   log(w.incarrt)+
-                  log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-                  log(chpov.amind.pc)+log(pctami)+
-                  inst6014_nom+log(v.crime.rt)+
-                   factor(stname)+year.c+
-                   offset(log(cl.nat.am)),
-                  data=d)))
-
-nb.inst.n<-list("models"=inst.count, "merge"=nb.merge(inst.count))
-
-los<-lapply(fc.imp$imputations, function(d) plm(sqrt(lifelos.nat.am)~sqrt(a.incarrt)+sqrt(a.incarrt.lag)+
-                                         log(w.incarrt)+
-                                                    log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
-                                                    sqrt(chpov.amind.pc)+log(pctami)+
-                                                    inst6014_nom+log(v.crime.rt),
-                                                  index=c("stname", "year.c"),
-                                                  effect="individual",
-                                                  model="within",
-                                                  data=d))
-los.n<-list("models"=los, "merge"=merge.mi(lapply(los, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-
-los<-lapply(fc.imp$imputations, function(d) plm(log(lifelos.blk)~log(b.incarrt)+log(b.incarrt.lag)+
-                                         log(w.incarrt)+
-                                                    log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
-                                                    log(chpov.blk.pc)+
-                                         log(pctblk)+
-                                                    inst6014_nom+log(v.crime.rt),
-                                                  index=c("stname", "year.c"),
-                                                  effect="individual",
-                                                  model="within",
-                                                  data=d))
-los.b<-list("models"=los, "merge"=merge.mi(lapply(los, function(d) coeftest(d, vcov=vcovBK,cluster=c("stname", "year.c")))))
-
-
-##### BAYESIAN ROBUSTNESS CHECKS 
-b.d.bayes<-stan_glmer.nb(cl.blk~log(b.incarrt)+log(b.incarrt.lag)+
-       log(chpov.blk.pc)+
-       log(b.unemp.rt)+log(b.singpar.rt)+
-       log(blk.lessHS)+
-       log(pctblk)+
-       scale(inst6014_nom)+log(v.crime.rt)+
-       year.c+offset(log(blk.child))+
-       (1|stname),
-     data=fc.imp$imputations[[1]])
+# los.re<-lmer(log(lifelos)~log(incarrt)+
+#                log(unemp.rt)+log(singpar.rt)+log(lessHS)+
+#                log(chpovrt)+
+#                inst6014_nom+log(v.crime.rt)+
+#                (1|stname), data=fc.imp$imputations[[1]])
 # 
-# a.d.bayes<-lapply(fc.imp$imputations, function(d) 
+# los.b.re<-lmer(log(lifelos.blk)~log(b.incarrt)+
+#                  log(b.unemp.rt)+log(b.singpar.rt)+log(blk.lessHS)+
+#                  log(chpov.blk.pc)+
+#                  log(pctblk)+
+#                  inst6014_nom+log(v.crime.rt)+
+#                  (1|stname), data=fc.imp$imputations[[1]])
+# 
+# los.n.re<-lmer(sqrt(lifelos.nat.am)~sqrt(a.incarrt)+
+#                  log(a.unemp.rt)+log(a.singpar.rt)+log(amind.lessHS)+
+#                  sqrt(chpov.amind.pc)+log(pctami)+
+#                  inst6014_nom+log(v.crime.rt)+
+#                  (1|stname), data=fc.imp$imputations[[1]])
+
+###########################ROBUSTNESS CHECKS
+
+# # # ##### BAYESIAN ROBUSTNESS CHECKS 
+# b.cl.bayes<-stan_glmer.nb(cl.blk~log(b.incarrt)+log(b.incarrt.lag)+
+#        log(chpov.blk.pc)+
+#        log(b.unemp.rt)+log(b.singpar.rt)+
+#        log(blk.lessHS)+
+#        log(pctblk)+
+#        scale(inst6014_nom)+log(v.crime.rt)+
+#        year.c+offset(log(blk.child))+
+#        (1|stname),
+#      data=fc.imp$imputations[[1]])
+# 
+# a.cl.bayes<-lapply(fc.imp$imputations, function(d)
 #   stan_glmer(I(ami.disp^(1/2))~I(a.incardisp^(1/2))+
 #          log(adisp.chpov)+
 #          log(a.unemp.rt/w.unemp.rt)+log(a.singpar.rt/w.singpar.rt)+
@@ -337,8 +200,8 @@ b.d.bayes<-stan_glmer.nb(cl.blk~log(b.incarrt)+log(b.incarrt.lag)+
 #          year.c+
 #          (1|stname),
 #        data=d))
-
-########## PREPARE TABLE OUTPUT, PREPARE SIMULATION / PREDICTION
+# 
+# ########## PREPARE TABLE OUTPUT, PREPARE SIMULATION / PREDICTION
 
 ################
 #Overimputation

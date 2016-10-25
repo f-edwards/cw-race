@@ -11,10 +11,7 @@ library(scales)
 library(RColorBrewer)
 
 
-setwd("~/sync/cw-race-paper/")
-
-### Depends on transformed data from FCmodels.r
-#source("FCmodels.r")
+setwd("D:/sync/cw-race/figures")
 
 returnquant<-function(x){
   l<-5 ### number of quantiles
@@ -29,8 +26,10 @@ returnquant<-function(x){
 
 fc14<-fc.imp$imputations[[1]]%>%filter(year.c==7)
 fcmap<-fc14%>%dplyr::select(stname, bw.disp, ami.disp, b.incardisp, a.incardisp, 
-                     b.incarrt, a.incarrt, cl.blk, cl.nat.am, blk.child, amind.child)%>%
-                     mutate("bcl.rt"=cl.blk/blk.child, "acl.rt"=cl.nat.am/amind.child)
+                     b.incarrt, a.incarrt, cl.blk, cl.nat.am, blk.child, amind.child,
+                     stname, cl, child, child.pov)%>%
+                     mutate("bcl.rt"=cl.blk/blk.child, "acl.rt"=cl.nat.am/amind.child,
+                            "cl.rt"=cl/child, "pov.rt"=child.pov/child)
 
 fcmap$state<-fcmap$St<-fcmap$stname
 fcmap<-StateNames(fcmap)
@@ -123,11 +122,8 @@ gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank()
 
 print(gg)
 
-ggsave(plot = MapPlot, "DispMapBlue.pdf", h = 8, w = 8)
+ggsave(plot = gg, "DispMapBlue.pdf", h = 8, w = 8)
 
-fc14<-fc.imp$imputations[[1]]%>%filter(year.c==7)
-fcmap<-fc14%>%dplyr::select(stname, cl, child, child.pov)%>%
-  mutate("cl.rt"=cl/child, "pov.rt"=child.pov/child)
 
 fcmap$state<-fcmap$St<-fcmap$stname
 fcmap<-StateNames(fcmap)
