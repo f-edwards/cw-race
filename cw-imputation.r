@@ -1,4 +1,5 @@
 fc[which((fc$stname=="MI")&(fc$year%in%(2000:2001))),3:17]<-NA
+# fc[which((fc$stname=="UT") & (fc$year==2001)), "blk.child"]<-NA
 
 fc$cl.blk<-as.integer(fc$cl.blk)
 fc$cl.nat.am<-as.integer(fc$cl.nat.am)

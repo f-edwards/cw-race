@@ -1,36 +1,408 @@
 [1] "RE Sims"
            e    upper    lower         x         p                m
-500 3.942813 4.441733 3.504234  7.393315 0.4995495 African American
-223 3.601279 4.205720 3.119030  5.446008 0.2500000 African American
-778 4.324687 4.831478 3.858178 10.069644 0.7500000 African American
+500 3.868648 4.275342 3.489065  7.393315 0.4995495 African American
+223 3.419094 3.831912 3.044516  5.446008 0.2500000 African American
+778 4.382299 4.841169 3.955649 10.056237 0.7500000 African American
            e    upper    lower         x         p               m
-500 3.503710 4.913010 2.369837 2.0833123 0.4995495 Native American
-223 2.672161 4.125209 1.597375 0.8655754 0.2500000 Native American
-778 4.592883 6.146039 3.199937 4.0913553 0.7500000 Native American
-[1] "FE Expected Values for 10 per 1,000 increase in incar from mean"
- [1] "Black FC Caseload pc"                                          
- [2] "For within state 0.005 increase (5 per 1,000), within state sd"
- [3] "0.00395734800935294"                                           
- [4] "Over median"                                                   
- [5] "0.0249364920516979"                                            
- [6] "Caseload PC increase"                                          
- [7] "0.018542146364994"                                             
- [8] "0.0127356457652941"                                            
- [9] "0.00470891932468198"                                           
-[10] "Caseload pct increase"                                         
-[11] "1.05877992500451"                                              
-[12] "1.11517982344022"                                              
-[13] "1.00523243519089"                                              
- [1] "NatAM FC Caseload pc"                                          
- [2] "For within state 0.005 increase (5 per 1,000), within state sd"
- [3] "0.00247947160301009"                                           
- [4] "Over median"                                                   
- [5] "0.00689560255815564"                                           
- [6] "Caseload PC increase"                                          
- [7] "0.0374573052475989"                                            
- [8] "0.0152312707067717"                                            
- [9] "0.000938701747999926"                                          
-[10] "Caseload pct increase"                                         
-[11] "1.2041781726189"                                               
-[12] "1.4486734018856"                                               
-[13] "1.00094684524781"                                              
+500 5.022000 7.861609 2.776249 2.0833123 0.4995495 Native American
+223 4.436776 7.202470 2.297741 0.8655754 0.2500000 Native American
+778 5.730541 8.736931 3.299322 4.0815081 0.7500000 Native American
+[1] "D:/sync/cw-race"
+[1] "D:/sync/cw-race"
+function () 
+.Internal(getwd())
+<bytecode: 0x0000000009a1ea58>
+<environment: namespace:base>
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]
+[1,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA
+[2,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA
+[3,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA
+[4,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA
+[5,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA
+[6,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA
+           [,1]      [,2]       [,3]         [,4]       [,5]         [,6]
+[1,] -1.4248232 0.3212829 0.07918151 -0.011371502 0.03802639  0.038870168
+[2,] -1.2740221 0.4576479 0.11534113 -0.011625241 0.07643333 -0.004183012
+[3,] -1.2240342 0.4212534 0.09027232 -0.016851128 0.04481722  0.046403883
+[4,] -1.4199729 0.4523941 0.07569406  0.004479910 0.04076496  0.089345794
+[5,] -0.9332676 0.3655086 0.11234620 -0.004831882 0.09792211  0.075496599
+[6,] -0.9932651 0.3048777 0.08975954 -0.007186315 0.03667618  0.065377858
+           [,7]          [,8]       [,9]       [,10]
+[1,] -0.3751726  0.0056072662 0.14945784 0.005547234
+[2,] -0.3477736  0.0181326227 0.06253031 0.006257298
+[3,] -0.2728047 -0.0011577229 0.10597528 0.001940867
+[4,] -0.2975603  0.0171705595 0.11563964 0.003229836
+[5,] -0.3125482 -0.0032869050 0.04547798 0.003498425
+[6,] -0.3045139 -0.0007892503 0.10507533 0.001879206
+ num [1:15000, 1:10] -1.425 -1.274 -1.224 -1.42 -0.933 ...
+       V1                V2                V3                 V4                  V5          
+ Min.   :-2.6578   Min.   :0.07587   Min.   :-0.03904   Min.   :-0.146342   Min.   :-0.05872  
+ 1st Qu.:-1.4244   1st Qu.:0.28203   1st Qu.: 0.08600   1st Qu.:-0.019038   1st Qu.: 0.05991  
+ Median :-1.1656   Median :0.32217   Median : 0.11313   Median : 0.011463   Median : 0.09512  
+ Mean   :-1.1649   Mean   :0.32250   Mean   : 0.12035   Mean   : 0.008532   Mean   : 0.09901  
+ 3rd Qu.:-0.9044   3rd Qu.:0.36281   3rd Qu.: 0.15314   3rd Qu.: 0.042732   3rd Qu.: 0.13839  
+ Max.   : 0.4497   Max.   :0.54904   Max.   : 0.27690   Max.   : 0.137678   Max.   : 0.27082  
+       V6                  V7                V8                  V9                V10           
+ Min.   :-0.164196   Min.   :-0.4489   Min.   :-0.027488   Min.   :-0.11732   Min.   :-0.006711  
+ 1st Qu.:-0.008056   1st Qu.:-0.3315   1st Qu.: 0.004876   1st Qu.: 0.06889   1st Qu.: 0.002126  
+ Median : 0.023718   Median :-0.3062   Median : 0.012487   Median : 0.10435   Median : 0.003823  
+ Mean   : 0.024256   Mean   :-0.3058   Mean   : 0.012604   Mean   : 0.10495   Mean   : 0.003835  
+ 3rd Qu.: 0.056241   3rd Qu.:-0.2801   3rd Qu.: 0.020226   3rd Qu.: 0.14145   3rd Qu.: 0.005535  
+ Max.   : 0.209616   Max.   :-0.1706   Max.   : 0.056943   Max.   : 0.30610   Max.   : 0.013865  
+                                      Beta          SE          z            p
+(Intercept)                    -5.55244110 0.955697029 -5.8098340 6.253481e-09
+I(a.incardisp^(1/2))            0.26644433 0.097920540  2.7210260 6.507965e-03
+log(adisp.chpov)                0.05936732 0.064003169  0.9275684 3.536315e-01
+log(a.unemp.rt/w.unemp.rt)     -0.02140651 0.060212584 -0.3555156 7.222034e-01
+log(a.singpar.rt/w.singpar.rt)  0.01484460 0.066496079  0.2232402 8.233486e-01
+log(amind.lessHS/wht.lessHS)   -0.32255501 0.121305231 -2.6590363 7.836453e-03
+log(pctami)                    -1.35197401 0.180033058 -7.5095875 5.931396e-14
+scale(inst6014_nom)            -0.03695374 0.022146267 -1.6686217 9.519237e-02
+log(v.crime.rt)                 0.06445721 0.112777770  0.5715418 5.676324e-01
+year.c                          0.01338505 0.004013336  3.3351429 8.525558e-04
+RE Variance                     3.95009543          NA         NA           NA
+$imp1
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 923.8289
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 1.9795  
+ Residual             0.3569  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.16279                         0.24834                         0.03050  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      -0.11381                         0.01123                        -0.30963  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.30836                        -0.03472                         0.05763  
+                        year.c  
+                       0.01168  
+
+$imp2
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 951.573
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 2.0263  
+ Residual             0.3636  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.41030                         0.18975                         0.01610  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      -0.02527                         0.06208                        -0.36627  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.33791                        -0.03457                         0.08002  
+                        year.c  
+                       0.01360  
+
+$imp3
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 945.0558
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 1.8298  
+ Residual             0.3642  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.32557                         0.31886                         0.12993  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      -0.00796                         0.01500                        -0.26987  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.22756                        -0.03864                         0.09669  
+                        year.c  
+                       0.01463  
+
+$imp4
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 929.0514
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 1.7418  
+ Residual             0.3616  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.08058                         0.39858                         0.01616  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                       0.01038                         0.05933                        -0.26015  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.16727                        -0.03383                         0.09990  
+                        year.c  
+                       0.01205  
+
+$imp5
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 1116.057
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 2.2469  
+ Residual             0.4068  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                     -6.289158                        0.323590                        0.139893  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      0.048439                       -0.004685                       -0.338887  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                     -1.649116                       -0.045167                       -0.099416  
+                        year.c  
+                      0.014815  
+
+$imp6
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 950.6183
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 1.8778  
+ Residual             0.3648  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                     -5.325437                        0.264415                        0.077013  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                     -0.005859                        0.004947                       -0.293343  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                     -1.238531                       -0.033791                        0.115612  
+                        year.c  
+                      0.013551  
+
+$imp7
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 962.4497
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 2.1952  
+ Residual             0.3643  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -6.26937                         0.16651                         0.08890  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                       0.02754                         0.01517                        -0.32621  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.51971                        -0.04225                         0.05702  
+                        year.c  
+                       0.01414  
+
+$imp8
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 952.4137
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 1.8918  
+ Residual             0.3657  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                    -5.0205332                       0.3026511                       0.0948257  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                    -0.0546767                      -0.0003005                      -0.5278298  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                    -1.2335761                      -0.0313722                       0.0890506  
+                        year.c  
+                     0.0169270  
+
+$imp9
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 958.3405
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 2.124   
+ Residual             0.364   
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.94896                         0.16517                         0.02651  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      -0.05678                        -0.04816                        -0.26291  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.42199                        -0.03716                         0.10947  
+                        year.c  
+                       0.01152  
+
+$imp10
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 960.6491
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 1.7217  
+ Residual             0.3704  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                     -4.752714                        0.357326                        0.007480  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                     -0.007375                        0.080674                       -0.358200  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                     -1.109608                       -0.036508                        0.117124  
+                        year.c  
+                      0.013134  
+
+$imp11
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 912.463
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 1.9982  
+ Residual             0.3538  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.42684                         0.26114                         0.13592  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      -0.09606                        -0.09348                        -0.36887  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.33433                        -0.03241                         0.07285  
+                        year.c  
+                       0.01479  
+
+$imp12
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 936.6463
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 2.0132  
+ Residual             0.3599  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.59377                         0.26851                         0.08391  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      -0.05478                        -0.01546                        -0.32476  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.36501                        -0.04219                         0.06469  
+                        year.c  
+                       0.01295  
+
+$imp13
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 952.5769
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 2.0333  
+ Residual             0.3637  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.61738                         0.18849                        -0.02770  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      -0.01924                         0.08428                        -0.21516  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.36022                        -0.03895                         0.08453  
+                        year.c  
+                       0.01041  
+
+$imp14
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 947.3152
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 2.0926  
+ Residual             0.3615  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -5.98599                         0.36777                         0.02863  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                       0.04675                        -0.01239                        -0.30071  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.50459                        -0.03199                        -0.02123  
+                        year.c  
+                       0.01265  
+
+$imp15
+Linear mixed model fit by REML ['lmerMod']
+Formula: I(ami.disp^(1/2)) ~ I(a.incardisp^(1/2)) + log(adisp.chpov) +  
+    log(a.unemp.rt/w.unemp.rt) + log(a.singpar.rt/w.singpar.rt) +  
+    log(amind.lessHS/wht.lessHS) + log(pctami) + scale(inst6014_nom) +  
+    log(v.crime.rt) + year.c + (1 | stname)
+   Data: d
+REML criterion at convergence: 934.8028
+Random effects:
+ Groups   Name        Std.Dev.
+ stname   (Intercept) 2.1859  
+ Residual             0.3573  
+Number of obs: 750, groups:  stname, 50
+Fixed Effects:
+                   (Intercept)            I(a.incardisp^(1/2))                log(adisp.chpov)  
+                      -6.07723                         0.17557                         0.04244  
+    log(a.unemp.rt/w.unemp.rt)  log(a.singpar.rt/w.singpar.rt)    log(amind.lessHS/wht.lessHS)  
+                      -0.01239                         0.06443                        -0.31553  
+                   log(pctami)             scale(inst6014_nom)                 log(v.crime.rt)  
+                      -1.50182                        -0.04076                         0.04294  
+                        year.c  
+                       0.01393  
+

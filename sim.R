@@ -92,12 +92,7 @@ disp.plot<-ggplot(as.data.frame(sim.disp), aes(y=e, x=p))+geom_line()+
 
 ggsave("cl-sim-plot.pdf", disp.plot, width=7, height=3)
 
-###point estimates
-sink("exp-out.txt")
-print("RE Sims")
-rbind(sim.bd[500,], sim.bd[223,], sim.bd[778,])
-rbind(sim.ad[500,], sim.ad[223,], sim.ad[778,])
-sink()
+
 ####################################################
 #############ENTRIES
 
@@ -132,6 +127,8 @@ sim.b.ent$m<-"African American"
 sim.a.ent$m<-"Native American"
 sim.ent<-rbind(sim.b.ent, sim.a.ent)
 sim.ent[, 5]<-sim.ent[,5]*100
+
+
 
 ent.plot<-ggplot(as.data.frame(sim.ent), aes(y=e, x=p))+geom_line()+
   geom_line(aes(y=upper, x=p), lty=2)+
@@ -195,7 +192,18 @@ ggsave("reun-sim-plot.pdf", reun.plot, width=7, height=3)
 
 
 
-
+###point estimates
+sink("exp-out.txt")
+print("CL Sims")
+rbind(sim.bd[500,], sim.bd[223,], sim.bd[778,])
+rbind(sim.ad[500,], sim.ad[223,], sim.ad[778,])
+print("Ent sims")
+rbind(sim.b.ent[500,], sim.b.ent[223,], sim.b.ent[778,])
+rbind(sim.a.ent[500,], sim.a.ent[223,], sim.a.ent[778,])
+print("Reun sims")
+rbind(sim.b.reun[500,], sim.b.reun[223,], sim.b.reun[778,])
+rbind(sim.a.reun[500,], sim.a.reun[223,], sim.a.reun[778,])
+sink()
 
 
 

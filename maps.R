@@ -1,5 +1,6 @@
-library(albersusa)
 #devtools::install_github("hrbrmstr/albersusa")
+
+library(albersusa)
 library(sp)
 library(rgeos)
 library(maptools)
@@ -11,7 +12,7 @@ library(scales)
 library(RColorBrewer)
 
 
-setwd("D:/sync/cw-race/figures")
+setwd("~/sync/cw-race/figures")
 
 returnquant<-function(x){
   l<-5 ### number of quantiles
@@ -42,13 +43,13 @@ fclong<-with(fcmap,
              data.frame(name=rep(name, 4),
                         q=as.factor(c(returnquant(bcl.rt), returnquant(acl.rt), returnquant(b.incarrt), returnquant(a.incarrt)))))
 
-fclong$c<-c(rep("Black children in foster care per capita", n), 
+fclong$c<-c(rep("African American children in foster care per capita", n), 
             rep("Native American children in foster care per capita", n), 
-            rep("Black Incarceration per capita", n),
+            rep("African American Incarceration per capita", n),
             rep("Native American incarceration per capita", n))
-fclong$c<-factor(fclong$c, levels=c("Black children in foster care per capita", 
+fclong$c<-factor(fclong$c, levels=c("African American children in foster care per capita", 
                                     "Native American children in foster care per capita", 
-                                    "Black Incarceration per capita", "Native American incarceration per capita"))
+                                    "African American Incarceration per capita", "Native American incarceration per capita"))
 
 
 us <- usa_composite()
@@ -76,24 +77,50 @@ gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank()
   theme(legend.key.size= unit(0.3, "cm"))+
   theme(strip.background=element_blank(), 
         strip.text.x=element_text(size=10),
+        strip.text.y=element_blank())+
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))+
+  labs(x=NULL, y=NULL)
+
+#print(gg)
+
+ggsave(plot = gg, "RateMapBlue.pdf", height=5.5, width=7)
+
+gg <- ggplot()+ geom_map(data=map.merge%>%filter(c%in%c("African American children in foster care per capita", 
+                                                        "Native American children in foster care per capita")), map=us_map,
+                         aes(x=long, y=lat, map_id=id, fill=q),
+                         color="black", size=0.2)+theme_map()+ coord_proj(us_laea_proj)+
+  facet_wrap(~c)+
+  scale_fill_manual(values = blue.pal,
+                    name="State Value\n2014", labels=c("Lowest 20%", " ", " ", " ", "Highest 20%"))
+
+gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
+              panel.border = element_blank(), panel.background=element_blank())+
+  scale_y_continuous(name="", breaks=NULL)+
+  scale_x_continuous(name="", breaks=NULL)+
+  theme(legend.title=element_text(size=10))+
+  theme(legend.text=element_text(size=10))+
+  theme(legend.position="bottom")+
+  theme(legend.key.size= unit(0.3, "cm"))+
+  theme(strip.background=element_blank(), 
+        strip.text.x=element_text(size=10),
         strip.text.y=element_blank())
 
-print(gg)
+#print(gg)
 
-ggsave(plot = gg, "RateMapBlue.pdf", h = 8, w = 8)
+ggsave(plot = gg, "FCRateMapBlue.pdf", width=7, height=3.5)
 
 
 fclong<-with(fcmap, 
              data.frame(name=rep(name, 4),
               q=as.factor(c(returnquant(bw.disp), returnquant(ami.disp), returnquant(b.incardisp), returnquant(a.incardisp)))))
               
-fclong$c<-c(rep("Black/White foster care disproportion", n), 
+fclong$c<-c(rep("African American/White foster care disproportion", n), 
             rep("Native American/White foster care disproportion", n), 
-            rep("Black/White Incarceration disproportion", n),
+            rep("African American/White Incarceration disproportion", n),
             rep("Native American/White incarceration disproportion", n))
-fclong$c<-factor(fclong$c, levels=c("Black/White foster care disproportion", 
+fclong$c<-factor(fclong$c, levels=c("African American/White foster care disproportion", 
                                     "Native American/White foster care disproportion", 
-                                    "Black/White Incarceration disproportion", "Native American/White incarceration disproportion"))
+                                    "African American/White Incarceration disproportion", "Native American/White incarceration disproportion"))
 
 map.merge<-merge(us_map, fclong, by="name")
 
@@ -120,9 +147,33 @@ gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank()
         strip.text.x=element_text(size=10),
         strip.text.y=element_blank())
 
-print(gg)
+#print(gg)
 
-ggsave(plot = gg, "DispMapBlue.pdf", h = 8, w = 8)
+ggsave(plot = gg, "DispMapBlue.pdf", height=5.5,width=7)
+
+gg <- ggplot()+ geom_map(data=map.merge%>%filter(c%in%c("African American/White foster care disproportion", 
+                                                        "Native American/White foster care disproportion")), map=us_map,
+                         aes(x=long, y=lat, map_id=id, fill=q),
+                         color="black", size=0.2)+theme_map()+ coord_proj(us_laea_proj)+
+  facet_wrap(~c)+
+  scale_fill_manual(values = blue.pal,
+                    name="State Value\n2014", labels=c("Lowest 20%", " ", " ", " ", "Highest 20%"))
+
+gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
+              panel.border = element_blank(), panel.background=element_blank())+
+  scale_y_continuous(name="", breaks=NULL)+
+  scale_x_continuous(name="", breaks=NULL)+
+  theme(legend.title=element_text(size=10))+
+  theme(legend.text=element_text(size=10))+
+  theme(legend.position="bottom")+
+  theme(legend.key.size= unit(0.3, "cm"))+
+  theme(strip.background=element_blank(), 
+        strip.text.x=element_text(size=10),
+        strip.text.y=element_blank())
+
+#print(gg)
+
+ggsave(plot = gg, "FCDispMapBlue.pdf", width=7, height=3.5)
 
 
 fcmap$state<-fcmap$St<-fcmap$stname
@@ -167,6 +218,29 @@ gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank()
         strip.text.x=element_text(size=10),
         strip.text.y=element_blank())
 
-print(gg)
+#print(gg)
 
-ggsave(plot = gg, "PovMapBlue.pdf", h = 8, w = 8)
+ggsave(plot = gg, "PovMapBlue.pdf", width=7, height=3.5)
+
+gg <- ggplot()+ geom_map(data=map.merge%>%filter(c=="Children in foster care per capita"), map=us_map,
+                         aes(x=long, y=lat, map_id=id, fill=q),
+                         color="black", size=0.2)+theme_map()+ coord_proj(us_laea_proj)+
+  facet_wrap(~c)+
+  scale_fill_manual(values = blue.pal,
+                    name="State Value\n2014", labels=c("Lowest 20%", " ", " ", " ", "Highest 20%"))
+
+gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(),
+              panel.border = element_blank(), panel.background=element_blank())+
+  scale_y_continuous(name="", breaks=NULL)+
+  scale_x_continuous(name="", breaks=NULL)+
+  theme(legend.title=element_text(size=10))+
+  theme(legend.text=element_text(size=10))+
+  theme(legend.position="bottom")+
+  theme(legend.key.size= unit(0.3, "cm"))+
+  theme(strip.background=element_blank(), 
+        strip.text.x=element_text(size=10),
+        strip.text.y=element_blank())
+
+#print(gg)
+
+ggsave(plot = gg, "CLMapBlue.pdf", width=7, height=5)
