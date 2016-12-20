@@ -27,6 +27,10 @@ library(plm)
 setwd("~/sync/cw-race/")
 source("~/sync/cw-race/cw-race-functions.r")
 fc<-read.csv("~/sync/cw-race/data/fc.csv")
+mort<-read.csv("~/sync/cw-race/data/infmort.csv")
+names(mort)[1:3]<-c("state", "year", "nonwht.inf.mort")
+mort$mortdisp<-mort[,3]/mort[,4]
+fc<-left_join(fc, mort, by=c("state", "year"))
 
 source("cw-imputation.r", echo=TRUE)
 
@@ -46,13 +50,17 @@ for(i in (1:m)){
 }
 
 ##### INEQ TS PLOTS
-# plotdat<-fc.imp$imputations[[1]]%>%group_by(year)%>%summarise(bw.disp=(sum(cl.blk)/sum(blk.child))/(sum(cl.white)/sum(wht.child)),
-#                                                               na.disp=(sum(cl.nat.am)/sum(amind.child))/(sum(cl.white)/sum(wht.child)))
-# dispts<-ggplot(plotdat%>%filter(year>2000), aes(x=year))+geom_line(aes(y=na.disp))+geom_line(aes(y=bw.disp), lty=2)+xlab("Year")+ylab("FC Caseload ineq. Nat.Am./White solid, Afr.Am./White dashed")
-# tsstate<-ggplot(fc.imp$imputations[[1]], aes(x=year, y=cl/child))+geom_line()+facet_wrap(~stname)+xlab("Year")+ylab("Caseload per cap.")
-# 
-# ggsave("~/sync/cw-race/figures/dispts.pdf", dispts, height=6, width=8)
-# ggsave("~/sync/cw-race/figures/statets.pdf", tsstate, height=8, width=10)
+plotdat<-fc.imp$imputations[[1]]%>%group_by(year)%>%summarise(bw.disp=(sum(cl.blk)/sum(blk.child))/(sum(cl.white)/sum(wht.child)),
+                                                              na.disp=(sum(cl.nat.am)/sum(amind.child))/(sum(cl.white)/sum(wht.child)))
+dispts<-ggplot(fc.imp$imputations[[1]]%>%filter(year>2000), aes(x=year))+
+  geom_line(aes(y=ami.disp))+geom_line(aes(y=bw.disp), lty=2)+xlab("Year")+
+  ylab("FC Caseload ineq. Nat.Am./White solid, Afr.Am./White dashed")+
+  coord_cartesian(ylim=c(0,15))+
+  facet_wrap(~stname)
+tsstate<-ggplot(fc.imp$imputations[[1]], aes(x=year, y=cl/child))+geom_line()+facet_wrap(~stname)+xlab("Year")+ylab("Caseload per cap.")
+
+ggsave("~/sync/cw-race/figures/dispts.pdf", dispts, height=6, width=8)
+ggsave("~/sync/cw-race/figures/statets.pdf", tsstate, height=8, width=10)
 
 ######## MAIN STATE FE MODEL RESULTS
 #source("state-models.r")

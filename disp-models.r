@@ -18,7 +18,7 @@ b.disp<-lapply(fc.imp$imputations, function(d)
          log(bdisp.chpov)+
          log(I(b.unemp.rt/w.unemp.rt))+log(I(b.singpar.rt/w.singpar.rt))+
          log(I(blk.lessHS/wht.lessHS))+
-         log(pctblk)+I(log(pctblk^2))+
+         log(pctblk)+
          scale(inst6014_nom)+log(v.crime.rt)+
          year.c+
          (1|stname),
