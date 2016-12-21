@@ -19,28 +19,28 @@ library(plm)
 # source("U:/cw-race/cw-race-functions.r")
 # fc<-read.csv("U:/cw-race/data/fc.csv")
 
-# setwd("D:/sync/cw-race/")
-# source("D:/sync/cw-race/cw-race-functions.r")
-# fc<-read.csv("D:/sync/cw-race/data/fc.csv")
+# setwd("U:/cw-race/")
+# source("U:/cw-race/cw-race-functions.r")
+# fc<-read.csv("U:/cw-race/data/fc.csv")
 
 # for laptop
-setwd("D:/sync/cw-race/")
-source("D:/sync/cw-race/cw-race-functions.r")
-fc<-read.csv("D:/sync/cw-race/data/fc.csv")
+setwd("U:/cw-race/")
+source("U:/cw-race/cw-race-functions.r")
+fc<-read.csv("U:/cw-race/data/fc.csv")
 
 ###robustness checks
-# mort<-read.csv("D:/sync/cw-race/data/infmort.csv")
+# mort<-read.csv("U:/cw-race/data/infmort.csv")
 # names(mort)[1:3]<-c("state", "year", "nonwht.inf.mort")
 # mort$mortdisp<-mort[,3]/mort[,4]
 # fc<-left_join(fc, mort, by=c("state", "year"))
-arrest<-read.csv("D:/sync/cw-race/data/ucr-race.csv")
+arrest<-read.csv("U:/cw-race/data/ucr-race.csv")
 
 
-welfare<-read.csv("D:/sync/cw-race/data/UKCPR_National_Welfare_Data_12062016.csv")
+welfare<-read.csv("U:/cw-race/data/UKCPR_National_Welfare_Data_12062016.csv")
 names(welfare)[1]<-"stname"
-welfare<-welfare%>%filter(year>1999)%>%select(stname, year, AFDC.TANF.Recipients, Food.Stamp.SNAP.Recipients, AFDC.TANF.Benefit.for.3.person.family, Medicaid.beneficiaries)
+welfare<-welfare%>%dplyr::filter(year>1999)%>%dplyr::select(stname, year, AFDC.TANF.Recipients, Food.Stamp.SNAP.Recipients, AFDC.TANF.Benefit.for.3.person.family, Medicaid.beneficiaries)
 fc<-left_join(fc, welfare, by=c("stname", "year"))
-rpp<-read.csv("D:/sync/cw-race/data/rpp.csv")
+rpp<-read.csv("U:/cw-race/data/rpp.csv")
 rpp$rpp<-rpp$rpp/100
 for(s in rpp$state){
   fc[which(fc$state==s), "AFDC.TANF.Benefit.for.3.person.family"]<-fc[which(fc$state==s), "AFDC.TANF.Benefit.for.3.person.family"]*rpp[which(rpp$state==s), "rpp"]
@@ -68,24 +68,24 @@ for(i in (1:m)){
 }
 
 ##### INEQ TS PLOTS
-plotdat<-fc.imp$imputations[[1]]%>%group_by(year)%>%summarise(bw.disp=(sum(cl.blk)/sum(blk.child))/(sum(cl.white)/sum(wht.child)),
-                                                              na.disp=(sum(cl.nat.am)/sum(amind.child))/(sum(cl.white)/sum(wht.child)))
-dispts<-ggplot(fc.imp$imputations[[1]]%>%filter(year>2000), aes(x=year))+
-  geom_line(aes(y=ami.disp))+geom_line(aes(y=bw.disp), lty=2)+xlab("Year")+
-  ylab("FC Caseload ineq. Nat.Am./White solid, Afr.Am./White dashed")+
-  coord_cartesian(ylim=c(0,15))+
-  facet_wrap(~stname)
-tsstate<-ggplot(fc.imp$imputations[[1]], aes(x=year, y=cl/child))+geom_line()+facet_wrap(~stname)+xlab("Year")+ylab("Caseload per cap.")
-
-ggsave("~/sync/cw-race/figures/dispts.pdf", dispts, height=6, width=8)
-ggsave("~/sync/cw-race/figures/statets.pdf", tsstate, height=8, width=10)
+# plotdat<-fc.imp$imputations[[1]]%>%group_by(year)%>%summarise(bw.disp=(sum(cl.blk)/sum(blk.child))/(sum(cl.white)/sum(wht.child)),
+#                                                               na.disp=(sum(cl.nat.am)/sum(amind.child))/(sum(cl.white)/sum(wht.child)))
+# dispts<-ggplot(fc.imp$imputations[[1]]%>%filter(year>2000), aes(x=year))+
+#   geom_line(aes(y=ami.disp))+geom_line(aes(y=bw.disp), lty=2)+xlab("Year")+
+#   ylab("FC Caseload ineq. Nat.Am./White solid, Afr.Am./White dashed")+
+#   coord_cartesian(ylim=c(0,15))+
+#   facet_wrap(~stname)
+# tsstate<-ggplot(fc.imp$imputations[[1]], aes(x=year, y=cl/child))+geom_line()+facet_wrap(~stname)+xlab("Year")+ylab("Caseload per cap.")
+# 
+# ggsave("~/sync/cw-race/figures/dispts.pdf", dispts, height=6, width=8)
+# ggsave("~/sync/cw-race/figures/statets.pdf", tsstate, height=8, width=10)
 
 ######## MAIN STATE FE MODEL RESULTS
 #source("state-models.r")
 
 ######################################
 ## RE MODELS
-source("disp-models.r")
+source("disp-models.r", echo=TRUE)
 
 #######################
 ## Sim visuals

@@ -29,20 +29,21 @@ b.disp<-lapply(fc.imp$imputations, function(d)
          (1|stname),
        data=d))
 
-b.disp.bayes<-stan_lmer(log(bw.disp)~scale(b.incardisp)+
-  scale(bdisp.chpov)+
-  scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
-  scale(I(blk.lessHS/wht.lessHS))+
-  scale(pctblk)+
-  scale(inst6014_nom)+
-  scale(b.arrest.disp)+
-  year.c+
-  scale(tanf.adeq)+
-  scale(tanf.incl)+
-  scale(medicaid.incl)+
-  scale(snap.incl)+
-  (1|stname),
-data=fc.imp$imputations[[1]])
+# do mean predictor controls, pool across imputations 
+#b.disp.bayes<-stan_lmer(log(bw.disp)~scale(b.incardisp)+
+#   scale(bdisp.chpov)+
+#   scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
+#   scale(I(blk.lessHS/wht.lessHS))+
+#   scale(pctblk)+
+#   scale(inst6014_nom)+
+#   scale(b.arrest.disp)+
+#   year.c+
+#   scale(tanf.adeq)+
+#   scale(tanf.incl)+
+#   scale(medicaid.incl)+
+#   scale(snap.incl)+
+#   (1|stname),
+#   data=fc.imp$imputations[[1]])
 
 a.disp<-lapply(fc.imp$imputations, function(d) 
   lmer(sqrt(ami.disp)~
@@ -60,6 +61,22 @@ a.disp<-lapply(fc.imp$imputations, function(d)
          scale(snap.incl)+
          (1|stname),
        data=d))
+
+# a.disp.bayes<-stan_lmer(sqrt(ami.disp)~
+#                      scale(a.incardisp)+
+#                      scale(adisp.chpov)+
+#                      scale(a.unemp.rt/w.unemp.rt)+scale(a.singpar.rt/w.singpar.rt)+
+#                      scale(amind.lessHS/wht.lessHS)+
+#                      scale(pctami)+
+#                      scale(inst6014_nom)+
+#                      scale(ai.arrest.disp)+
+#                      year.c+
+#                      scale(tanf.adeq)+
+#                      scale(tanf.incl)+
+#                      scale(medicaid.incl)+
+#                      scale(snap.incl)+
+#                      (1|stname),
+#                    data=fc.imp$imputations[[1]])
 
 
 # to include state means as predictors, maybe better for unbiased, but interpretation is weird
