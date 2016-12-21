@@ -24,13 +24,31 @@ library(plm)
 # fc<-read.csv("D:/sync/cw-race/data/fc.csv")
 
 # for laptop
-setwd("~/sync/cw-race/")
-source("~/sync/cw-race/cw-race-functions.r")
-fc<-read.csv("~/sync/cw-race/data/fc.csv")
-mort<-read.csv("~/sync/cw-race/data/infmort.csv")
-names(mort)[1:3]<-c("state", "year", "nonwht.inf.mort")
-mort$mortdisp<-mort[,3]/mort[,4]
-fc<-left_join(fc, mort, by=c("state", "year"))
+setwd("D:/sync/cw-race/")
+source("D:/sync/cw-race/cw-race-functions.r")
+fc<-read.csv("D:/sync/cw-race/data/fc.csv")
+
+###robustness checks
+# mort<-read.csv("D:/sync/cw-race/data/infmort.csv")
+# names(mort)[1:3]<-c("state", "year", "nonwht.inf.mort")
+# mort$mortdisp<-mort[,3]/mort[,4]
+# fc<-left_join(fc, mort, by=c("state", "year"))
+arrest<-read.csv("D:/sync/cw-race/data/ucr-race.csv")
+
+
+welfare<-read.csv("D:/sync/cw-race/data/UKCPR_National_Welfare_Data_12062016.csv")
+names(welfare)[1]<-"stname"
+welfare<-welfare%>%filter(year>1999)%>%select(stname, year, AFDC.TANF.Recipients, Food.Stamp.SNAP.Recipients, AFDC.TANF.Benefit.for.3.person.family, Medicaid.beneficiaries)
+fc<-left_join(fc, welfare, by=c("stname", "year"))
+rpp<-read.csv("D:/sync/cw-race/data/rpp.csv")
+rpp$rpp<-rpp$rpp/100
+for(s in rpp$state){
+  fc[which(fc$state==s), "AFDC.TANF.Benefit.for.3.person.family"]<-fc[which(fc$state==s), "AFDC.TANF.Benefit.for.3.person.family"]*rpp[which(rpp$state==s), "rpp"]
+}
+inflate<-cbind(c(2000:2014), c(1.37,1.34, 1.32, 1.29, 1.25, 1.21, 1.17, 1.14,1.10, 1.10, 1.09,1.05, 1.03,1.02, 1 ))
+for(y in inflate[,1]){
+  fc[which(fc$year==y), "AFDC.TANF.Benefit.for.3.person.family"]<-fc[which(fc$year==y), "AFDC.TANF.Benefit.for.3.person.family"]*inflate[which(inflate[,1]==y), 2]
+}
 
 source("cw-imputation.r", echo=TRUE)
 

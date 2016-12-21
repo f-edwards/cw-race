@@ -50,8 +50,9 @@ for(i in 1:length(amind.thresh)){
 ###MANUALLY ADD PROBLEMATIC CHILD POP AND CHILD POV OBS FOR OI
 ### HI 2007, NH amind child 2001
 
-amind.oi<-rbind(amind.oi, c(361, 37))
-amind.oi<-rbind(amind.oi, c(680, 36))
+
+amind.oi<-rbind(amind.oi, c(367, 37) )
+amind.oi<-rbind(amind.oi, c(693, 36))
 
 blk.oi<-matrix(nrow=length(blk.acs)*length(blk.thresh), ncol=2)
 blk.oi[,2]<-rep(blk.acs, length(blk.thresh))
@@ -98,6 +99,7 @@ for(i in 1:nrow(oi.priors)){
   oi.priors[i,3:4]<-create.prior(i)
 }
 
+fc<-left_join(fc, arrest, by=c("state", "year"))
 
 ##imputation model
 m<-15
@@ -148,7 +150,17 @@ for(i in 1:m){
                                      singpar.rt=singpar/child,
                                      bw.disp=cl.blk.pc/cl.wht.pc,
                                      ami.disp=ifelse((cl.amind.pc/cl.wht.pc)>0,cl.amind.pc/cl.wht.pc, 0),
-                                     year.c=year-2000)
+                                     year.c=year-2000,
+                                     tanf.adeq=AFDC.TANF.Benefit.for.3.person.family,
+                                     tanf.incl=AFDC.TANF.Recipients/(child.pov/child),
+                                     snap.incl=Food.Stamp.SNAP.Recipients/(child.pov/child),
+                                     medicaid.incl=Medicaid.beneficiaries/(child.pov/child),
+                                     b.arrest.pc=b.arrest/b.adult,
+                                     w.arrest.pc=w.arrest/w.adult,
+                                     ai.arrest.pc=ai.arrest/a.adult,
+                                     b.arrest.disp=b.arrest.pc/w.arrest.pc,
+                                     ai.arrest.disp=ai.arrest.pc/b.arrest.pc
+                                     )
   fc.imp$imputations[[i]]$cl.blk<-as.integer(fc.imp$imputations[[i]]$cl.blk)
   fc.imp$imputations[[i]]$cl.nat.am<-as.integer(fc.imp$imputations[[i]]$cl.nat.am)
   fc.imp$imputations[[i]]$ent.blk<-as.integer(fc.imp$imputations[[i]]$ent.blk)

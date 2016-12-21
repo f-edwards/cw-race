@@ -9,7 +9,7 @@ makeMIRegTab<-function(x){
   beta<-t(r[[1]])
   se<-t(r[[2]])
   z<-beta/se
-  p<-2*pnorm(-abs(z))
+  p<-round(2*pnorm(-abs(z)), 5)
   ### TO SUMMARIZE VARIANCE OF REs ACROSS IMPUTATIONS
   ranefs.disp<-matrix(ncol=nrow(fc), nrow=m)
   ranefs.disp.se<-matrix(ncol=nrow(fc), nrow=m)
@@ -590,7 +590,7 @@ read.ucr<-function(x, year){
 }
 
 inflation<-function(x,money){
-	inflate<-cbind(c(2000:2011), c(1.31,1.27, 1.25, 1.22, 1.19, 1.15, 1.12, 1.08,1.04, 1.05, 1.03,1))
+	inflate<-cbind(c(2000:2014), c(1.37,1.34, 1.32, 1.29, 1.25, 1.21, 1.17, 1.14,1.10, 1.10, 1.09,1.05, 1.03,1.02, 1 ))
 	for(i in 1:nrow(x)){
 		for(s in 1:length(money)){
 		z<-which(x[i, "year"]==inflate[,1])	
