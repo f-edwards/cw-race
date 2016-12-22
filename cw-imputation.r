@@ -7,11 +7,7 @@ fc$cl<-as.integer(fc$cl)
 
 
 
-bounds<-cbind(1:ncol(fc),
-              rep(0.0000001, ncol(fc)),
-              rep(Inf, ncol(fc)))
-ratios<-which(names(fc)%in%c("blk.lessHS", "wht.lessHS", "amind.lessHS"))
-bounds[ratios, 3]<-1
+
 
 colClass<-sapply(fc, class)
 colClass[2]<-"year"
@@ -50,9 +46,8 @@ for(i in 1:length(amind.thresh)){
 ###MANUALLY ADD PROBLEMATIC CHILD POP AND CHILD POV OBS FOR OI
 ### HI 2007, NH amind child 2001
 
-
-amind.oi<-rbind(amind.oi, c(367, 37) )
-amind.oi<-rbind(amind.oi, c(693, 36))
+amind.oi<-rbind(amind.oi, c(which((fc$stname=="HI")&(fc$year==2007)), which(names(fc)=="amind.child.pov")))
+amind.oi<-rbind(amind.oi, c(which((fc$stname=="NH")&(fc$year==2001)), which(names(fc)=="amind.child")))
 
 blk.oi<-matrix(nrow=length(blk.acs)*length(blk.thresh), ncol=2)
 blk.oi[,2]<-rep(blk.acs, length(blk.thresh))
@@ -102,6 +97,13 @@ for(i in 1:nrow(oi.priors)){
 fc<-left_join(fc, arrest, by=c("state", "year"))
 
 ##imputation model
+
+bounds<-cbind(1:ncol(fc),
+              rep(0.0000001, ncol(fc)),
+              rep(Inf, ncol(fc)))
+ratios<-which(names(fc)%in%c("blk.lessHS", "wht.lessHS", "amind.lessHS"))
+bounds[ratios, 3]<-1
+
 m<-15
 fc.imp<-amelia(fc, m=m,
                ts="year", cs="stname", polytime=1, 
@@ -176,6 +178,31 @@ for(i in 1:m){
   
 }
 
+### state means for within-unit modeling, bias elimination
+for(i in 1:m){
+  fc.imp$imputations[[i]]<-fc.imp$imputations[[i]]%>%group_by(stname)%>%mutate(b.incardisp.mean=mean(b.incardisp),
+                                                               a.incardisp.mean=mean(a.incardisp),
+                                                               bdisp.chpov.mean=mean(bdisp.chpov),
+                                                               adisp.chpov.mean=mean(adisp.chpov),
+                                                               a.singpardisp.mean=mean(a.singpar.rt/w.singpar.rt),
+                                                               a.unempdisp.mean=mean(a.unemp.rt/w.unemp.rt),
+                                                               b.unempdisp.mean=mean(b.unemp.rt/w.unemp.rt),
+                                                               a.lessHS.mean=mean(amind.lessHS/wht.lessHS),
+                                                               pctami.mean=mean(pctami),
+                                                               inst.mean=mean(inst6014_nom),
+                                                               v.crime.mean=mean(v.crime.rt),
+                                                               b.singpardisp.mean=mean(b.singpar.rt/w.singpar.rt),
+                                                               b.lessHS.mean=mean(blk.lessHS/wht.lessHS),
+                                                               pctblk.mean=mean(pctblk),
+                                                               b.arrest.mean=mean(b.arrest.disp),
+                                                               ai.arrest.mean=mean(ai.arrest.disp),
+                                                               tanf.adeq.mean=mean(tanf.adeq),
+                                                               tanf.incl.mean=mean(tanf.incl),
+                                                               medicaid.incl.mean=mean(medicaid.incl),
+                                                               snap.incl.mean=mean(snap.incl)
+                                                               )
+
+}
 
 ###lags and leads
 for(i in 1:m){

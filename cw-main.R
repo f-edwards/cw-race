@@ -9,6 +9,7 @@ library(dplyr)
 library(arm)
 library(MASS)
 library(rstanarm, options(mc.cores = parallel::detectCores()))
+library(rstan)
 library(multiwayvcov)
 library(lmtest)
 library(sandwich)
@@ -26,7 +27,7 @@ library(plm)
 # for laptop
 setwd("U:/cw-race/")
 source("U:/cw-race/cw-race-functions.r")
-fc<-read.csv("U:/cw-race/data/fc.csv")
+fc<-read.csv("U:/cw-race/data/fc.csv", stringsAsFactors = FALSE)
 
 ###robustness checks
 # mort<-read.csv("U:/cw-race/data/infmort.csv")
@@ -34,9 +35,20 @@ fc<-read.csv("U:/cw-race/data/fc.csv")
 # mort$mortdisp<-mort[,3]/mort[,4]
 # fc<-left_join(fc, mort, by=c("state", "year"))
 arrest<-read.csv("U:/cw-race/data/ucr-race.csv")
+names(arrest)[2]<-"year"
+###Treat meas. error as missing for imputation
+missing<-matrix(c(55, 2000, 55, 2001, 51, 2013, 51, 2014, 1, 2011, 1, 2012, 1, 2013, 1, 2014,
+                21, 2000, 21, 2001, 21, 2002, 21, 2003, 21, 2004, 21, 2005, 21, 2006, 21, 2007, 21, 2008,
+                30, 2004), ncol=2, byrow=TRUE)
+cols<-which(names(arrest)%in%c("w.arrest", "b.arrest", "ai.arrest"))
+
+for(i in 1:nrow(missing)){
+  arrest[which((arrest$state==missing[i,1]) & arrest$year==missing[i,2]), cols]<-NA
+}
 
 
-welfare<-read.csv("U:/cw-race/data/UKCPR_National_Welfare_Data_12062016.csv")
+
+welfare<-read.csv("U:/cw-race/data/UKCPR_National_Welfare_Data_12062016.csv", stringsAsFactors = FALSE)
 names(welfare)[1]<-"stname"
 welfare<-welfare%>%dplyr::filter(year>1999)%>%dplyr::select(stname, year, AFDC.TANF.Recipients, Food.Stamp.SNAP.Recipients, AFDC.TANF.Benefit.for.3.person.family, Medicaid.beneficiaries)
 fc<-left_join(fc, welfare, by=c("stname", "year"))
@@ -86,6 +98,9 @@ for(i in (1:m)){
 ######################################
 ## RE MODELS
 source("disp-models.r", echo=TRUE)
+
+## BAYESIAN MODELS
+source("bayes-models.r", echo=TRUE)
 
 #######################
 ## Sim visuals
