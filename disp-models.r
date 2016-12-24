@@ -102,6 +102,7 @@ b.ent.disp<-lapply(fc.imp$imputations, function(d)
          scale(I(blk.lessHS/wht.lessHS))+
          scale(pctblk)+
          scale(inst6014_nom)+
+         scale(b.arrest.disp)+
          year.c+
          scale(tanf.adeq)+
          scale(tanf.incl)+
@@ -135,6 +136,7 @@ a.ent.disp<-lapply(fc.imp$imputations, function(d)
          scale(amind.lessHS/wht.lessHS)+
          scale(pctami)+
          scale(inst6014_nom)+
+         scale(ai.arrest.disp)+
          year.c+
          scale(tanf.adeq)+
          scale(tanf.incl)+
@@ -172,7 +174,9 @@ b.reun<-lapply(fcb.reun.imp, function(d) lmer(log((reun.blk/cl.blk)/(reun.white/
              scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
              scale(I(blk.lessHS/wht.lessHS))+
              scale(pctblk)+
-             scale(inst6014_nom)+year.c+
+             scale(inst6014_nom)+
+               scale(b.arrest.disp)+
+               year.c+
                scale(tanf.adeq)+
                scale(tanf.incl)+
                scale(medicaid.incl)+
@@ -202,6 +206,7 @@ a.reun<-lapply(fcn.reun.imp, function(d)
          scale(amind.lessHS/wht.lessHS)+
          scale(pctami)+
          scale(inst6014_nom)+
+         scale(ai.arrest.disp)+
          year.c+
          scale(tanf.adeq)+
          scale(tanf.incl)+

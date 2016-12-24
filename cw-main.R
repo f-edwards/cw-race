@@ -103,7 +103,7 @@ source("disp-models.r", echo=TRUE)
 source("cw-tables.r", echo=TRUE)
 
 ## BAYESIAN MODELS
-source("bayes-models.r", echo=TRUE)
+#source("bayes-models.r", echo=TRUE)
 
 #######################
 ## Sim visuals

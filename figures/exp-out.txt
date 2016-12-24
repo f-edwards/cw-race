@@ -1,9 +1,43 @@
-[1] "RE Sims"
-           e    upper    lower         x         p                m
-500 3.871305 4.278033 3.493476  7.393315 0.4995495 African American
-223 3.424060 3.826488 3.061393  5.446008 0.2500000 African American
-778 4.381874 4.844637 3.959102 10.056237 0.7500000 African American
-           e    upper    lower         x         p               m
-500 5.040854 7.995075 2.747292 2.0833123 0.4995495 Native American
-223 4.460944 7.354768 2.305033 0.8655754 0.2500000 Native American
-778 5.742215 8.860104 3.296220 4.0815081 0.7500000 Native American
+[1] "CL Sims"
+           e    upper    lower         x         p
+500 3.873802 4.269264 3.515338  7.393315 0.4995495
+223 3.764530 4.175993 3.398695  5.446010 0.2500000
+778 4.029729 4.428057 3.661364 10.069646 0.7500000
+                   m
+500 African American
+223 African American
+778 African American
+           e    upper    lower         x         p
+500 3.308274 4.728077 2.087026 2.0833137 0.4995495
+223 3.008524 4.434131 1.828739 0.8655826 0.2500000
+778 3.840270 5.358799 2.470875 4.0913573 0.7500000
+                  m
+500 Native American
+223 Native American
+778 Native American
+[1] "Ent sims"
+     e upper lower  x  p                m
+500 NA    NA    NA NA NA African American
+223 NA    NA    NA NA NA African American
+778 NA    NA    NA NA NA African American
+     e upper lower  x  p               m
+500 NA    NA    NA NA NA Native American
+223 NA    NA    NA NA NA Native American
+778 NA    NA    NA NA NA Native American
+[1] "Reun sims"
+            e     upper     lower         x         p
+500 0.8092905 0.8491995 0.7715118  7.393315 0.4995495
+223 0.8224343 0.8669334 0.7804996  5.446010 0.2500000
+778 0.7916245 0.8294378 0.7552785 10.069646 0.7500000
+                   m
+500 African American
+223 African American
+778 African American
+            e     upper     lower         x         p
+500 0.9154553 0.9924278 0.8410360 2.0833137 0.4995495
+223 0.9122154 0.9929115 0.8334431 0.8655826 0.2500000
+778 0.9209388 1.0014139 0.8424860 4.0913573 0.7500000
+                  m
+500 Native American
+223 Native American
+778 Native American
