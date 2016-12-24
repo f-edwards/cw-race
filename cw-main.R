@@ -99,6 +99,9 @@ for(i in (1:m)){
 ## RE MODELS
 source("disp-models.r", echo=TRUE)
 
+# RE Model tables
+source("cw-tables.r", echo=TRUE)
+
 ## BAYESIAN MODELS
 source("bayes-models.r", echo=TRUE)
 

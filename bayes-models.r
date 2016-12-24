@@ -1,3 +1,4 @@
+setwd("U:/cw-race/tables")
 b.disp.bayes<-lapply(fc.imp$imputations, function(d) 
   stan_lmer(log(bw.disp)~
               scale(b.incardisp)+scale(b.incardisp.mean)+
@@ -25,8 +26,10 @@ b.disp.bayes.stan<-sflist2stanfit(list(b.disp.bayes[[1]]$stanfit, b.disp.bayes[[
                                        b.disp.bayes[[13]]$stanfit, b.disp.bayes[[14]]$stanfit,
                                        b.disp.bayes[[15]]$stanfit))
 
-s<-b.disp.bayes$stan_summary
-print(xtable(summary(b.disp.bayes.stan)))
+out<-as.data.frame(summary(b.disp.bayes.stan))
+write.csv(out, "b-disp-bayes.csv", row.names=TRUE)
+rm(b.disp.bayes)
+rm(b.disp.bayes.stan)
 
 a.disp.bayes<-lapply(fc.imp$imputations, function(d) 
   stan_lmer(sqrt(ami.disp)~
@@ -46,7 +49,6 @@ a.disp.bayes<-lapply(fc.imp$imputations, function(d)
          (1|stname),
        data=d))
 
-
 a.disp.bayes.stan<-sflist2stanfit(list(a.disp.bayes[[1]]$stanfit, a.disp.bayes[[2]]$stanfit,
                                        a.disp.bayes[[3]]$stanfit, a.disp.bayes[[4]]$stanfit,
                                        a.disp.bayes[[5]]$stanfit, a.disp.bayes[[6]]$stanfit,
@@ -55,6 +57,11 @@ a.disp.bayes.stan<-sflist2stanfit(list(a.disp.bayes[[1]]$stanfit, a.disp.bayes[[
                                        a.disp.bayes[[11]]$stanfit, a.disp.bayes[[12]]$stanfit,
                                        a.disp.bayes[[13]]$stanfit, a.disp.bayes[[14]]$stanfit,
                                        a.disp.bayes[[15]]$stanfit))
+
+out<-as.data.frame(summary(a.disp.bayes.stan))
+write.csv(out, "a-disp-bayes.csv", row.names=TRUE)
+rm(a.disp.bayes)
+rm(a.disp.bayes.stan)
 
 b.ent.bayes<-lapply(fc.imp$imputations, function(d) 
   stan_lmer(log((ent.blk/blk.child)/(ent.white/wht.child))~
@@ -83,6 +90,11 @@ b.ent.bayes.stan<-sflist2stanfit(list(b.ent.bayes[[1]]$stanfit, b.ent.bayes[[2]]
                                        b.ent.bayes[[13]]$stanfit, b.ent.bayes[[14]]$stanfit,
                                        b.ent.bayes[[15]]$stanfit))
 
+out<-as.data.frame(summary(b.ent.bayes.stan))
+write.csv(out, "b-ent-bayes.csv", row.names=TRUE)
+rm(b.ent.bayes)
+rm(b.ent.bayes.stan)
+
 a.ent.bayes<-lapply(fc.imp$imputations, function(d) 
   stan_lmer(sqrt((ent.nat.am/amind.child)/(ent.white/wht.child))~
          scale(a.incardisp)+scale(a.incardisp.mean)+
@@ -110,6 +122,11 @@ a.ent.bayes.stan<-sflist2stanfit(list(a.ent.bayes[[1]]$stanfit, a.ent.bayes[[2]]
                                       a.ent.bayes[[13]]$stanfit, a.ent.bayes[[14]]$stanfit,
                                       a.ent.bayes[[15]]$stanfit))
 
+out<-as.data.frame(summary(a.ent.bayes.stan))
+write.csv(out, "a-ent-bayes.csv", row.names=TRUE)
+rm(a.ent.bayes)
+rm(a.ent.bayes.stan)
+
 b.reun.bayes<-lapply(fcb.reun.imp, function(d) stan_lmer(log((reun.blk/cl.blk)/(reun.white/cl.white)) ~ 
                                                      scale(b.incardisp)+scale(b.incardisp.mean)+
                                                      scale(bdisp.chpov)+scale(bdisp.chpov.mean)+
@@ -134,6 +151,11 @@ b.reun.bayes.stan<-sflist2stanfit(list(b.reun.bayes[[1]]$stanfit, b.reun.bayes[[
                                       b.reun.bayes[[11]]$stanfit, b.reun.bayes[[12]]$stanfit,
                                       b.reun.bayes[[13]]$stanfit, b.reun.bayes[[14]]$stanfit,
                                       b.reun.bayes[[15]]$stanfit))
+
+out<-as.data.frame(summary(b.reun.bayes.stan))
+write.csv(out, "b-reun-bayes.csv", row.names=TRUE)
+rm(b.reun.bayes)
+rm(b.reun.bayes.stan)
 
 a.reun.bayes<-lapply(fcn.reun.imp, function(d) 
   stan_lmer((sqrt((reun.nat.am/cl.nat.am)/(reun.white/cl.white)))~
@@ -161,5 +183,10 @@ a.reun.bayes.stan<-sflist2stanfit(list(a.reun.bayes[[1]]$stanfit, a.reun.bayes[[
                                        a.reun.bayes[[11]]$stanfit, a.reun.bayes[[12]]$stanfit,
                                        a.reun.bayes[[13]]$stanfit, a.reun.bayes[[14]]$stanfit,
                                        a.reun.bayes[[15]]$stanfit))
-save.image(file="bayes-out.Rdata")
+
+out<-as.data.frame(summary(a.reun.bayes.stan))
+write.csv(out, "a-reun-bayes.csv", row.names=TRUE)
+rm(a.reun.bayes)
+rm(a.reun.bayes.stan)
+
 q("no")
