@@ -1,5 +1,5 @@
 
-setwd("U:/cw-race/tables/")
+setwd("~/sync/cw-race/tables/")
 library(texreg)
 
 names<- c("Intercept", "Incarceration disparity",  "Child poverty disparity", "Unemployment disparity", 
@@ -13,6 +13,46 @@ names<- c("Intercept", "Incarceration disparity",  "Child poverty disparity", "U
           "Leg ideology, mean", "Arrest disparity, mean", "TANF adeq, mean",
           "TANF incl, mean", "Medicaid incl, mean", "SNAP incl, mean")
 
+names1<- c("Intercept", "Incarceration disparity",  "Child poverty disparity", "Unemployment disparity", 
+          "Single parent HH disparity",
+          "Less than HS disparity", "Percent pop.",
+          "Leg. ideology", "Arrest disparity", "Year", "TANF adequacy",
+          "TANF inclusion", "Medicaid inclusion", "SNAP inclusion")
+
+b.slide.table<-texreg(list(b.disp[[1]], b.ent.disp[[1]], b.reun[[1]]), custom.coef.names = names1,
+                     single.row=TRUE, include.bic=FALSE, custom.model.names=c("Caseload", "Entries", "Reunification"), 
+                     include.aic=FALSE, include.loglik=FALSE, include.nobs=FALSE, include.groups=FALSE,
+                     override.coef=list(b.d.tab[1:(nrow(b.d.tab)-1),1], 
+                                        b.ent.tab[1:(nrow(b.ent.tab)-1),1],
+                                        b.reun.tab[1:nrow(b.reun.tab)-1,1]),
+                     override.se=list(b.d.tab[1:(nrow(b.d.tab)-1),2], 
+                                      b.ent.tab[1:(nrow(b.ent.tab)-1),2],
+                                      b.reun.tab[1:nrow(b.reun.tab)-1,2]),
+                     override.pvalues = list(b.d.tab[1:(nrow(b.d.tab)-1),4], 
+                                             b.ent.tab[1:(nrow(b.ent.tab)-1),4],
+                                             b.reun.tab[1:nrow(b.reun.tab)-1,4]),
+                     caption.above=TRUE,
+                     # caption="Multilevel models of African American/White foster care caseload disparity with state intercepts. Model 2 includes state means for all predictors ",
+                     # custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
+                     file="b-slide.tex")
+
+a.slide.table<-texreg(list(a.disp[[1]], a.ent.disp[[1]], a.reun[[1]]), custom.coef.names = names1,
+                      single.row=TRUE, include.bic=FALSE, custom.model.names=c("Caseload", "Entries", "Reunification"), 
+                      include.aic=FALSE, include.loglik=FALSE, include.nobs=FALSE, include.groups=FALSE,
+                      override.coef=list(a.d.tab[1:(nrow(a.d.tab)-1),1], 
+                                         a.ent.tab[1:(nrow(a.ent.tab)-1),1],
+                                         a.reun.tab[1:nrow(a.reun.tab)-1,1]),
+                      override.se=list(a.d.tab[1:(nrow(a.d.tab)-1),2], 
+                                       a.ent.tab[1:(nrow(a.ent.tab)-1),2],
+                                       a.reun.tab[1:nrow(a.reun.tab)-1,2]),
+                      override.pvalues = list(a.d.tab[1:(nrow(a.d.tab)-1),4], 
+                                              a.ent.tab[1:(nrow(a.ent.tab)-1),4],
+                                              a.reun.tab[1:nrow(a.reun.tab)-1,4]),
+                      caption.above=TRUE,
+                      # caption="Multilevel models of African American/White foster care caseload disparity with state intercepts. Model 2 includes state means for all predictors ",
+                      # custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
+                      file="a-slide.tex")
+
 
 b.disp.table<-texreg(list(b.disp[[1]], b.disp.mean[[1]]), custom.coef.names = names,
                       single.row=TRUE, include.bic=FALSE, custom.model.names=c("(1)", "(2)"), 
@@ -24,8 +64,8 @@ b.disp.table<-texreg(list(b.disp[[1]], b.disp.mean[[1]]), custom.coef.names = na
                      override.pvalues = list(b.d.tab[1:(nrow(b.d.tab)-1),4], 
                                              b.disp.mean.tab[1:(nrow(b.disp.mean.tab)-1),4]),
                      caption.above=TRUE,
-                     caption="Multilevel models of African American/White foster care caseload disparity with state intercepts. Model 2 includes state means for all predictors ",
-                     custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
+                     # caption="Multilevel models of African American/White foster care caseload disparity with state intercepts. Model 2 includes state means for all predictors ",
+                     # custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
                      file="b-disp.tex")
 
 a.disp.table<-texreg(list(a.disp[[1]], a.disp.mean[[1]]), custom.coef.names = names,
@@ -38,8 +78,8 @@ a.disp.table<-texreg(list(a.disp[[1]], a.disp.mean[[1]]), custom.coef.names = na
                      override.pvalues = list(a.d.tab[1:(nrow(a.d.tab)-1),4], 
                                              a.disp.mean.tab[1:(nrow(a.disp.mean.tab)-1),4]),
                      caption.above=TRUE,
-                     caption="Multilevel models of Native American/White foster care caseload disparity with state intercepts. Model 2 includes state means for all predictors ",
-                     custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
+                     # caption="Multilevel models of Native American/White foster care caseload disparity with state intercepts. Model 2 includes state means for all predictors ",
+                     # custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
                      file="a-disp.tex")
 
 b.ent.table<-texreg(list(b.ent.disp[[1]], b.ent.disp.mean[[1]]), custom.coef.names = names,
@@ -52,8 +92,8 @@ b.ent.table<-texreg(list(b.ent.disp[[1]], b.ent.disp.mean[[1]]), custom.coef.nam
                      override.pvalues = list(b.ent.tab[1:(nrow(b.ent.tab)-1),4], 
                                              b.ent.tab.mean[1:(nrow(b.ent.tab.mean)-1),4]),
                     caption.above=TRUE,
-                    caption="Multilevel models of African American/White foster care entry disparity with state intercepts. Model 2 includes state means for all predictors ",
-                    custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
+                    # caption="Multilevel models of African American/White foster care entry disparity with state intercepts. Model 2 includes state means for all predictors ",
+                    # custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
                      file="b-ent.tex")
 
 a.ent.table<-texreg(list(a.disp[[1]], a.disp.mean[[1]]), custom.coef.names = names,
@@ -66,8 +106,8 @@ a.ent.table<-texreg(list(a.disp[[1]], a.disp.mean[[1]]), custom.coef.names = nam
                      override.pvalues = list(a.d.tab[1:(nrow(a.d.tab)-1),4], 
                                              a.disp.mean.tab[1:(nrow(a.disp.mean.tab)-1),4]),
                     caption.above=TRUE,
-                    caption="Multilevel models of Native American/White foster care entry disparity with state intercepts. Model 2 includes state means for all predictors ",
-                    custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
+                    # caption="Multilevel models of Native American/White foster care entry disparity with state intercepts. Model 2 includes state means for all predictors ",
+                    # custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
                      file="a-ent.tex")
 
 b.reun.table<-texreg(list(b.reun[[1]], b.reun.mean[[1]]), custom.coef.names = names,
@@ -80,8 +120,8 @@ b.reun.table<-texreg(list(b.reun[[1]], b.reun.mean[[1]]), custom.coef.names = na
                     override.pvalues = list(b.reun.tab[1:(nrow(b.reun.tab)-1),4], 
                                             b.reun.tab.mean[1:(nrow(b.reun.tab.mean)-1),4]),
                     caption.above=TRUE,
-                    caption="Multilevel models of African American/White foster care reunification exit disparity with state intercepts. Model 2 includes state means for all predictors ",
-                    custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
+                    # caption="Multilevel models of African American/White foster care reunification exit disparity with state intercepts. Model 2 includes state means for all predictors ",
+                    # custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
                     file="b-reun.tex")
 
 a.reun.table<-texreg(list(a.reun[[1]], a.reun.mean[[1]]), custom.coef.names = names,
@@ -94,6 +134,7 @@ a.reun.table<-texreg(list(a.reun[[1]], a.reun.mean[[1]]), custom.coef.names = na
                     override.pvalues = list(a.reun.tab[1:(nrow(a.reun.tab)-1),4], 
                                             a.reun.tab.mean[1:(nrow(a.reun.tab.mean)-1),4]),
                     caption.above=TRUE,
-                    caption="Multilevel models of Native American/White foster care reunification exit disparity with state intercepts. Model 2 includes state means for all predictors ",
-                    custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
+                    # caption="Multilevel models of Native American/White foster care reunification exit disparity with state intercepts. Model 2 includes state means for all predictors ",
+                    # custom.note="%stars. Results combined across imputations (m=15). Standard errors in parentheses",
                     file="a-reun.tex")
+

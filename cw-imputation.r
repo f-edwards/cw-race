@@ -81,10 +81,10 @@ create.prior<-function(x){
   year<-fc[oi[x,1], "year"]
   ###set pop based on underlying pop of interest
   strong.2000<-fc[which((fc$year==2000)&(fc$stname==st)), var]
-  strong.2009<-fc[which((fc$year==2009)&(fc$stname==st)), var]
+  strong.2007<-fc[which((fc$year==2007)&(fc$stname==st)), var]
   strong.set<-fc[which((fc$year%in%strong)&(fc$stname==st)), var]
   ###WEIGHT ON PROXIMITY TO OBS, with obs - Weight is 0.1 on obs, 0.75 on 2000 at 2001, linear to 0.15 at 2009
-  pr.E<-((0.9-(year-2001)*0.12))*strong.2000+(1-(0.9-(year-2001)*0.12))*strong.2009
+  pr.E<-((0.9-(year-2001)*0.12))*strong.2000+(.1+(year-2001)*0.12)*strong.2007
   all.set<-fc[fc$stname==st,var]
   pr.SD<-1/2*(max(all.set)-min(all.set))##as invese pop penalized - heteroskedastic error
   return(c(pr.E, pr.SD))

@@ -16,25 +16,25 @@ library(sandwich)
 library(plm)
 
 # 
-# setwd("U:/cw-race/")
-# source("U:/cw-race/cw-race-functions.r")
-# fc<-read.csv("U:/cw-race/data/fc.csv")
+# setwd("~/sync/cw-race/")
+# source("~/sync/cw-race/cw-race-functions.r")
+# fc<-read.csv("~/sync/cw-race/data/fc.csv")
 
-# setwd("U:/cw-race/")
-# source("U:/cw-race/cw-race-functions.r")
-# fc<-read.csv("U:/cw-race/data/fc.csv")
+# setwd("~/sync/cw-race/")
+# source("~/sync/cw-race/cw-race-functions.r")
+# fc<-read.csv("~/sync/cw-race/data/fc.csv")
 
 # for laptop
-setwd("U:/cw-race/")
-source("U:/cw-race/cw-race-functions.r")
-fc<-read.csv("U:/cw-race/data/fc.csv", stringsAsFactors = FALSE)
+setwd("~/sync/cw-race/")
+source("~/sync/cw-race/cw-race-functions.r")
+fc<-read.csv("~/sync/cw-race/data/fc.csv", stringsAsFactors = FALSE)
 
 ###robustness checks
-# mort<-read.csv("U:/cw-race/data/infmort.csv")
+# mort<-read.csv("~/sync/cw-race/data/infmort.csv")
 # names(mort)[1:3]<-c("state", "year", "nonwht.inf.mort")
 # mort$mortdisp<-mort[,3]/mort[,4]
 # fc<-left_join(fc, mort, by=c("state", "year"))
-arrest<-read.csv("U:/cw-race/data/ucr-race.csv")
+arrest<-read.csv("~/sync/cw-race/data/ucr-race.csv")
 names(arrest)[2]<-"year"
 ###Treat meas. error as missing for imputation
 missing<-matrix(c(55, 2000, 55, 2001, 51, 2013, 51, 2014, 1, 2011, 1, 2012, 1, 2013, 1, 2014,
@@ -48,11 +48,11 @@ for(i in 1:nrow(missing)){
 
 
 
-welfare<-read.csv("U:/cw-race/data/UKCPR_National_Welfare_Data_12062016.csv", stringsAsFactors = FALSE)
+welfare<-read.csv("~/sync/cw-race/data/UKCPR_National_Welfare_Data_12062016.csv", stringsAsFactors = FALSE)
 names(welfare)[1]<-"stname"
 welfare<-welfare%>%dplyr::filter(year>1999)%>%dplyr::select(stname, year, AFDC.TANF.Recipients, Food.Stamp.SNAP.Recipients, AFDC.TANF.Benefit.for.3.person.family, Medicaid.beneficiaries)
 fc<-left_join(fc, welfare, by=c("stname", "year"))
-rpp<-read.csv("U:/cw-race/data/rpp.csv")
+rpp<-read.csv("~/sync/cw-race/data/rpp.csv")
 rpp$rpp<-rpp$rpp/100
 for(s in rpp$state){
   fc[which(fc$state==s), "AFDC.TANF.Benefit.for.3.person.family"]<-fc[which(fc$state==s), "AFDC.TANF.Benefit.for.3.person.family"]*rpp[which(rpp$state==s), "rpp"]
@@ -89,8 +89,23 @@ for(i in (1:m)){
 #   facet_wrap(~stname)
 # tsstate<-ggplot(fc.imp$imputations[[1]], aes(x=year, y=cl/child))+geom_line()+facet_wrap(~stname)+xlab("Year")+ylab("Caseload per cap.")
 # 
-# ggsave("~/sync/cw-race/figures/dispts.pdf", dispts, height=6, width=8)
-# ggsave("~/sync/cw-race/figures/statets.pdf", tsstate, height=8, width=10)
+# ggsave("~/sync/sync/cw-race/figures/dispts.pdf", dispts, height=6, width=8)
+# ggsave("~/sync/sync/cw-race/figures/statets.pdf", tsstate, height=8, width=10)
+
+z<-ggplot(fc.imp$imputations[[1]])+geom_line(aes(x=year, y=log(bw.disp)))+
+  geom_line(aes(y=log(b.incardisp), x=year), lty=2)+facet_wrap(~stname, nrow=5)+
+  ggtitle("African American disparity in FC caseloads (solid) and incarceration (dashed)")+
+  ylab("Log disparity")+scale_x_continuous(breaks=c(2000,2008))+xlab("Year")
+
+ggsave(z, file="b-inc-fc-ts.pdf", width=8, height=6)
+
+z<-ggplot(fc.imp$imputations[[1]])+geom_line(aes(x=year, y=log(ami.disp)))+
+  geom_line(aes(y=log(a.incardisp), x=year), lty=2)+facet_wrap(~stname, nrow=5)+
+  ggtitle("Native American disparity in FC caseloads (solid) and incarceration (dashed)")+
+  ylab("Log disparity")+scale_x_continuous(breaks=c(2000,2008))+coord_cartesian(ylim=c(-0.5, 4))+xlab("Year")
+
+ggsave(z, file="a-inc-fc-ts.pdf", width=8, height=6)
+
 
 ######## MAIN STATE FE MODEL RESULTS
 #source("state-models.r")
@@ -100,15 +115,18 @@ for(i in (1:m)){
 source("disp-models.r", echo=TRUE)
 
 # RE Model tables
-source("cw-tables.r", echo=TRUE)
+source("~/sync/cw-race/cw-tables.r", echo=TRUE)
 
+source("sim.R", echo=TRUE)
+
+source("~/sync/cw-race/cw-forest.r", echo=TRUE)
 ## BAYESIAN MODELS
 #source("bayes-models.r", echo=TRUE)
 
 #######################
 ## Sim visuals
-# setwd("~/sync/cw-race/figures")
-# source("~/sync/cw-race/sim.R")
+# setwd("~/sync/sync/cw-race/figures")
+# source("~/sync/sync/cw-race/sim.R")
 
 ###Between and within-state variances
 vardat<-fc.imp$imputations[[1]]

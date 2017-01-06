@@ -114,13 +114,13 @@ fclong<-with(fcmap,
              data.frame(name=rep(name, 4),
               q=as.factor(c(returnquant(bw.disp), returnquant(ami.disp), returnquant(b.incardisp), returnquant(a.incardisp)))))
               
-fclong$c<-c(rep("African American/White foster care disproportion", n), 
-            rep("Native American/White foster care disproportion", n), 
-            rep("African American/White Incarceration disproportion", n),
-            rep("Native American/White incarceration disproportion", n))
-fclong$c<-factor(fclong$c, levels=c("African American/White foster care disproportion", 
-                                    "Native American/White foster care disproportion", 
-                                    "African American/White Incarceration disproportion", "Native American/White incarceration disproportion"))
+fclong$c<-c(rep("African American/White foster care disparity", n), 
+            rep("Native American/White foster care disparity", n), 
+            rep("African American/White Incarceration disparity", n),
+            rep("Native American/White incarceration disparity", n))
+fclong$c<-factor(fclong$c, levels=c("African American/White foster care disparity", 
+                                    "Native American/White foster care disparity", 
+                                    "African American/White Incarceration disparity", "Native American/White incarceration disparity"))
 
 map.merge<-merge(us_map, fclong, by="name")
 
@@ -151,8 +151,8 @@ gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank()
 
 ggsave(plot = gg, "DispMapBlue.pdf", height=5.5,width=7)
 
-gg <- ggplot()+ geom_map(data=map.merge%>%filter(c%in%c("African American/White foster care disproportion", 
-                                                        "Native American/White foster care disproportion")), map=us_map,
+gg <- ggplot()+ geom_map(data=map.merge%>%filter(c%in%c("African American/White foster care disparity", 
+                                                        "Native American/White foster care disparity")), map=us_map,
                          aes(x=long, y=lat, map_id=id, fill=q),
                          color="black", size=0.2)+theme_map()+ coord_proj(us_laea_proj)+
   facet_wrap(~c)+

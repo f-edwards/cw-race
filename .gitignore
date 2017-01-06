@@ -21,3 +21,6 @@ vignettes/*.pdf
 #Rstudio cache
 *_cache
 *_files
+
+#Data folder
+/data

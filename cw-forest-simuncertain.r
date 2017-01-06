@@ -4,7 +4,7 @@
 ### Depends on model output from FCmodels.r in working environment (objects ent.results, inst.results)
 library(ggplot2)
 library(dplyr)
-source("~/Dropbox/cw-race/sim.R")
+source("~/sync/cw-race/sim.R")
 
 ###sim from posterior - pull results from sim.R
 ### Count models
