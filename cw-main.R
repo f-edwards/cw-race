@@ -111,7 +111,7 @@ for(i in (1:m)){
 #source("state-models.r")
 
 ######################################
-## RE MODELS
+## Main models
 source("disp-models.r", echo=TRUE)
 
 # RE Model tables
