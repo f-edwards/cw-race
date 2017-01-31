@@ -91,20 +91,20 @@ for(i in (1:m)){
 # 
 # ggsave("~/sync/sync/cw-race/figures/dispts.pdf", dispts, height=6, width=8)
 # ggsave("~/sync/sync/cw-race/figures/statets.pdf", tsstate, height=8, width=10)
-
-z<-ggplot(fc.imp$imputations[[1]])+geom_line(aes(x=year, y=log(bw.disp)))+
-  geom_line(aes(y=log(b.incardisp), x=year), lty=2)+facet_wrap(~stname, nrow=5)+
-  ggtitle("African American disparity in FC caseloads (solid) and incarceration (dashed)")+
-  ylab("Log disparity")+scale_x_continuous(breaks=c(2000,2008))+xlab("Year")
-
-ggsave(z, file="b-inc-fc-ts.pdf", width=8, height=6)
-
-z<-ggplot(fc.imp$imputations[[1]])+geom_line(aes(x=year, y=log(ami.disp)))+
-  geom_line(aes(y=log(a.incardisp), x=year), lty=2)+facet_wrap(~stname, nrow=5)+
-  ggtitle("Native American disparity in FC caseloads (solid) and incarceration (dashed)")+
-  ylab("Log disparity")+scale_x_continuous(breaks=c(2000,2008))+coord_cartesian(ylim=c(-0.5, 4))+xlab("Year")
-
-ggsave(z, file="a-inc-fc-ts.pdf", width=8, height=6)
+# 
+# z<-ggplot(fc.imp$imputations[[1]])+geom_line(aes(x=year, y=log(bw.disp)))+
+#   geom_line(aes(y=log(b.incardisp), x=year), lty=2)+facet_wrap(~stname, nrow=5)+
+#   ggtitle("African American disparity in FC caseloads (solid) and incarceration (dashed)")+
+#   ylab("Log disparity")+scale_x_continuous(breaks=c(2000,2008))+xlab("Year")
+# 
+# ggsave(z, file="b-inc-fc-ts.pdf", width=8, height=6)
+# 
+# z<-ggplot(fc.imp$imputations[[1]])+geom_line(aes(x=year, y=log(ami.disp)))+
+#   geom_line(aes(y=log(a.incardisp), x=year), lty=2)+facet_wrap(~stname, nrow=5)+
+#   ggtitle("Native American disparity in FC caseloads (solid) and incarceration (dashed)")+
+#   ylab("Log disparity")+scale_x_continuous(breaks=c(2000,2008))+coord_cartesian(ylim=c(-0.5, 4))+xlab("Year")
+# 
+# ggsave(z, file="a-inc-fc-ts.pdf", width=8, height=6)
 
 
 ######## MAIN STATE FE MODEL RESULTS
@@ -115,11 +115,11 @@ ggsave(z, file="a-inc-fc-ts.pdf", width=8, height=6)
 source("disp-models.r", echo=TRUE)
 
 # RE Model tables
-source("~/sync/cw-race/cw-tables.r", echo=TRUE)
+#source("~/sync/cw-race/cw-tables.r", echo=TRUE)
 
-source("sim.R", echo=TRUE)
+#source("sim.R", echo=TRUE)
 
-source("~/sync/cw-race/cw-forest.r", echo=TRUE)
+#source("~/sync/cw-race/cw-forest.r", echo=TRUE)
 ## BAYESIAN MODELS
 #source("bayes-models.r", echo=TRUE)
 

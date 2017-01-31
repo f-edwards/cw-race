@@ -141,12 +141,23 @@ for(i in 1:ncount){
 sim.bd$m<-"African American"
 sim.ad$m<-"Native American"
 
+sim.bd1<-sim.bd
+sim.bd1$m<-"Caseloads"
+sim.ad1<-sim.ad
+sim.ad1$m<-"Caseloads"
+
 sim.b.ent$m<-"African American"
 sim.a.ent$m<-"Native American"
+
+sim.b.ent1<-sim.b.ent
+sim.a.ent1<-sim.a.ent
+sim.b.ent1$m<-"Entries"
+sim.a.ent1$m<-"Entries"
+
 sim.ent<-rbind(sim.b.ent, sim.a.ent)
 
-sim.b<-rbind(sim.bd, sim.b.ent)
-sim.a<-rbind(sim.ad, sim.a.ent)
+sim.b<-rbind(sim.bd1, sim.b.ent1)
+sim.a<-rbind(sim.ad1, sim.a.ent1)
 
 sim.ent<-rbind(sim.b.ent, sim.a.ent)
 sim.cl<-rbind(sim.bd, sim.ad)

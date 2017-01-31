@@ -1,6 +1,6 @@
 
 
-b.disp<-lapply(fc.imp$imputations, function(d) 
+b.disp1<-lapply(fc.imp$imputations, function(d) 
   lmer(log(bw.disp)~scale(b.incardisp)+
          scale(bdisp.chpov)+
          scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
@@ -11,25 +11,12 @@ b.disp<-lapply(fc.imp$imputations, function(d)
          year.c+
          scale(tanf.adeq)+
          scale(tanf.incl)+
-         scale(medicaid.incl)+
          scale(snap.incl)+
+         scale(I(tanf.adeq)^2)+
+         scale(I(tanf.incl)^2)+
+         scale(I(snap.incl)^2)+
          (1|state),
        data=d))
-
-b.disp<-lapply(fc.imp$imputations, function(d) 
-  lm(log(bw.disp)~scale(b.incardisp)+
-         scale(bdisp.chpov)+
-         scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
-         scale(I(blk.lessHS/wht.lessHS))+
-         scale(pctblk)+
-         scale(inst6014_nom)+
-         scale(b.arrest.disp)+
-         year.c+
-         scale(tanf.adeq)+
-         scale(tanf.incl)+
-         scale(medicaid.incl)+
-         scale(snap.incl),
-       data=d%>%filter(year==2014)))
 
 b.disp.mean<-lapply(fc.imp$imputations, function(d) 
   lmer(log(bw.disp)~
@@ -86,6 +73,25 @@ a.disp<-lapply(fc.imp$imputations, function(d)
          (1|state),
        data=d))
 
+a.disp1<-lapply(fc.imp$imputations, function(d) 
+  lmer(sqrt(ami.disp)~
+         scale(a.incardisp)+
+         scale(adisp.chpov)+
+         scale(a.unemp.rt/w.unemp.rt)+scale(a.singpar.rt/w.singpar.rt)+
+         scale(amind.lessHS/wht.lessHS)+
+         scale(pctami)+
+         scale(inst6014_nom)+
+         scale(ai.arrest.disp)+
+         year.c+
+         scale(tanf.adeq)+
+         scale(tanf.incl)+
+         scale(snap.incl)+
+         scale(I(tanf.adeq)^2)+
+         scale(I(tanf.incl)^2)+
+         scale(I(snap.incl)^2)+
+         (1|state),
+       data=d))
+
 a.disp.mean<-lapply(fc.imp$imputations, function(d) 
   lmer(sqrt(ami.disp)~
          scale(a.incardisp)+scale(a.incardisp.mean)+
@@ -109,6 +115,13 @@ a.disp.mean.tab<-makeMIRegTab(a.disp.mean)
 b.d.tab<-makeMIRegTab(b.disp)
 a.d.tab<-makeMIRegTab(a.disp)
 
+b.d.tab1<-makeMIRegTab(b.disp1)
+a.d.tab1<-makeMIRegTab(a.disp1)
+
+print(xtable(b.d.tab, caption="Black caseload disparity"), type="html", file="bcl-noquad.html")
+print(xtable(b.d.tab1, caption="Black caseload disparity"), type="html", file="bcl-quad.html")
+print(xtable(a.d.tab, caption="Native American caseload disparity"), type="html", file="acl-noquad.html")
+print(xtable(a.d.tab1, caption="Native American caseload disparity"), type="html", file="acl-quad.html")
 
 b.ent.disp<-lapply(fc.imp$imputations, function(d) 
   lmer(log((ent.blk/blk.child)/(ent.white/wht.child))~scale(b.incardisp)+

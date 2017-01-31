@@ -114,13 +114,13 @@ fclong<-with(fcmap,
              data.frame(name=rep(name, 4),
               q=as.factor(c(returnquant(bw.disp), returnquant(ami.disp), returnquant(b.incardisp), returnquant(a.incardisp)))))
               
-fclong$c<-c(rep("African American/White foster care disparity", n), 
-            rep("Native American/White foster care disparity", n), 
-            rep("African American/White Incarceration disparity", n),
-            rep("Native American/White incarceration disparity", n))
-fclong$c<-factor(fclong$c, levels=c("African American/White foster care disparity", 
-                                    "Native American/White foster care disparity", 
-                                    "African American/White Incarceration disparity", "Native American/White incarceration disparity"))
+fclong$c<-c(rep("Afr Am foster care disparity", n), 
+            rep("Native Am foster care disparity", n), 
+            rep("Afr Am incarceration disparity", n),
+            rep("Native Am incarceration disparity", n))
+fclong$c<-factor(fclong$c, levels=c("Afr Am foster care disparity", 
+                                    "Native Am foster care disparity", 
+                                    "Afr Am incarceration disparity", "Native Am incarceration disparity"))
 
 map.merge<-merge(us_map, fclong, by="name")
 
@@ -144,15 +144,15 @@ gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank()
   theme(legend.position="bottom")+
   theme(legend.key.size= unit(0.3, "cm"))+
   theme(strip.background=element_blank(), 
-        strip.text.x=element_text(size=10),
+        strip.text.x=element_text(size=12),
         strip.text.y=element_blank())
 
 #print(gg)
 
 ggsave(plot = gg, "DispMapBlue.pdf", height=5.5,width=7)
 
-gg <- ggplot()+ geom_map(data=map.merge%>%filter(c%in%c("African American/White foster care disparity", 
-                                                        "Native American/White foster care disparity")), map=us_map,
+gg <- ggplot()+ geom_map(data=map.merge%>%filter(c%in%c("Afr Am foster care disparity", 
+                                                        "Native Am foster care disparity")), map=us_map,
                          aes(x=long, y=lat, map_id=id, fill=q),
                          color="black", size=0.2)+theme_map()+ coord_proj(us_laea_proj)+
   facet_wrap(~c)+
@@ -163,12 +163,12 @@ gg<-gg +theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank()
               panel.border = element_blank(), panel.background=element_blank())+
   scale_y_continuous(name="", breaks=NULL)+
   scale_x_continuous(name="", breaks=NULL)+
-  theme(legend.title=element_text(size=10))+
-  theme(legend.text=element_text(size=10))+
+  theme(legend.title=element_text(size=12))+
+  theme(legend.text=element_text(size=12))+
   theme(legend.position="bottom")+
   theme(legend.key.size= unit(0.3, "cm"))+
   theme(strip.background=element_blank(), 
-        strip.text.x=element_text(size=10),
+        strip.text.x=element_text(size=12),
         strip.text.y=element_blank())
 
 #print(gg)
