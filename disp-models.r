@@ -1,6 +1,4 @@
-
-
-b.disp1<-lapply(fc.imp$imputations, function(d) 
+b.disp<-lapply(fc.imp$imputations, function(d) 
   lmer(log(bw.disp)~scale(b.incardisp)+
          scale(bdisp.chpov)+
          scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
@@ -12,9 +10,27 @@ b.disp1<-lapply(fc.imp$imputations, function(d)
          scale(tanf.adeq)+
          scale(tanf.incl)+
          scale(snap.incl)+
+         scale(medicaid.incl)+
+         (1|state),
+       data=d))
+
+b.disp.welf<-lapply(fc.imp$imputations, function(d) 
+  lmer(log(bw.disp)~scale(b.incardisp)+
+         scale(bdisp.chpov)+
+         scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
+         scale(I(blk.lessHS/wht.lessHS))+
+         scale(pctblk)+
+         scale(inst6014_nom)+
+         scale(b.arrest.disp)+
+         year.c+
+         scale(tanf.adeq)+
+         scale(tanf.incl)+
+         scale(snap.incl)+
+         scale(medicaid.incl)+
          scale(I(tanf.adeq)^2)+
          scale(I(tanf.incl)^2)+
          scale(I(snap.incl)^2)+
+         scale(I(medicaid.incl)^2)+
          (1|state),
        data=d))
 
@@ -38,24 +54,6 @@ b.disp.mean<-lapply(fc.imp$imputations, function(d)
 
 b.disp.mean.tab<-makeMIRegTab(b.disp.mean)
 
-# b.disp.fe<-lapply(fc.imp$imputations, function(d) 
-#   lm(log(bw.disp)~scale(b.incardisp)+
-#          scale(bdisp.chpov)+
-#          scale(I(b.unemp.rt/w.unemp.rt))+
-#          scale(I(b.singpar.rt/w.singpar.rt))+
-#          scale(I(blk.lessHS/wht.lessHS))+
-#          scale(pctblk)+
-#          scale(inst6014_nom)+
-#          scale(b.arrest.disp)+
-#          year.c+
-#          scale(tanf.adeq)+
-#          scale(tanf.incl)+
-#          scale(medicaid.incl)+
-#          scale(snap.incl)+
-#          factor(state),
-#        data=d))
-# NEAT! RE yields identical results
-
 a.disp<-lapply(fc.imp$imputations, function(d) 
   lmer(sqrt(ami.disp)~
          scale(a.incardisp)+
@@ -73,7 +71,7 @@ a.disp<-lapply(fc.imp$imputations, function(d)
          (1|state),
        data=d))
 
-a.disp1<-lapply(fc.imp$imputations, function(d) 
+a.disp.welf<-lapply(fc.imp$imputations, function(d) 
   lmer(sqrt(ami.disp)~
          scale(a.incardisp)+
          scale(adisp.chpov)+
@@ -86,9 +84,11 @@ a.disp1<-lapply(fc.imp$imputations, function(d)
          scale(tanf.adeq)+
          scale(tanf.incl)+
          scale(snap.incl)+
+         scale(medicaid.incl)+
          scale(I(tanf.adeq)^2)+
          scale(I(tanf.incl)^2)+
          scale(I(snap.incl)^2)+
+         scale(I(medicaid.incl)^2)+
          (1|state),
        data=d))
 
@@ -115,8 +115,8 @@ a.disp.mean.tab<-makeMIRegTab(a.disp.mean)
 b.d.tab<-makeMIRegTab(b.disp)
 a.d.tab<-makeMIRegTab(a.disp)
 
-b.d.tab1<-makeMIRegTab(b.disp1)
-a.d.tab1<-makeMIRegTab(a.disp1)
+b.d.welf.tab<-makeMIRegTab(b.disp.welf)
+a.d.welf.tab<-makeMIRegTab(a.disp.welf)
 
 print(xtable(b.d.tab, caption="Black caseload disparity"), type="html", file="bcl-noquad.html")
 print(xtable(b.d.tab1, caption="Black caseload disparity"), type="html", file="bcl-quad.html")
@@ -136,6 +136,26 @@ b.ent.disp<-lapply(fc.imp$imputations, function(d)
          scale(tanf.incl)+
          scale(medicaid.incl)+
          scale(snap.incl)+
+         (1|state),
+       data=d))
+
+b.ent.disp.welf<-lapply(fc.imp$imputations, function(d) 
+  lmer(log((ent.blk/blk.child)/(ent.white/wht.child))~scale(b.incardisp)+
+         scale(bdisp.chpov)+
+         scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
+         scale(I(blk.lessHS/wht.lessHS))+
+         scale(pctblk)+
+         scale(inst6014_nom)+
+         scale(b.arrest.disp)+
+         year.c+
+         scale(tanf.adeq)+
+         scale(tanf.incl)+
+         scale(snap.incl)+
+         scale(medicaid.incl)+
+         scale(I(tanf.adeq)^2)+
+         scale(I(tanf.incl)^2)+
+         scale(I(snap.incl)^2)+
+         scale(I(medicaid.incl)^2)+
          (1|state),
        data=d))
 
@@ -173,6 +193,26 @@ a.ent.disp<-lapply(fc.imp$imputations, function(d)
          (1|state),
        data=d))
 
+a.ent.disp.welf<-lapply(fc.imp$imputations, function(d) 
+  lmer(sqrt((ent.nat.am/amind.child)/(ent.white/wht.child))~scale(a.incardisp)+
+         scale(adisp.chpov)+
+         scale(a.unemp.rt/w.unemp.rt)+scale(a.singpar.rt/w.singpar.rt)+
+         scale(amind.lessHS/wht.lessHS)+
+         scale(pctami)+
+         scale(inst6014_nom)+
+         scale(ai.arrest.disp)+
+         year.c+
+         scale(tanf.adeq)+
+         scale(tanf.incl)+
+         scale(medicaid.incl)+
+         scale(snap.incl)+
+         scale(I(tanf.adeq)^2)+
+         scale(I(tanf.incl)^2)+
+         scale(I(snap.incl)^2)+
+         scale(I(medicaid.incl)^2)+
+         (1|state),
+       data=d))
+
 a.ent.disp.mean<-lapply(fc.imp$imputations, function(d) 
   lmer(sqrt((ent.nat.am/amind.child)/(ent.white/wht.child))~
          scale(a.incardisp)+scale(a.incardisp.mean)+
@@ -195,6 +235,8 @@ b.ent.tab<-makeMIRegTab(b.ent.disp)
 a.ent.tab<-makeMIRegTab(a.ent.disp)
 b.ent.tab.mean<-makeMIRegTab(b.ent.disp.mean)
 a.ent.tab.mean<-makeMIRegTab(a.ent.disp.mean)
+b.ent.welf.tab<-makeMIRegTab(b.ent.disp.welf)
+a.ent.welf.tab<-makeMIRegTab(b.ent.disp.welf)
 
 
 b.reun<-lapply(fcb.reun.imp, function(d) lmer(log((reun.blk/cl.blk)/(reun.white/cl.white)) ~ scale(b.incardisp)+
@@ -210,6 +252,24 @@ b.reun<-lapply(fcb.reun.imp, function(d) lmer(log((reun.blk/cl.blk)/(reun.white/
                scale(medicaid.incl)+
                scale(snap.incl)+
              (1|state), data=d))
+
+b.reun.welf<-lapply(fcb.reun.imp, function(d) lmer(log((reun.blk/cl.blk)/(reun.white/cl.white)) ~ scale(b.incardisp)+
+                                                scale(bdisp.chpov)+
+                                                scale(I(b.unemp.rt/w.unemp.rt))+scale(I(b.singpar.rt/w.singpar.rt))+
+                                                scale(I(blk.lessHS/wht.lessHS))+
+                                                scale(pctblk)+
+                                                scale(inst6014_nom)+
+                                                scale(b.arrest.disp)+
+                                                year.c+
+                                                scale(tanf.adeq)+
+                                                scale(tanf.incl)+
+                                                scale(medicaid.incl)+
+                                                scale(snap.incl)+
+                                                scale(I(tanf.adeq)^2)+
+                                                scale(I(tanf.incl)^2)+
+                                                scale(I(snap.incl)^2)+
+                                                scale(I(medicaid.incl)^2)+
+                                                (1|state), data=d))
 
 b.reun.mean<-lapply(fcb.reun.imp, function(d) lmer(log((reun.blk/cl.blk)/(reun.white/cl.white)) ~ 
                                                 scale(b.incardisp)+scale(b.incardisp.mean)+
@@ -243,6 +303,27 @@ a.reun<-lapply(fcn.reun.imp, function(d)
          (1|state),
        data=d))
 
+a.reun.welf<-lapply(fcn.reun.imp, function(d) 
+  lmer((sqrt((reun.nat.am/cl.nat.am)/(reun.white/cl.white)))~scale(a.incardisp)+
+         scale(adisp.chpov)+
+         scale(a.unemp.rt/w.unemp.rt)+scale(a.singpar.rt/w.singpar.rt)+
+         scale(amind.lessHS/wht.lessHS)+
+         scale(pctami)+
+         scale(inst6014_nom)+
+         scale(ai.arrest.disp)+
+         year.c+
+         scale(tanf.adeq)+
+         scale(tanf.incl)+
+         scale(medicaid.incl)+
+         scale(snap.incl)+
+         scale(I(tanf.adeq)^2)+
+         scale(I(tanf.incl)^2)+
+         scale(I(snap.incl)^2)+
+         scale(I(medicaid.incl)^2)+
+         (1|state),
+       data=d))
+
+
 a.reun.mean<-lapply(fcn.reun.imp, function(d) 
   lmer((sqrt((reun.nat.am/cl.nat.am)/(reun.white/cl.white)))~
          scale(a.incardisp)+scale(a.incardisp.mean)+
@@ -266,6 +347,9 @@ b.reun.tab<-makeMIRegTab(b.reun)
 a.reun.tab<-makeMIRegTab(a.reun)
 b.reun.tab.mean<-makeMIRegTab(b.reun.mean)
 a.reun.tab.mean<-makeMIRegTab(a.reun.mean)
+b.reun.welf.tab<-makeMIRegTab(b.reun.welf)
+a.reun.welf.tab<-makeMIRegTab(a.reun.welf)
+
 
 
 

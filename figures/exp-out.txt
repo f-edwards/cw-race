@@ -1,27 +1,27 @@
 [1] "CL Sims"
-            e    upper    lower         x         p                m
-500  3.865933 4.255375 3.504706  7.388072 0.4995495 African American
-1    3.630605 4.039042 3.262982  3.848396 0.0500000 African American
-1000 4.554836 5.115926 4.050927 16.556490 0.9500000 African American
-            e    upper    lower         x         p               m
-500  3.270320 4.700723 2.093989 2.0833137 0.4995495 Native American
-1    2.722541 4.305081 1.567110 0.1089037 0.0500000 Native American
-1000 5.709836 8.410301 3.151688 9.0438680 0.9500000 Native American
+            e    upper    lower         x        p                m
+500  3.894852 4.304671 3.522042  7.350399 0.495005 African American
+1    3.601336 4.057089 3.198224  2.258286 0.001000 African American
+1000 4.813952 5.559870 4.136313 20.936296 0.990000 African American
+            e     upper    lower         x        p               m
+500  3.158995  4.573925 1.966776  2.067974 0.495005 Native American
+1    2.677795  4.161031 1.505055  0.000000 0.001000 Native American
+1000 7.762799 12.651494 3.744539 16.197827 0.990000 Native American
 [1] "Ent sims"
-            e    upper    lower         x         p                m
-500  3.396500 3.731424 3.083157  7.388072 0.4995495 African American
-1    3.258078 3.629740 2.916874  3.848396 0.0500000 African American
-1000 3.789273 4.274690 3.352070 16.556490 0.9500000 African American
-            e    upper    lower         x         p               m
-500  3.077273 4.279060 2.072796 2.0833137 0.4995495 Native American
-1    2.469087 3.823734 1.466571 0.1089037 0.0500000 Native American
-1000 5.867748 8.546010 3.351360 9.0438680 0.9500000 Native American
+      e upper lower  x  p                m
+500  NA    NA    NA NA NA African American
+1    NA    NA    NA NA NA African American
+1000 NA    NA    NA NA NA African American
+      e upper lower  x  p               m
+500  NA    NA    NA NA NA Native American
+1    NA    NA    NA NA NA Native American
+1000 NA    NA    NA NA NA Native American
 [1] "Reun sims"
-             e     upper     lower         x         p                m
-500  0.8091565 0.8487839 0.7713044  7.388072 0.4995495 African American
-1    0.8309335 0.8803815 0.7839666  3.848396 0.0500000 African American
-1000 0.7558461 0.8068291 0.7065019 16.556490 0.9500000 African American
-             e     upper     lower         x         p               m
-500  0.9194161 0.9959219 0.8440591 2.0833137 0.4995495 Native American
-1    0.9136380 0.9991635 0.8291819 0.1089037 0.0500000 Native American
-1000 0.9412007 1.0805749 0.8099433 9.0438680 0.9500000 Native American
+      e upper lower  x  p                m
+500  NA    NA    NA NA NA African American
+1    NA    NA    NA NA NA African American
+1000 NA    NA    NA NA NA African American
+      e upper lower  x  p               m
+500  NA    NA    NA NA NA Native American
+1    NA    NA    NA NA NA Native American
+1000 NA    NA    NA NA NA Native American
