@@ -10,7 +10,7 @@ library(ggthemes)
 library(viridis)
 library(scales)
 library(RColorBrewer)
-
+library(dplyr)
 
 setwd("~/sync/cw-race/figures")
 

@@ -8,12 +8,12 @@ library(texreg)
 library(dplyr)
 library(arm)
 library(MASS)
-library(rstanarm, options(mc.cores = parallel::detectCores()))
-library(rstan)
-library(multiwayvcov)
-library(lmtest)
-library(sandwich)
-library(plm)
+# library(rstanarm, options(mc.cores = parallel::detectCores()))
+# library(rstan)
+# library(multiwayvcov)
+# library(lmtest)
+# library(sandwich)
+#library(plm)
 
 # 
 # setwd("~/sync/cw-race/")
@@ -115,9 +115,9 @@ for(i in (1:m)){
 source("disp-models.r", echo=TRUE)
 
 # RE Model tables
-#source("~/sync/cw-race/cw-tables.r", echo=TRUE)
+source("~/sync/cw-race/cw-tables.r", echo=TRUE)
 
-#source("sim.R", echo=TRUE)
+source("sim.R", echo=TRUE)
 
 #source("~/sync/cw-race/cw-forest.r", echo=TRUE)
 ## BAYESIAN MODELS
