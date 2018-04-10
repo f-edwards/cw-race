@@ -1,0 +1,55 @@
+---
+title: "Policy regime sandbox"
+author: "Frank Edwards"
+date: "May 12, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Hypothesis:
+
+Soss et al. suggest policy regimes are systematically racialized. Criminal justice and neoliberal paternalism lock in, driven by racial classification. I'm suggesting that this is true for neolib paternalism, but need to look at welfare paternalism too. Going to see different patterns.
+
+got a 2x2x2 table
+
+CJ punishment: low/high
+
+Welf pat: low/high
+
+Welf pat low
+
+            |CJ low | CJ high
+Neolib low  | prog  | ?
+Neolib high | weak  | closure
+
+Welf pat high
+
+            |CJ low | CJ high
+Neolib low  | redistributive pat  | classical paternalism
+Neolib high | ?  | full punitive
+
+actually populate these tables with observed data. track whether states move over time
+
+*predictions* 
+
+- White: (+) incar, (-) TANF 
+- Black: (+) incar, (+) TANF (excluded under closure/weak systems)
+- AmInd: (+) incar, (0) TANF (simple punitive, states have limited welfare policy for AmInd)
+
+Closure regime: high neolib paternalism, high CJ involvement, low welfare paternalism
+Paternalist regime: high neolib paternalism, high cj involvement, high welfare paternalism
+
+```{r cars}
+source("cw-regime.r")
+
+display(b.cl)
+display(w.cl)
+display(a.cl)
+```
+
+Looks largely consistent with predictions. Need to re-read soss, clarify regime argument. explain why I predict race to matter for quadrants. 
