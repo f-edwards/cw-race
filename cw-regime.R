@@ -25,9 +25,9 @@ library(MASS)
 # fc<-read.csv("~/sync/cw-race/data/fc.csv")
 
 # for laptop
-setwd("C:/sync/cw-race/")
-source("C:/sync/cw-race/cw-race-functions.r")
-fc<-read.csv("C:/sync/cw-race/data/fc.csv", stringsAsFactors = FALSE)
+setwd("C:/Users/frank/Dropbox/data_analysis/cw-race")
+source("./cw-race-functions.r")
+fc<-read.csv("./data/fc.csv", stringsAsFactors = FALSE)
 
 ###robustness checks
 # mort<-read.csv("~/sync/cw-race/data/infmort.csv")

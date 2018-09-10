@@ -3,6 +3,7 @@ b.cl<-lmer(log(cl.blk/blk.child)~scale(b.incarrt)+
          scale(b.unemp.rt)+scale(b.singpar.rt)+
          scale(blk.lessHS)+
          scale(pctblk)+
+         scale(pctblk1930)+
          scale(inst6014_nom)+
          scale(b.arrest.pc)+
          year.c+

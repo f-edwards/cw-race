@@ -8,6 +8,8 @@ library(texreg)
 library(dplyr)
 library(arm)
 library(MASS)
+setwd("C:/Users/fre9/Dropbox/data_analysis/cw-race")
+select<-dplyr::select
 # library(rstanarm, options(mc.cores = parallel::detectCores()))
 # library(rstan)
 # library(multiwayvcov)
@@ -16,25 +18,25 @@ library(MASS)
 #library(plm)
 
 # 
-# setwd("~/sync/cw-race/")
-# source("~/sync/cw-race/cw-race-functions.r")
-# fc<-read.csv("~/sync/cw-race/data/fc.csv")
+# setwd("./")
+# source("./cw-race-functions.r")
+# fc<-read.csv("./data/fc.csv")
 
-# setwd("~/sync/cw-race/")
-# source("~/sync/cw-race/cw-race-functions.r")
-# fc<-read.csv("~/sync/cw-race/data/fc.csv")
+# setwd("./")
+# source("./cw-race-functions.r")
+# fc<-read.csv("./data/fc.csv")
 
 # for laptop
-setwd("~/sync/cw-race/")
-source("~/sync/cw-race/cw-race-functions.r")
-fc<-read.csv("~/sync/cw-race/data/fc.csv", stringsAsFactors = FALSE)
+setwd("./")
+source("./cw-race-functions.r")
+fc<-read.csv("./data/fc.csv", stringsAsFactors = FALSE)
 
 ###robustness checks
-# mort<-read.csv("~/sync/cw-race/data/infmort.csv")
+# mort<-read.csv("./data/infmort.csv")
 # names(mort)[1:3]<-c("state", "year", "nonwht.inf.mort")
 # mort$mortdisp<-mort[,3]/mort[,4]
 # fc<-left_join(fc, mort, by=c("state", "year"))
-arrest<-read.csv("~/sync/cw-race/data/ucr-race.csv")
+arrest<-read.csv("./data/ucr-race.csv")
 names(arrest)[2]<-"year"
 ###Treat meas. error as missing for imputation
 missing<-matrix(c(55, 2000, 55, 2001, 51, 2013, 51, 2014, 1, 2011, 1, 2012, 1, 2013, 1, 2014,
@@ -48,11 +50,11 @@ for(i in 1:nrow(missing)){
 
 
 
-welfare<-read.csv("~/sync/cw-race/data/UKCPR_National_Welfare_Data_12062016.csv", stringsAsFactors = FALSE)
+welfare<-read.csv("./data/UKCPR_National_Welfare_Data_12062016.csv", stringsAsFactors = FALSE)
 names(welfare)[1]<-"stname"
 welfare<-welfare%>%dplyr::filter(year>1999)%>%dplyr::select(stname, year, AFDC.TANF.Recipients, Food.Stamp.SNAP.Recipients, AFDC.TANF.Benefit.for.3.person.family, Medicaid.beneficiaries)
 fc<-left_join(fc, welfare, by=c("stname", "year"))
-rpp<-read.csv("~/sync/cw-race/data/rpp.csv")
+rpp<-read.csv("./data/rpp.csv")
 rpp$rpp<-rpp$rpp/100
 for(s in rpp$state){
   fc[which(fc$state==s), "AFDC.TANF.Benefit.for.3.person.family"]<-fc[which(fc$state==s), "AFDC.TANF.Benefit.for.3.person.family"]*rpp[which(rpp$state==s), "rpp"]
@@ -115,11 +117,11 @@ for(i in (1:m)){
 source("disp-models.r", echo=TRUE)
 
 # RE Model tables
-source("~/sync/cw-race/cw-tables.r", echo=TRUE)
+source("./cw-tables.r", echo=TRUE)
 
 source("sim.R", echo=TRUE)
 
-#source("~/sync/cw-race/cw-forest.r", echo=TRUE)
+#source("./cw-forest.r", echo=TRUE)
 ## BAYESIAN MODELS
 #source("bayes-models.r", echo=TRUE)
 

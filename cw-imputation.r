@@ -5,10 +5,6 @@ fc$cl.blk<-as.integer(fc$cl.blk)
 fc$cl.nat.am<-as.integer(fc$cl.nat.am)
 fc$cl<-as.integer(fc$cl)
 
-
-
-
-
 colClass<-sapply(fc, class)
 colClass[2]<-"year"
 colClass[66:73]<-"hist"
@@ -220,3 +216,11 @@ for(i in 1:m){
            clrt.blk.lead=lead(cl.blk)/lead(blk.child), cl.nat.am.lead=lead(cl.nat.am)/lead(amind.child),
            clrt.blk.lag2=lag(cl.blk.pc, n=2), clrt.nat.am.lag2=lag(cl.amind.pc, n=2))
 }
+
+dat<-fc.imp$imputations[[1]]
+dat$imp<-1
+for(i in 2:length(fc.imp$imputations)){
+  dat<-rbind(dat, fc.imp$imputations[[2]]%>%mutate(imp=i))
+}
+
+write.csv(dat, "./data/dat_imp.csv", row.names = FALSE)
